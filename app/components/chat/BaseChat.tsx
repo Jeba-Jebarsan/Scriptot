@@ -12,7 +12,7 @@ import { classNames } from '~/utils/classNames';
 import { MODEL_LIST, PROVIDER_LIST, initializeModelList } from '~/utils/constants';
 import { Messages } from './Messages.client';
 import { SendButton } from './SendButton.client';
-import { APIKeyManager, getApiKeysFromCookies } from './APIKeyManager';
+
 import Cookies from 'js-cookie';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
@@ -64,6 +64,7 @@ interface BaseChatProps {
   setImageDataList?: (dataList: string[]) => void;
   actionAlert?: ActionAlert;
   clearAlert?: () => void;
+  children?: React.ReactNode;
 }
 
 export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
@@ -101,7 +102,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
-    const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookies());
+    const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
     const [modelList, setModelList] = useState(MODEL_LIST);
     const [isModelSettingsCollapsed, setIsModelSettingsCollapsed] = useState(false);
     const [isListening, setIsListening] = useState(false);
@@ -173,7 +174,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         let parsedApiKeys: Record<string, string> | undefined = {};
 
         try {
-          parsedApiKeys = getApiKeysFromCookies();
+          parsedApiKeys = {};
           setApiKeys(parsedApiKeys);
         } catch (error) {
           console.error('Error loading API keys from cookies:', error);
@@ -324,10 +325,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             {!chatStarted && (
               <div id="intro" className="mt-[16vh] max-w-chat mx-auto text-center px-4 lg:px-0">
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                  Where ideas begin
+                  Build Faster, <span className="bg-gradient-to-r from-[#6e6939] via-[#9b6d33] to-[#b06f32] bg-clip-text text-transparent">Build Smarter</span>
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Bring ideas to life in seconds or get help on existing projects.
+                  Create apps instantly with CodeIQ's AI-driven full-stack development tools, or receive expert help for your existing projects
                 </p>
               </div>
             )}
@@ -387,10 +388,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         gradientUnits="userSpaceOnUse"
                         gradientTransform="rotate(-45)"
                       >
-                        <stop offset="0%" stopColor="#b44aff" stopOpacity="0%"></stop>
-                        <stop offset="40%" stopColor="#b44aff" stopOpacity="80%"></stop>
-                        <stop offset="50%" stopColor="#b44aff" stopOpacity="80%"></stop>
-                        <stop offset="100%" stopColor="#b44aff" stopOpacity="0%"></stop>
+                        <stop offset="0%" stopColor="#195ba8" stopOpacity="0%"></stop>
+                        <stop offset="40%" stopColor="#195ba8" stopOpacity="80%"></stop>
+                        <stop offset="50%" stopColor="#195ba8" stopOpacity="80%"></stop>
+                        <stop offset="100%" stopColor="#195ba8" stopOpacity="0%"></stop>
                       </linearGradient>
                       <linearGradient id="shine-gradient">
                         <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>
@@ -417,15 +418,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             apiKeys={apiKeys}
                             modelLoading={isModelLoading}
                           />
-                          {(providerList || []).length > 0 && provider && (
-                            <APIKeyManager
-                              provider={provider}
-                              apiKey={apiKeys[provider.name] || ''}
-                              setApiKey={(key) => {
-                                onApiKeysChange(provider.name, key);
-                              }}
-                            />
-                          )}
                         </div>
                       )}
                     </ClientOnly>
@@ -520,7 +512,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         minHeight: TEXTAREA_MIN_HEIGHT,
                         maxHeight: TEXTAREA_MAX_HEIGHT,
                       }}
-                      placeholder="How can Bolt help you today?"
+                      placeholder="Let’s build something together!"
                       translate="no"
                     />
                     <ClientOnly>

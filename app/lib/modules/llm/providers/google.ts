@@ -20,6 +20,7 @@ export default class GoogleProvider extends BaseProvider {
     { name: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro', provider: 'Google', maxTokenAllowed: 8192 },
     { name: 'gemini-1.5-pro-002', label: 'Gemini 1.5 Pro-002', provider: 'Google', maxTokenAllowed: 8192 },
     { name: 'gemini-exp-1206', label: 'Gemini exp-1206', provider: 'Google', maxTokenAllowed: 8192 },
+    { name: 'gemini-2.0-flash-thinking-exp-1219', label: 'Gemini 2.0 Flash Thinking', provider: 'Google', maxTokenAllowed: 8192 },
   ];
 
   getModelInstance(options: {

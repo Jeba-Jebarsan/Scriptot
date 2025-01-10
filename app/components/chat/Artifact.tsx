@@ -58,15 +58,23 @@ export const Artifact = memo(({ messageId }: ArtifactProps) => {
     }
   }, [actions]);
 
+  const handleWorkbenchClick = () => {
+    const showWorkbench = workbenchStore.showWorkbench.get();
+    workbenchStore.showWorkbench.set(!showWorkbench);
+    
+    // Set code view as default when opening workbench
+    if (!showWorkbench) {
+      workbenchStore.currentView.set('code');
+    }
+  };
+
   return (
     <div className="artifact border border-bolt-elements-borderColor flex flex-col overflow-hidden rounded-lg w-full transition-border duration-150">
       <div className="flex">
         <button
           className="flex items-stretch bg-bolt-elements-artifacts-background hover:bg-bolt-elements-artifacts-backgroundHover w-full overflow-hidden"
-          onClick={() => {
-            const showWorkbench = workbenchStore.showWorkbench.get();
-            workbenchStore.showWorkbench.set(!showWorkbench);
-          }}
+          onClick={handleWorkbenchClick}
+          title="Open in Workbench"
         >
           {artifact.type == 'bundled' && (
             <>
@@ -82,7 +90,10 @@ export const Artifact = memo(({ messageId }: ArtifactProps) => {
           )}
           <div className="px-5 p-3.5 w-full text-left">
             <div className="w-full text-bolt-elements-textPrimary font-medium leading-5 text-sm">{artifact?.title}</div>
-            <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">Click to open Workbench</div>
+            <div className="w-full text-bolt-elements-textSecondary text-xs mt-0.5 flex items-center gap-1">
+              <span>Click to open Workbench</span>
+              <div className="i-ph:arrow-right text-[10px]" />
+            </div>
           </div>
         </button>
         <div className="bg-bolt-elements-artifacts-borderColor w-[1px]" />

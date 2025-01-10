@@ -33,6 +33,7 @@ const IGNORE_PATTERNS = [
   '**/yarn-error.log*',
   '**/*lock.json',
   '**/*lock.yaml',
+  '.env',
 ];
 
 export function GitUrlImport() {

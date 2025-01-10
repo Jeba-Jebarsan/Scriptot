@@ -192,12 +192,14 @@ export class LLMManager {
   }
 
   getDefaultProvider(): BaseProvider {
-    const firstProvider = this._providers.values().next().value;
-
-    if (!firstProvider) {
-      throw new Error('No providers registered');
+    const googleProvider = this._providers.get('Google');
+    if (!googleProvider) {
+      throw new Error('Google provider not registered');
     }
+    return googleProvider;
+  }
 
-    return firstProvider;
+  getDefaultModel(): string {
+    return 'gemini-exp-1206';
   }
 }

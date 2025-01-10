@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 import type { ActionAlert } from '~/types/actions';
 import { classNames } from '~/utils/classNames';
 
@@ -10,12 +11,13 @@ interface Props {
 
 export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
   const { description, content, source } = alert;
+  const [showError, setShowError] = useState(false);
 
   const isPreview = source === 'preview';
   const title = isPreview ? 'Preview Error' : 'Terminal Error';
   const message = isPreview
-    ? 'We encountered an error while running the preview. Would you like Bolt to analyze and help resolve this issue?'
-    : 'We encountered an error while running terminal commands. Would you like Bolt to analyze and help resolve this issue?';
+    ? 'An error occurred while running terminal commands. Would you like to try to fix it or see the full error details?'
+    : 'An error occurred while running terminal commands. Would you like to try to fix it or see the full error details?';
 
   return (
     <AnimatePresence>
@@ -58,6 +60,11 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                   Error: {description}
                 </div>
               )}
+              {showError && (
+                <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4 whitespace-pre-wrap font-mono">
+                  {content}
+                </div>
+              )}
             </motion.div>
 
             {/* Actions */}
@@ -71,7 +78,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                 <button
                   onClick={() =>
                     postMessage(
-                      `*Fix this ${isPreview ? 'preview' : 'terminal'} error* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
+                      `Try to fix this ${isPreview ? 'preview' : 'terminal'} error: \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
                     )
                   }
                   className={classNames(
@@ -83,19 +90,35 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'flex items-center gap-1.5',
                   )}
                 >
-                  <div className="i-ph:chat-circle-duotone"></div>
-                  Ask Bolt
+                  <div className="i-ph:wrench-duotone"></div>
+                  Try to Fix
                 </button>
                 <button
-                  onClick={clearAlert}
+                  onClick={() => setShowError(!showError)}
                   className={classNames(
                     `px-2 py-1.5 rounded-md text-sm font-medium`,
                     'bg-bolt-elements-button-secondary-background',
                     'hover:bg-bolt-elements-button-secondary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
                     'text-bolt-elements-button-secondary-text',
+                    'flex items-center gap-1.5',
                   )}
                 >
+                  <div className="i-ph:eye-duotone"></div>
+                  {showError ? 'Hide Error' : 'Show Error'}
+                </button>
+                <button
+                  onClick={clearAlert}
+                  className={classNames(
+                    `px-2 py-1.5 rounded-md text-sm font-medium`,
+                    'bg-bolt-elements-button-secondary-background',
+                    'hover:bg-bolt-elements-button-secondary-backgroundHover', 
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
+                    'text-bolt-elements-button-secondary-text',
+                    'flex items-center gap-1.5',
+                  )}
+                >
+                  <div className="i-ph:x-duotone"></div>
                   Dismiss
                 </button>
               </div>
