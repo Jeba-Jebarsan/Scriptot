@@ -78,7 +78,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                 <button
                   onClick={() =>
                     postMessage(
-                      `Try to fix this ${isPreview ? 'preview' : 'terminal'} error: \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
+                      `Try to fix this ${isPreview ? 'preview' : 'terminal'} error: \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`
                     )
                   }
                   className={classNames(
@@ -87,7 +87,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'hover:bg-bolt-elements-button-primary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-danger-background',
                     'text-bolt-elements-button-primary-text',
-                    'flex items-center gap-1.5',
+                    'flex items-center gap-1.5'
                   )}
                 >
                   <div className="i-ph:wrench-duotone"></div>
@@ -101,7 +101,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'hover:bg-bolt-elements-button-secondary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
                     'text-bolt-elements-button-secondary-text',
-                    'flex items-center gap-1.5',
+                    'flex items-center gap-1.5'
                   )}
                 >
                   <div className="i-ph:eye-duotone"></div>
@@ -112,10 +112,10 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                   className={classNames(
                     `px-2 py-1.5 rounded-md text-sm font-medium`,
                     'bg-bolt-elements-button-secondary-background',
-                    'hover:bg-bolt-elements-button-secondary-backgroundHover', 
+                    'hover:bg-bolt-elements-button-secondary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
                     'text-bolt-elements-button-secondary-text',
-                    'flex items-center gap-1.5',
+                    'flex items-center gap-1.5'
                   )}
                 >
                   <div className="i-ph:x-duotone"></div>

@@ -69,14 +69,14 @@ export const Preview = memo(() => {
 
       return false;
     },
-    [activePreview],
+    [activePreview]
   );
 
   const findMinPortIndex = useCallback(
     (minIndex: number, preview: { port: number }, index: number, array: { port: number }[]) => {
       return preview.port < array[minIndex].port ? index : minIndex;
     },
-    [],
+    []
   );
 
   // When previews change, display the lowest port if user hasn't selected a preview

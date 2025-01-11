@@ -249,7 +249,7 @@ export const CodeMirrorEditor = memo(
         editable,
         languageCompartment,
         autoFocusOnDocumentChange,
-        doc as TextEditorDocument,
+        doc as TextEditorDocument
       );
     }, [doc?.value, editable, doc?.filePath, autoFocusOnDocumentChange]);
 
@@ -259,7 +259,7 @@ export const CodeMirrorEditor = memo(
         <div className="h-full overflow-hidden" ref={containerRef} />
       </div>
     );
-  },
+  }
 );
 
 export default CodeMirrorEditor;
@@ -273,7 +273,7 @@ function newEditorState(
   onScrollRef: MutableRefObject<OnScrollCallback | undefined>,
   debounceScroll: number,
   onFileSaveRef: MutableRefObject<OnSaveCallback | undefined>,
-  extensions: Extension[],
+  extensions: Extension[]
 ) {
   return EditorState.create({
     doc: content,
@@ -379,7 +379,7 @@ function setEditorDocument(
   editable: boolean,
   languageCompartment: Compartment,
   autoFocus: boolean,
-  doc: TextEditorDocument,
+  doc: TextEditorDocument
 ) {
   if (doc.value !== view.state.doc.toString()) {
     view.dispatch({
@@ -421,7 +421,7 @@ function setEditorDocument(
             () => {
               view.focus();
             },
-            { once: true },
+            { once: true }
           );
         } else {
           // if the scroll position is still the same we can focus immediately

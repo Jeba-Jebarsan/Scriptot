@@ -10,7 +10,9 @@ export function useUnsplashImage(query: string) {
     const fetchImage = async () => {
       try {
         setLoading(true);
+
         const images = await searchUnsplashImages(query, 1);
+
         if (images.length > 0) {
           setImage(images[0]);
         } else {

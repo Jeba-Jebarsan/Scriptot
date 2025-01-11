@@ -8,7 +8,9 @@ export default function HelpTab() {
         <section>
           <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-3">What is CodeIQ?</h3>
           <p className="text-sm text-bolt-elements-textSecondary mb-4">
-            CodeIQ is an AI-powered full-stack development tool that helps you create web applications effortlessly. Generate both front-end and back-end code, upload directly to GitHub for version control, and soon self-host your applications.
+            CodeIQ is an AI-powered full-stack development tool that helps you create web applications effortlessly.
+            Generate both front-end and back-end code, upload directly to GitHub for version control, and soon self-host
+            your applications.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg">
@@ -88,7 +90,7 @@ export default function HelpTab() {
             <a
               href="https://thinktank.ottomator.ai"
               target="_blank"
-              rel="noopener noreferrer" 
+              rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-bolt-elements-textPrimary hover:text-bolt-elements-textSecondary transition-colors"
             >
               <div className="i-ph:users" />

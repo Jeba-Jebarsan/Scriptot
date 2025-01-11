@@ -136,7 +136,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
               'left-0': showWorkbench && isSmallViewport,
               'left-[var(--workbench-left)]': showWorkbench,
               'left-[100%]': !showWorkbench,
-            },
+            }
           )}
         >
           <div className="absolute inset-0 px-2 lg:px-6">
@@ -173,7 +173,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       onClick={() => {
                         const repoName = prompt(
                           'Please enter a name for your new GitHub repository:',
-                          'bolt-generated-project',
+                          'bolt-generated-project'
                         );
 
                         if (!repoName) {

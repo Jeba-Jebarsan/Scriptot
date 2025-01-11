@@ -26,7 +26,7 @@ export async function searchUnsplashImages(query: string, perPage: number = 10):
     // Using a direct Unsplash photo ID for demonstration
     const photoId = 'random-photo-id'; // You'll need to replace this with actual photo IDs
     const url = `${UNSPLASH_API_URL}/photo-${photoId}`;
-    
+
     // Creating a mock response with the direct URL format
     const mockImage: UnsplashImage = {
       id: photoId,
@@ -35,17 +35,17 @@ export async function searchUnsplashImages(query: string, perPage: number = 10):
         full: `${UNSPLASH_API_URL}/photo-${photoId}`,
         regular: `${UNSPLASH_API_URL}/photo-${photoId}`,
         small: `${UNSPLASH_API_URL}/photo-${photoId}`,
-        thumb: `${UNSPLASH_API_URL}/photo-${photoId}`
+        thumb: `${UNSPLASH_API_URL}/photo-${photoId}`,
       },
       alt_description: query,
       user: {
         name: 'Unsplash Photographer',
         links: {
-          html: 'https://unsplash.com'
-        }
-      }
+          html: 'https://unsplash.com',
+        },
+      },
     };
-    
+
     return [mockImage];
   } catch (error) {
     console.error('Error fetching Unsplash images:', error);

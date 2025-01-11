@@ -97,7 +97,7 @@ const processSampledMessages = createSampler(
       storeMessageHistory(messages).catch((error) => toast.error(error.message));
     }
   },
-  50,
+  50
 );
 
 interface ChatProps {
@@ -149,7 +149,7 @@ export const ChatImpl = memo(
       onError: (error) => {
         logger.error('Request failed\n\n', error);
         toast.error(
-          'There was an error processing your request: ' + (error.message ? error.message : 'No details were returned'),
+          'There was an error processing your request: ' + (error.message ? error.message : 'No details were returned')
         );
       },
       onFinish: (message, response) => {
@@ -445,7 +445,7 @@ export const ChatImpl = memo(
         const trimmedValue = event.target.value.trim();
         Cookies.set(PROMPT_COOKIE_KEY, trimmedValue, { expires: 30 });
       }, 1000),
-      [],
+      []
     );
 
     const [messageRef, scrollRef] = useSnapScroll();
@@ -513,7 +513,7 @@ export const ChatImpl = memo(
             },
             model,
             provider,
-            apiKeys,
+            apiKeys
           );
         }}
         uploadedFiles={uploadedFiles}
@@ -524,5 +524,5 @@ export const ChatImpl = memo(
         clearAlert={() => workbenchStore.clearAlert()}
       />
     );
-  },
+  }
 );

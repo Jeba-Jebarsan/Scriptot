@@ -40,7 +40,7 @@ export function useSettings() {
   const checkIsStableVersion = async () => {
     try {
       const response = await fetch(
-        `https://api.github.com/repos/stackblitz-labs/bolt.diy/git/refs/tags/v${versionData.version}`,
+        `https://api.github.com/repos/stackblitz-labs/bolt.diy/git/refs/tags/v${versionData.version}`
       );
       const data: { object: { sha: string } } = await response.json();
 
@@ -164,13 +164,23 @@ export function useSettings() {
       const settings = providers[provider].settings;
       providersStore.setKey(provider, { ...providers[provider], settings: { ...settings, ...config } });
     },
-    [providers],
+    [providers]
   );
 
   const enableDebugMode = useCallback((enabled: boolean) => {
-    isDebugMode.set(enabled);
-    logStore.logSystem(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
-    Cookies.set('isDebugEnabled', String(enabled));
+    try {
+      isDebugMode.set(enabled);
+      logStore.logSystem(`Debug mode ${enabled ? 'enabled' : 'disabled'}`);
+      Cookies.set('isDebugEnabled', String(enabled), {
+        expires: 365, // Store for 1 year
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+      });
+    } catch (error) {
+      console.error('Failed to toggle debug mode:', error);
+      // Revert the state if cookie setting fails
+      isDebugMode.set(!enabled);
+    }
   }, []);
 
   const enableEventLogs = useCallback((enabled: boolean) => {

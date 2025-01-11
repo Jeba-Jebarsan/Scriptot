@@ -139,10 +139,10 @@ export const ScreenshotSelector = memo(
 
         // Calculate the scaled coordinates with scroll offset and adjustments
         const scaledX = Math.round(
-          (containerRect.left + Math.min(selectionStart.x, selectionEnd.x) + scrollX + leftOffset) * scaleX,
+          (containerRect.left + Math.min(selectionStart.x, selectionEnd.x) + scrollX + leftOffset) * scaleX
         );
         const scaledY = Math.round(
-          (containerRect.top + Math.min(selectionStart.y, selectionEnd.y) + scrollY + bottomOffset) * scaleY,
+          (containerRect.top + Math.min(selectionStart.y, selectionEnd.y) + scrollY + bottomOffset) * scaleY
         );
         const scaledWidth = Math.round(Math.abs(selectionEnd.x - selectionStart.x) * scaleX);
         const scaledHeight = Math.round(Math.abs(selectionEnd.y - selectionStart.y) * scaleY);
@@ -231,7 +231,7 @@ export const ScreenshotSelector = memo(
         setSelectionStart({ x, y });
         setSelectionEnd({ x, y });
       },
-      [isSelectionMode],
+      [isSelectionMode]
     );
 
     const handleSelectionMove = useCallback(
@@ -248,7 +248,7 @@ export const ScreenshotSelector = memo(
         const y = e.clientY - rect.top;
         setSelectionEnd({ x, y });
       },
-      [isSelectionMode, selectionStart],
+      [isSelectionMode, selectionStart]
     );
 
     if (!isSelectionMode) {
@@ -289,5 +289,5 @@ export const ScreenshotSelector = memo(
         )}
       </div>
     );
-  },
+  }
 );

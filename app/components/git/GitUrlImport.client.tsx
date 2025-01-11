@@ -82,7 +82,7 @@ ${fileContents
     (file) =>
       `<boltAction type="file" filePath="${file.path}">
 ${file.content}
-</boltAction>`,
+</boltAction>`
   )
   .join('\n')}
 </boltArtifact>`,

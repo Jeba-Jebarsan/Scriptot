@@ -12,12 +12,12 @@ interface UnsplashImageProps {
   height?: number;
 }
 
-export const Unsplashimage: React.FC<UnsplashImageProps> = ({ 
-  query, 
-  alt = '', 
+export const Unsplashimage: React.FC<UnsplashImageProps> = ({
+  query,
+  alt = '',
   className = '',
   width = 800,
-  height = 600
+  height = 600,
 }) => {
   const [image, setImage] = useState<UnsplashImage | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,12 +31,14 @@ export const Unsplashimage: React.FC<UnsplashImageProps> = ({
         setLoading(true);
         setError(null);
         console.log('Fetching image for query:', query);
-        
+
         const images = await searchUnsplashImages(query, 1);
         console.log('Received images:', images);
-        
-        if (!mounted) return;
-        
+
+        if (!mounted) {
+          return;
+        }
+
         if (images && images.length > 0) {
           setImage(images[0]);
         } else {
@@ -44,6 +46,7 @@ export const Unsplashimage: React.FC<UnsplashImageProps> = ({
         }
       } catch (err) {
         console.error('Error in component:', err);
+
         if (mounted) {
           setError('Failed to load image');
         }
@@ -55,7 +58,10 @@ export const Unsplashimage: React.FC<UnsplashImageProps> = ({
     };
 
     fetchImage();
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, [query]);
 
   if (loading) {
@@ -76,9 +82,7 @@ export const Unsplashimage: React.FC<UnsplashImageProps> = ({
         height={height}
         loading="lazy"
       />
-      <figcaption className="text-xs text-gray-500 mt-1">
-        {getUnsplashAttribution(image)}
-      </figcaption>
+      <figcaption className="text-xs text-gray-500 mt-1">{getUnsplashAttribution(image)}</figcaption>
     </figure>
   );
 };

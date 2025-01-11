@@ -1,4 +1,5 @@
 # Codeiq (Previously Scriptot)
+
 [![Codeiq: AI-Powered Full-Stack Web Development in the Browser](./public/social_preview_index.jpg)](https://codeiq.dev)
 
 Welcome to Codeiq, which allows you to use Google's Gemini API for AI-powered development! See the instructions below for running this locally.
@@ -33,15 +34,15 @@ bolt.diy was originally started by [Cole Medin](https://www.youtube.com/@ColeMed
 - **Download projects as ZIP** for easy portability
 - **Integration-ready Docker support** for a hassle-free setup
 
-## Setup 
+## Setup
 
-If you're new to installing software from GitHub, don't worry! If you encounter any issues, feel free to submit an "issue" using the provided links or improve this documentation by forking the repository, editing the instructions, and submitting a pull request. The following instruction will help you get the stable branch up and running on your local machine in no time.  
+If you're new to installing software from GitHub, don't worry! If you encounter any issues, feel free to submit an "issue" using the provided links or improve this documentation by forking the repository, editing the instructions, and submitting a pull request. The following instruction will help you get the stable branch up and running on your local machine in no time.
 
 Let's get you up and running with the stable version of Bolt.DIY!
 
 ## Quick Download
 
-[![Download Latest Release](https://img.shields.io/github/v/release/stackblitz-labs/bolt.diy?label=Download%20Bolt&sort=semver)](https://github.com/Jeba-Jebarsan/Scriptot.git) ← Click here to go the the latest release version! 
+[![Download Latest Release](https://img.shields.io/github/v/release/stackblitz-labs/bolt.diy?label=Download%20Bolt&sort=semver)](https://github.com/Jeba-Jebarsan/Scriptot.git) ← Click here to go the the latest release version!
 
 - Next **click source.zip**
 
@@ -77,16 +78,19 @@ You have two options for running Bolt.DIY: directly on your machine or using Doc
 ### Option 1: Direct Installation (Recommended for Beginners)
 
 1. **Install Package Manager (pnpm)**:
+
    ```bash
    npm install -g pnpm
    ```
 
 2. **Install Project Dependencies**:
+
    ```bash
    pnpm install
    ```
 
 3. **Start the Application**:
+
    ```bash
    pnpm run dev
    ```
@@ -98,11 +102,13 @@ You have two options for running Bolt.DIY: directly on your machine or using Doc
 This option requires some familiarity with Docker but provides a more isolated environment.
 
 #### Additional Prerequisite
+
 - Install Docker: [Download Docker](https://www.docker.com/)
 
 #### Steps:
 
 1. **Build the Docker Image**:
+
    ```bash
    # Using npm script:
    npm run dockerbuild
@@ -132,23 +138,27 @@ Setting up your Google API key in Bolt.DIY is straightforward:
 ## Setup Using Git (For Developers only)
 
 This method is recommended for developers who want to:
+
 - Contribute to the project
 - Stay updated with the latest changes
 - Switch between different versions
 - Create custom modifications
 
 #### Prerequisites
+
 1. Install Git: [Download Git](https://git-scm.com/downloads)
 
 #### Initial Setup
 
 1. **Clone the Repository**:
+
    ```bash
    # Using HTTPS
    git clone https://github.com/Jeba-Jebarsan/Scriptot.git
    ```
 
 2. **Navigate to Project Directory**:
+
    ```bash
    cd bolt.diy
    ```
@@ -158,6 +168,7 @@ This method is recommended for developers who want to:
    git checkout main
    ```
 4. **Install Dependencies**:
+
    ```bash
    pnpm install
    ```
@@ -172,16 +183,19 @@ This method is recommended for developers who want to:
 To get the latest changes from the repository:
 
 1. **Save Your Local Changes** (if any):
+
    ```bash
    git stash
    ```
 
 2. **Pull Latest Updates**:
+
    ```bash
    git pull origin main
    ```
 
 3. **Update Dependencies**:
+
    ```bash
    pnpm install
    ```
@@ -196,6 +210,7 @@ To get the latest changes from the repository:
 If you encounter issues:
 
 1. **Clean Installation**:
+
    ```bash
    # Remove node modules and lock files
    rm -rf node_modules pnpm-lock.yaml

@@ -12,7 +12,7 @@ const EXAMPLE_PROMPTS = [
   { text: 'Create a budget tracking tool' },
   { text: 'Build a simple music player' },
   { text: 'Create a habit tracking app' },
-  { text: 'Build a pomodoro timer app' }
+  { text: 'Build a pomodoro timer app' },
 ];
 
 export function ExamplePrompts(sendMessage?: { (event: React.UIEvent, messageInput?: string): void | undefined }) {

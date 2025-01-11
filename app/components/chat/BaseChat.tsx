@@ -99,7 +99,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       actionAlert,
       clearAlert,
     },
-    ref,
+    ref
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
@@ -213,7 +213,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           const dynamicModels = await provider.getDynamicModels(
             newApiKeys,
             providerSettings,
-            import.meta.env || process.env || {},
+            import.meta.env || process.env || {}
           );
 
           setModelList((preModels) => {
@@ -325,10 +325,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             {!chatStarted && (
               <div id="intro" className="mt-[16vh] max-w-chat mx-auto text-center px-4 lg:px-0">
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                  Build Faster, <span className="bg-gradient-to-r from-[#6e6939] via-[#9b6d33] to-[#b06f32] bg-clip-text text-transparent">Build Smarter</span>
+                  Build Faster,{' '}
+                  <span className="bg-gradient-to-r from-[#6e6939] via-[#9b6d33] to-[#b06f32] bg-clip-text text-transparent">
+                    Build Smarter
+                  </span>
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Create apps instantly with CodeIQ's AI-driven full-stack development tools, or receive expert help for your existing projects
+                  Create apps instantly with CodeIQ's AI-driven full-stack development tools, or receive expert help for
+                  your existing projects
                 </p>
               </div>
             )}
@@ -368,7 +372,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
                 <div
                   className={classNames(
-                    'bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt',
+                    'bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt'
 
                     /*
                      * {
@@ -442,7 +446,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   </ClientOnly>
                   <div
                     className={classNames(
-                      'relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg',
+                      'relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg'
                     )}
                   >
                     <textarea
@@ -450,7 +454,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       className={classNames(
                         'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
                         'transition-all duration-200',
-                        'hover:border-bolt-elements-focus',
+                        'hover:border-bolt-elements-focus'
                       )}
                       onDragEnter={(e) => {
                         e.preventDefault();
@@ -614,5 +618,5 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     );
 
     return <Tooltip.Provider delayDuration={200}>{baseChat}</Tooltip.Provider>;
-  },
+  }
 );

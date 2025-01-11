@@ -25,7 +25,7 @@ export default function ProvidersTab() {
 
     if (searchTerm && searchTerm.length > 0) {
       newFilteredProviders = newFilteredProviders.filter((provider) =>
-        provider.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        provider.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 

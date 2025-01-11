@@ -40,7 +40,7 @@ export const IconButton = memo(
         onClick,
         children,
       }: IconButtonProps,
-      ref: ForwardedRef<HTMLButtonElement>,
+      ref: ForwardedRef<HTMLButtonElement>
     ) => {
       return (
         <button
@@ -50,7 +50,7 @@ export const IconButton = memo(
             {
               [classNames('opacity-30', disabledClassName)]: disabled,
             },
-            className,
+            className
           )}
           title={title}
           disabled={disabled}
@@ -65,8 +65,8 @@ export const IconButton = memo(
           {children ? children : <div className={classNames(icon, getIconSize(size), iconClassName)}></div>}
         </button>
       );
-    },
-  ),
+    }
+  )
 );
 
 function getIconSize(size: IconSize) {

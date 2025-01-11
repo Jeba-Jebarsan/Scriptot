@@ -58,7 +58,7 @@ export const DialogButton = memo(({ type, children, onClick }: DialogButtonProps
             type === 'secondary',
           'bg-bolt-elements-button-danger-background text-bolt-elements-button-danger-text hover:bg-bolt-elements-button-danger-backgroundHover':
             type === 'danger',
-        },
+        }
       )}
       onClick={onClick}
     >
@@ -72,7 +72,7 @@ export const DialogTitle = memo(({ className, children, ...props }: RadixDialog.
     <RadixDialog.Title
       className={classNames(
         'px-5 py-4 flex items-center justify-between border-b border-bolt-elements-borderColor text-lg font-semibold leading-6 text-bolt-elements-textPrimary',
-        className,
+        className
       )}
       {...props}
     >
@@ -115,7 +115,7 @@ export const Dialog = memo(({ className, children, onBackdrop, onClose }: Dialog
         <motion.div
           className={classNames(
             'fixed top-[50%] left-[50%] z-max max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] border border-bolt-elements-borderColor rounded-lg bg-bolt-elements-background-depth-2 shadow-lg focus:outline-none overflow-hidden',
-            className,
+            className
           )}
           initial="closed"
           animate="open"

@@ -36,7 +36,7 @@ export const Artifact = memo(({ messageId }: ArtifactProps) => {
   const actions = useStore(
     computed(artifact.runner.actions, (actions) => {
       return Object.values(actions);
-    }),
+    })
   );
 
   const toggleActions = () => {
@@ -61,7 +61,7 @@ export const Artifact = memo(({ messageId }: ArtifactProps) => {
   const handleWorkbenchClick = () => {
     const showWorkbench = workbenchStore.showWorkbench.get();
     workbenchStore.showWorkbench.set(!showWorkbench);
-    
+
     // Set code view as default when opening workbench
     if (!showWorkbench) {
       workbenchStore.currentView.set('code');

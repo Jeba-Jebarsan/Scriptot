@@ -220,7 +220,7 @@ export default function DataTab() {
             if (apiKeys[baseUrl]) {
               Cookies.set(baseUrl, apiKeys[baseUrl]);
             }
-          },
+          }
         );
       } catch (error) {
         toast.error('Failed to import API keys. Make sure the file is a valid JSON file.');
@@ -252,7 +252,7 @@ export default function DataTab() {
                   disabled={isDeleting}
                   className={classNames(
                     'px-4 py-2 bg-bolt-elements-button-danger-background hover:bg-bolt-elements-button-danger-backgroundHover text-bolt-elements-button-danger-text rounded-lg transition-colors',
-                    isDeleting ? 'opacity-50 cursor-not-allowed' : '',
+                    isDeleting ? 'opacity-50 cursor-not-allowed' : ''
                   )}
                 >
                   {isDeleting ? 'Deleting...' : 'Delete All Chats'}

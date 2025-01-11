@@ -176,7 +176,7 @@ export const FileTree = memo(
         })}
       </div>
     );
-  },
+  }
 );
 
 export default FileTree;
@@ -306,7 +306,7 @@ function NodeButton({ depth, iconClasses, onClick, className, children }: Button
     <button
       className={classNames(
         'flex items-center gap-1.5 w-full pr-2 border-2 border-transparent text-faded py-0.5',
-        className,
+        className
       )}
       style={{ paddingLeft: `${6 + depth * NODE_PADDING_LEFT}px` }}
       onClick={() => onClick?.()}
@@ -338,7 +338,7 @@ function buildFileList(
   files: FileMap,
   rootFolder = '/',
   hideRoot: boolean,
-  hiddenFiles: Array<string | RegExp>,
+  hiddenFiles: Array<string | RegExp>
 ): Node[] {
   const folderPaths = new Set<string>();
   const fileList: Node[] = [];

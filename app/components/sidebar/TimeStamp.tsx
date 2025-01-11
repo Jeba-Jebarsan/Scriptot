@@ -6,7 +6,7 @@ interface TimeStampProps {
 
 export function TimeStamp({ date }: TimeStampProps) {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   return (
     <div className="flex items-center gap-2 text-bolt-elements-textTertiary text-sm">
       <div className="flex items-center gap-1.5 bg-bolt-elements-background-depth-2 px-3 py-1 rounded-full">
@@ -19,4 +19,4 @@ export function TimeStamp({ date }: TimeStampProps) {
       </div>
     </div>
   );
-} 
+}

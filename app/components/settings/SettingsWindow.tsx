@@ -83,7 +83,7 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
               <div
                 className={classNames(
                   'w-48 border-r border-bolt-elements-borderColor bg-bolt-elements-background-depth-1 p-4 flex flex-col',
-                  styles['settings-tabs'],
+                  styles['settings-tabs']
                 )}
               >
                 <DialogTitle className="flex-shrink-0 text-lg font-semibold text-bolt-elements-textPrimary mb-2">
