@@ -23,6 +23,10 @@ export default [
       'no-eval': ['error'],
       'linebreak-style': ['error', 'unix'],
       'arrow-spacing': ['error', { before: true, after: true }],
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_'
+      }],
     },
   },
   {
