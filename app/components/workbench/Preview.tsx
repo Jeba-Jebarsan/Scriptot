@@ -26,14 +26,14 @@ export const Preview = memo(() => {
   // Toggle between responsive mode and device mode
   const [isDeviceModeOn, setIsDeviceModeOn] = useState(false);
 
-  // Use percentage for width
-  const [widthPercent, setWidthPercent] = useState<number>(37.5); // 375px assuming 1000px window width initially
+  // Use percentage for width - increased from 37.5 to 50
+  const [widthPercent, setWidthPercent] = useState<number>(50); // 500px assuming 1000px window width initially
 
   const resizingState = useRef({
     isResizing: false,
     side: null as ResizeSide,
     startX: 0,
-    startWidthPercent: 37.5,
+    startWidthPercent: 50, // Increased from 37.5 to 50
     windowWidth: window.innerWidth,
   });
 
@@ -213,6 +213,84 @@ export const Preview = memo(() => {
     </div>
   );
 
+  const PreviewLoader = () => {
+    const loadingSteps = [
+      { text: 'Initializing environment', icon: '🚀' },
+      { text: 'Setting up dependencies', icon: '⚙️' },
+      { text: 'Starting development server', icon: '🔄' }
+    ];
+
+    return (
+      <div className="flex flex-col w-full h-full justify-center items-center bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute w-full h-full">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-[200px] h-[200px] rounded-full mix-blend-multiply filter blur-xl animate-orbit-${i + 1}`}
+                style={{
+                  background: `radial-gradient(circle, var(--bolt-elements-loader-progress) 0%, transparent 70%)`,
+                  opacity: 0.15,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Text content with animations */}
+        <div className="relative flex flex-col items-center gap-3 z-10">
+          <h3 className="text-xl font-medium text-bolt-elements-textPrimary animate-fade-in mb-8">
+            Building preview
+          </h3>
+          <div className="flex flex-col items-center gap-4">
+            {loadingSteps.map((step, index) => (
+              <div
+                key={step.text}
+                className="flex items-center gap-3 animate-slide-up"
+                style={{
+                  animationDelay: `${index * 0.3}s`,
+                  transform: 'translateY(20px)',
+                  opacity: 0,
+                  animation: `
+                    slideUp 0.5s ease-out ${index * 0.3}s forwards,
+                    glow 2s ease-in-out ${index * 0.3}s infinite
+                  `
+                }}
+              >
+                <span className="animate-bounce text-xl" style={{ animationDelay: `${index * 0.3}s` }}>
+                  {step.icon}
+                </span>
+                <p className="text-sm text-bolt-elements-textTertiary tracking-wide">
+                  {step.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <style jsx>{`
+          @keyframes slideUp {
+            from {
+              transform: translateY(20px);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+
+          @keyframes glow {
+            0% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+            50% { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+            100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+          }
+        `}</style>
+      </div>
+    );
+  };
+
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col relative">
       {isPortDropdownOpen && (
@@ -303,7 +381,7 @@ export const Preview = memo(() => {
               />
             </>
           ) : (
-            <div className="flex w-full h-full justify-center items-center bg-white">No preview available</div>
+            <PreviewLoader />
           )}
 
           {isDeviceModeOn && (

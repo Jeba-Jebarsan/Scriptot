@@ -18,6 +18,7 @@ import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
 import useViewport from '~/lib/hooks';
 import Cookies from 'js-cookie';
+import { GitHubPushModal } from '../git/GitHubPushModal';
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -58,6 +59,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
   renderLogger.trace('Workbench');
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showGitHubModal, setShowGitHubModal] = useState(false);
 
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
   const showWorkbench = useStore(workbenchStore.showWorkbench);
@@ -152,11 +154,11 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                         workbenchStore.downloadZip();
                       }}
                     >
-                      <div className="i-ph:code" />
+                      <div className="i-ph:code text-blue-500" />
                       Download Code
                     </PanelHeaderButton>
                     <PanelHeaderButton className="mr-1 text-sm" onClick={handleSyncFiles} disabled={isSyncing}>
-                      {isSyncing ? <div className="i-ph:spinner" /> : <div className="i-ph:cloud-arrow-down" />}
+                      {isSyncing ? <div className="i-ph:spinner text-blue-500" /> : <div className="i-ph:cloud-arrow-down text-blue-500" />}
                       {isSyncing ? 'Syncing...' : 'Sync Files'}
                     </PanelHeaderButton>
                     <PanelHeaderButton
@@ -165,41 +167,14 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                         workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
                       }}
                     >
-                      <div className="i-ph:terminal" />
+                      <div className="i-ph:terminal text-blue-500" />
                       Toggle Terminal
                     </PanelHeaderButton>
                     <PanelHeaderButton
                       className="mr-1 text-sm"
-                      onClick={() => {
-                        const repoName = prompt(
-                          'Please enter a name for your new GitHub repository:',
-                          'bolt-generated-project'
-                        );
-
-                        if (!repoName) {
-                          alert('Repository name is required. Push to GitHub cancelled.');
-                          return;
-                        }
-
-                        const githubUsername = Cookies.get('githubUsername');
-                        const githubToken = Cookies.get('githubToken');
-
-                        if (!githubUsername || !githubToken) {
-                          const usernameInput = prompt('Please enter your GitHub username:');
-                          const tokenInput = prompt('Please enter your GitHub personal access token:');
-
-                          if (!usernameInput || !tokenInput) {
-                            alert('GitHub username and token are required. Push to GitHub cancelled.');
-                            return;
-                          }
-
-                          workbenchStore.pushToGitHub(repoName, usernameInput, tokenInput);
-                        } else {
-                          workbenchStore.pushToGitHub(repoName, githubUsername, githubToken);
-                        }
-                      }}
+                      onClick={() => setShowGitHubModal(true)}
                     >
-                      <div className="i-ph:github-logo" />
+                      <div className="i-ph:github-logo text-blue-500" />
                       Push to GitHub
                     </PanelHeaderButton>
                   </div>
@@ -241,6 +216,11 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
             </div>
           </div>
         </div>
+
+        <GitHubPushModal 
+          isOpen={showGitHubModal}
+          onClose={() => setShowGitHubModal(false)}
+        />
       </motion.div>
     )
   );

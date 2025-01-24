@@ -93,7 +93,7 @@ export class LLMManager {
         .filter((provider) => enabledProviders.includes(provider.name))
         .filter(
           (provider): provider is BaseProvider & Required<Pick<ProviderInfo, 'getDynamicModels'>> =>
-            !!provider.getDynamicModels
+            !!provider.getDynamicModels,
         )
         .map(async (provider) => {
           const cachedModels = provider.getModelsFromCache(options);
@@ -116,7 +116,7 @@ export class LLMManager {
             });
 
           return dynamicModels;
-        })
+        }),
     );
 
     // Combine static and dynamic models
@@ -137,7 +137,7 @@ export class LLMManager {
       apiKeys?: Record<string, string>;
       providerSettings?: Record<string, IProviderSetting>;
       serverEnv?: Record<string, string>;
-    }
+    },
   ): Promise<ModelInfo[]> {
     const provider = this._providers.get(providerArg.name);
 
@@ -192,16 +192,12 @@ export class LLMManager {
   }
 
   getDefaultProvider(): BaseProvider {
-    const googleProvider = this._providers.get('Google');
+    const firstProvider = this._providers.values().next().value;
 
-    if (!googleProvider) {
-      throw new Error('Google provider not registered');
+    if (!firstProvider) {
+      throw new Error('No providers registered');
     }
 
-    return googleProvider;
-  }
-
-  getDefaultModel(): string {
-    return 'gemini-exp-1206';
+    return firstProvider;
   }
 }

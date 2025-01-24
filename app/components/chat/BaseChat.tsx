@@ -32,6 +32,7 @@ import StarterTemplates from './StarterTemplates';
 import type { ActionAlert } from '~/types/actions';
 import ChatAlert from './ChatAlert';
 import { LLMManager } from '~/lib/modules/llm/manager';
+import { GradientText } from '~/components/ui/GradientText';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -60,11 +61,12 @@ interface BaseChatProps {
   exportChat?: () => void;
   uploadedFiles?: File[];
   setUploadedFiles?: (files: File[]) => void;
-  imageDataList?: string[];
-  setImageDataList?: (dataList: string[]) => void;
+  imageDataList: string[];
+  setImageDataList?: React.Dispatch<React.SetStateAction<string[]>>;
   actionAlert?: ActionAlert;
   clearAlert?: () => void;
   children?: React.ReactNode;
+  onTemplateSelect?: (prompt: string) => void;
 }
 
 export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
@@ -98,6 +100,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       messages,
       actionAlert,
       clearAlert,
+      onTemplateSelect,
     },
     ref
   ) => {
@@ -326,9 +329,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               <div id="intro" className="mt-[16vh] max-w-chat mx-auto text-center px-4 lg:px-0">
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
                   Build Faster,{' '}
-                  <span className="bg-gradient-to-r from-[#6e6939] via-[#9b6d33] to-[#b06f32] bg-clip-text text-transparent">
+                  <GradientText
+                    colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+                    animationSpeed={5}
+                    showBorder={false}
+                    className="text-6xl font-bold"
+                  >
                     Build Smarter
-                  </span>
+                  </GradientText>
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
                   Create apps instantly with CodeIQ's AI-driven full-stack development tools, or receive expert help for
@@ -516,7 +524,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         minHeight: TEXTAREA_MIN_HEIGHT,
                         maxHeight: TEXTAREA_MAX_HEIGHT,
                       }}
-                      placeholder="Let’s build something together!"
+                      placeholder="Let's build something together!"
                       translate="no"
                     />
                     <ClientOnly>
@@ -609,7 +617,22 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
                   handleSendMessage?.(event, messageInput);
                 })}
-              {!chatStarted && <StarterTemplates />}
+              {!chatStarted && (
+                <StarterTemplates 
+                  onTemplateSelect={(prompt) => {
+                    if (textareaRef?.current) {
+                      textareaRef.current.value = prompt;
+                      textareaRef.current.focus();
+                      // Trigger input change to update state
+                      const event = new Event('input', { bubbles: true });
+                      textareaRef.current.dispatchEvent(event);
+                      handleInputChange?.(event as unknown as React.ChangeEvent<HTMLTextAreaElement>);
+                    }
+                  }}
+                  setImageDataList={setImageDataList}
+                  imageDataList={imageDataList}
+                />
+              )}
             </div>
           </div>
           <ClientOnly>{() => <Workbench chatStarted={chatStarted} isStreaming={isStreaming} />}</ClientOnly>

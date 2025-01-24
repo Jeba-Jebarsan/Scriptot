@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useSettings } from '~/lib/hooks/useSettings';
 import { toast } from 'react-toastify';
 import { providerBaseUrlEnvKeys } from '~/utils/constants';
+import useViewport from '~/lib/hooks';
 
 interface ProviderStatus {
   name: string;
@@ -330,6 +331,7 @@ export default function DebugTab() {
   const [updateMessage, setUpdateMessage] = useState<string>('');
   const [systemInfo] = useState<SystemInfo>(getSystemInfo());
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const isSmallViewport = useViewport(1024);
 
   const updateProviderStatuses = async () => {
     if (!providers) {
@@ -438,10 +440,19 @@ export default function DebugTab() {
   }, [activeProviders, systemInfo, isLatestBranch]);
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className={`
+      p-4 space-y-6
+      ${isSmallViewport ? 'flex flex-col' : 'flex flex-row gap-4'}
+    `}>
+      <div className={`
+        flex items-center justify-between
+        ${isSmallViewport ? 'flex-col' : 'flex-row'}
+      `}>
         <h3 className="text-lg font-medium text-bolt-elements-textPrimary">Debug Information</h3>
-        <div className="flex gap-2">
+        <div className={`
+          flex gap-2
+          ${isSmallViewport ? 'flex-col' : 'flex-row'}
+        `}>
           <button
             onClick={handleCopyToClipboard}
             className="bg-bolt-elements-button-primary-background rounded-lg px-4 py-2 transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text"

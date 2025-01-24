@@ -2,7 +2,6 @@ import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
-import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
 import { createHead } from 'remix-island';
 import { useEffect } from 'react';
@@ -78,6 +77,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { themeStore } from './lib/stores/theme';
 import { logStore } from './lib/stores/logs';
 
 export default function App() {

@@ -40,6 +40,6 @@
     "**/.server/**/*.ts",
     "**/.server/**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "../app/lib/persistence/neondb.ts", "../app/components/auth/Login.tsx", "../app/components/auth/LogoutButton.tsx", "../app/routes/sign-up.tsx", "../app/routes/sign-in.tsx"  ],
   "exclude": ["node_modules"]
 }

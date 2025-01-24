@@ -19,9 +19,9 @@ export default function ProvidersTab() {
 
   useEffect(() => {
     let newFilteredProviders: IProviderConfig[] = Object.entries(providers).map(([key, value]) => ({
-      ...value,
+      ...(value as object),
       name: key,
-    }));
+    } as IProviderConfig));
 
     if (searchTerm && searchTerm.length > 0) {
       newFilteredProviders = newFilteredProviders.filter((provider) =>

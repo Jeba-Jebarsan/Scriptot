@@ -5,7 +5,6 @@ import type { ActionCallbackData, ArtifactCallbackData } from '~/lib/runtime/mes
 import { webcontainer } from '~/lib/webcontainer';
 import type { ITerminal } from '~/types/terminal';
 import { unreachable } from '~/utils/unreachable';
-import { EditorStore } from './editor';
 import { FilesStore, type FileMap } from './files';
 import { PreviewsStore } from './previews';
 import { TerminalStore } from './terminal';
@@ -18,6 +17,7 @@ import { description } from '~/lib/persistence';
 import Cookies from 'js-cookie';
 import { createSampler } from '~/utils/sampler';
 import type { ActionAlert } from '~/types/actions';
+import { EditorStore } from './editor';
 
 export interface ArtifactState {
   id: string;
@@ -532,14 +532,14 @@ export class WorkbenchStore {
       await octokit.git.updateRef({
         owner: repo.owner.login,
         repo: repo.name,
-        ref: `heads/${repo.default_branch || 'main'}`, // Handle dynamic branch
+        ref: `heads/${repo.default_branch || 'main'}`,
         sha: newCommit.sha,
       });
 
-      alert(`Repository created and code pushed: ${repo.html_url}`);
+      return repo.html_url;
     } catch (error) {
       console.error('Error pushing to GitHub:', error);
-      throw error; // Rethrow the error for further handling
+      throw error;
     }
   }
 }
