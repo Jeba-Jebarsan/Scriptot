@@ -1,10 +1,11 @@
-#:schema node_modules/wrangler/config-schema.json
 name = "codeiq"
 compatibility_date = "2024-01-01"
 
-[build]
-command = "pnpm run build"
-output_dir = "build/client"
+# Remove build.output_dir and use pages_build_output_dir instead
+pages_build_output_dir = "build/client"
 
 [site]
 bucket = "./build/client"
+
+# Add main field as suggested
+main = "functions/[[path]].ts"
