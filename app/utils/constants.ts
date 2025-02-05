@@ -147,3 +147,10 @@ export const STARTER_TEMPLATES: Template[] = [
     icon: 'i-bolt:angular',
   },
 ];
+
+export const VERCEL_CONFIG = {
+  API_VERSION: 'v13',
+  BASE_URL: 'https://api.vercel.com',
+  DEPLOYMENT_TIMEOUT: 60000, // 1 minute
+  POLL_INTERVAL: 2000, // 2 seconds
+};
