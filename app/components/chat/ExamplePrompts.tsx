@@ -13,6 +13,17 @@ const EXAMPLE_PROMPTS = [
   { text: 'Build a simple music player' },
   { text: 'Create a habit tracking app' },
   { text: 'Build a pomodoro timer app' },
+  { text: 'Create Login Signup Screen' },
+  { text: 'Create Netflix Clone' },
+  { text: 'Create YouTube Clone' },
+  { text: 'Create Instagram Clone' },
+  { text: 'Create Twitter Clone' },
+  { text: 'Create Amazon Clone' },
+  { text: 'Create Spotify Clone' },
+  { text: 'Create WhatsApp Clone' },
+  { text: 'Create TikTok Clone' },
+  { text: 'Create LinkedIn Clone' },
+  { text: 'Create Airbnb Clone' },
 ];
 
 export function ExamplePrompts(sendMessage?: { (event: React.UIEvent, messageInput?: string): void | undefined }) {
