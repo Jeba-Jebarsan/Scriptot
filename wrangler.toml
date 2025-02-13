@@ -1,12 +1,9 @@
-name = "codeiq"
+name = "scriptot"
 compatibility_date = "2024-01-01"
 
-# The build section is where the build command is defined
 [build]
-command = "pnpm run build"          # Command to run the build (ensure this works with your setup)
-output_dir = "build/client"          # Directory where the build output is generated
+command = "pnpm run build"
 
-# The site section is for the static site setup
 [site]
-bucket = "./build/client"            # Path to the built files you want to deploy (should match your output directory)
-url = "https://codeiq-a4u.pages.dev/" # The URL for your deployed site
+bucket = "./build/client"
+entry-point = "functions/[[path]].ts"
