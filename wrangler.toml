@@ -6,4 +6,5 @@ command = "pnpm run build"
 
 [site]
 bucket = "./build/client"
+url = "https://scriptot.pages.dev" 
 entry-point = "functions/[[path]].ts"
