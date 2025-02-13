@@ -23,6 +23,9 @@ import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
 import { getTemplates, selectStarterTemplate } from '~/utils/selectStarterTemplate';
+import { LoginPopup } from '../auth/LoginPopup';
+import { checkAuthStatus } from '~/utils/auth';
+import { useLocation, useNavigate } from '@remix-run/react';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -31,26 +34,62 @@ const toastAnimation = cssTransition({
 
 const logger = createScopedLogger('Chat');
 
-export function Chat() {
-  renderLogger.trace('Chat');
+interface ChatProps {
+  showLoginPopup: boolean;
+  setShowLoginPopup: (show: boolean) => void;
+}
 
+export default function Chat({ showLoginPopup, setShowLoginPopup }: ChatProps) {
   const { ready, initialMessages, storeMessageHistory, importChat, exportChat } = useChatHistory();
   const title = useStore(description);
+  const isAuthenticated = checkAuthStatus();
+  const [hasAttemptedAction, setHasAttemptedAction] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated && location.pathname.includes('/chat/')) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, location]);
+
   useEffect(() => {
     workbenchStore.setReloadedMessages(initialMessages.map((m) => m.id));
   }, [initialMessages]);
 
+  const handleStartChat = () => {
+    if (!isAuthenticated) {
+      setHasAttemptedAction(true);
+      setShowLoginPopup(true);
+      return;
+    }
+    // Continue with chat logic
+  };
+
+  if (!ready) {
+    return null;
+  }
+
   return (
     <>
-      {ready && (
-        <ChatImpl
-          description={title}
-          initialMessages={initialMessages}
-          exportChat={exportChat}
-          storeMessageHistory={storeMessageHistory}
-          importChat={importChat}
+      {showLoginPopup && (
+        <LoginPopup
+          onSuccess={() => {
+            setShowLoginPopup(false);
+            // Continue with chat logic after successful login
+          }}
+          onClose={() => setShowLoginPopup(false)}
         />
       )}
+      <ChatImpl
+        description={title}
+        initialMessages={initialMessages}
+        exportChat={exportChat}
+        storeMessageHistory={storeMessageHistory}
+        importChat={importChat}
+        showLoginPopup={showLoginPopup}
+        setShowLoginPopup={setShowLoginPopup}
+      />
       <ToastContainer
         closeButton={({ closeToast }) => {
           return (
@@ -100,16 +139,18 @@ const processSampledMessages = createSampler(
   50
 );
 
-interface ChatProps {
+interface ChatImplProps {
   initialMessages: Message[];
   storeMessageHistory: (messages: Message[]) => Promise<void>;
   importChat: (description: string, messages: Message[]) => Promise<void>;
   exportChat: () => void;
   description?: string;
+  showLoginPopup: boolean;
+  setShowLoginPopup: (show: boolean) => void;
 }
 
 export const ChatImpl = memo(
-  ({ description, initialMessages, storeMessageHistory, importChat, exportChat }: ChatProps) => {
+  ({ description, initialMessages, storeMessageHistory, importChat, exportChat, showLoginPopup, setShowLoginPopup }: ChatImplProps) => {
     useShortcuts();
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -522,6 +563,8 @@ export const ChatImpl = memo(
         setImageDataList={setImageDataList}
         actionAlert={actionAlert}
         clearAlert={() => workbenchStore.clearAlert()}
+        showLoginPopup={showLoginPopup}
+        setShowLoginPopup={setShowLoginPopup}
       />
     );
   }

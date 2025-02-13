@@ -1,6 +1,6 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { motion } from 'framer-motion';
-import { useState, type ReactElement } from 'react';
+import { useState, type ReactElement, useEffect } from 'react';
 import { classNames } from '~/utils/classNames';
 import { DialogTitle, dialogVariants, dialogBackdropVariants } from '~/components/ui/Dialog';
 import { IconButton } from '~/components/ui/IconButton';
@@ -25,6 +25,38 @@ type TabType = 'data' | 'features' | 'debug' | 'event-logs' | 'connection' | 'ap
 export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
   const { debug, eventLogs } = useSettings();
   const [activeTab, setActiveTab] = useState<TabType>('data');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      if (typeof window !== 'undefined') {
+        const user = localStorage.getItem('user');
+        if (user) {
+          setUserInfo(JSON.parse(user));
+          setIsAuthenticated(true);
+        } else {
+          setUserInfo(null);
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    checkAuth();
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('auth-change', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('auth-change', checkAuth);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUserInfo(null);
+  };
 
   const tabs: { id: TabType; label: string; icon: string; component?: ReactElement }[] = [
     { id: 'data', label: 'Data', icon: 'i-ph:database', component: <DataTab /> },
@@ -99,6 +131,7 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
                     {tab.label}
                   </button>
                 ))}
+              
               </div>
               <div className="flex-1 flex flex-col p-8 pt-10 bg-bolt-elements-background-depth-2">
                 <div className="flex-1 overflow-y-auto">{tabs.find((tab) => tab.id === activeTab)?.component}</div>

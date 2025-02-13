@@ -3,11 +3,13 @@ import { Markdown } from './Markdown';
 import type { JSONValue } from 'ai';
 
 interface AssistantMessageProps {
-  content: string;
+  content: string | Array<{ type: string; text?: string; image?: string }>;
+  isStreaming?: boolean;
   annotations?: JSONValue[];
 }
 
-export const AssistantMessage = memo(({ content, annotations }: AssistantMessageProps) => {
+export const AssistantMessage = memo(({ content, isStreaming, annotations }: AssistantMessageProps) => {
+  const contentStr = typeof content === 'string' ? content : content.map(c => c.text || '').join('');
   const filteredAnnotations = (annotations?.filter(
     (annotation: JSONValue) => annotation && typeof annotation === 'object' && Object.keys(annotation).includes('type')
   ) || []) as { type: string; value: any }[];
@@ -25,7 +27,7 @@ export const AssistantMessage = memo(({ content, annotations }: AssistantMessage
           Tokens: {usage.totalTokens} (prompt: {usage.promptTokens}, completion: {usage.completionTokens})
         </div>
       )}
-      <Markdown html>{content}</Markdown>
+      <Markdown html>{contentStr}</Markdown>
     </div>
   );
 });

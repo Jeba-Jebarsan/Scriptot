@@ -54,13 +54,19 @@ function CurrentDateTime() {
   );
 }
 
-export const Menu = () => {
+interface MenuProps {
+  setShowLoginPopup?: (show: boolean) => void;
+}
+
+export const Menu = ({ setShowLoginPopup }: MenuProps) => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
   const [open, setOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -127,6 +133,30 @@ export const Menu = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const checkAuth = () => {
+      if (typeof window !== 'undefined') {
+        const user = localStorage.getItem('user');
+        if (user) {
+          setUserInfo(JSON.parse(user));
+          setIsAuthenticated(true);
+        } else {
+          setUserInfo(null);
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    checkAuth();
+    window.addEventListener('storage', checkAuth);
+    window.addEventListener('auth-change', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('auth-change', checkAuth);
+    };
+  }, []);
+
   const handleDeleteClick = (event: React.UIEvent, item: ChatHistoryItem) => {
     event.preventDefault();
     setDialogContent({ type: 'delete', item });
@@ -135,6 +165,12 @@ export const Menu = () => {
   const handleDuplicate = async (id: string) => {
     await duplicateCurrentChat(id);
     loadEntries(); // Reload the list after duplication
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('storage'));
+    window.location.reload();
   };
 
   return (
@@ -147,9 +183,19 @@ export const Menu = () => {
     >
       <div className="h-[60px]" /> {/* Spacer for top margin */}
       <CurrentDateTime />
+      
+      {/* Add User Profile Section */}
+      
       <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
         <div className="p-4 select-none">
           <a
+            onClick={(e) => {
+              if (!isAuthenticated) {
+                e.preventDefault();
+                setShowLoginPopup?.(true);
+                return;
+              }
+            }}
             href="/"
             className="flex gap-2 items-center bg-bolt-elements-sidebar-buttonBackgroundDefault text-bolt-elements-sidebar-buttonText hover:bg-bolt-elements-sidebar-buttonBackgroundHover rounded-md p-2 transition-theme mb-4"
           >
@@ -222,6 +268,25 @@ export const Menu = () => {
           </DialogRoot>
         </div>
         <div className="flex items-center justify-between border-t border-bolt-elements-borderColor p-4">
+          <div className="flex items-center gap-3">
+            {userInfo?.picture && (
+              <img 
+                src={userInfo.picture} 
+                alt="Profile" 
+                className="w-8 h-8 rounded-full"
+              />
+            )}
+            {userInfo && (
+              <div>
+                <div className="text-bolt-elements-textPrimary font-medium text-sm">
+                  {userInfo.name}
+                </div>
+                <div className="text-bolt-elements-textSecondary text-xs">
+                  {userInfo.email}
+                </div>
+              </div>
+            )}
+          </div>
           <SettingsButton onClick={() => setIsSettingsOpen(true)} />
         </div>
       </div>

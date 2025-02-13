@@ -1,23 +1,14 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { useEffect, useState } from "react";
+
+if (!import.meta.env.VITE_CONVEX_URL) {
+  throw new Error('VITE_CONVEX_URL is required');
+}
+
+const convexClient = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
 export function ConvexProviderWrapper({ children }: { children: React.ReactNode }) {
-  const [client, setClient] = useState<ConvexReactClient | null>(null);
-
-  useEffect(() => {
-    const convexUrl = import.meta.env.VITE_CONVEX_URL;
-    if (!convexUrl) {
-      console.error("Missing VITE_CONVEX_URL environment variable");
-      return;
-    }
-    const newClient = new ConvexReactClient(convexUrl);
-    setClient(newClient);
-  }, []);
-
-  if (!client) return null;
-
   return (
-    <ConvexProvider client={client}>
+    <ConvexProvider client={convexClient}>
       {children}
     </ConvexProvider>
   );

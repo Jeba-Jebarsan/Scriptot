@@ -107,7 +107,7 @@ export const TerminalTabs = memo(() => {
                       onClick={() => setActiveTerminal(index)}
                     >
                       <div className="i-ph:terminal-window-duotone text-lg" />
-                      CodeIQ Terminal
+                      Deepgen
                     </button>
                   ) : (
                     <React.Fragment>

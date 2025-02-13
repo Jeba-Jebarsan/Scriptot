@@ -1,12 +1,15 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import { stripIndents } from './utils/stripIndent';
 import { createHead } from 'remix-island';
 import { useEffect } from 'react';
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { ToastContainer } from 'react-toastify';
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
+import { ConvexProviderWrapper } from '~/lib/providers/ConvexProvider';
+
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
 
@@ -93,8 +96,22 @@ export default function App() {
   }, []);
 
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <ConvexProviderWrapper>
+      <GoogleOAuthProvider clientId="778869098493-iqhl5il154f29o8nm399i0jfldfbru48.apps.googleusercontent.com">
+        <Outlet />
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+        <ToastContainer
+          position="bottom-right"
+          theme="dark"
+          closeButton={({ closeToast }) => (
+            <button className="Toastify__close-button" onClick={closeToast}>
+              <div className="i-ph:x text-lg" />
+            </button>
+          )}
+        />
+      </GoogleOAuthProvider>
+    </ConvexProviderWrapper>
   );
 }

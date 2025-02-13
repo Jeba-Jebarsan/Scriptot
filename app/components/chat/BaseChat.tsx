@@ -33,6 +33,8 @@ import type { ActionAlert } from '~/types/actions';
 import ChatAlert from './ChatAlert';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import { GradientText } from '~/components/ui/GradientText';
+import { chatStore } from '~/lib/stores/chat';
+import { checkAuthStatus } from '~/utils/auth';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -67,6 +69,8 @@ interface BaseChatProps {
   clearAlert?: () => void;
   children?: React.ReactNode;
   onTemplateSelect?: (prompt: string) => void;
+  showLoginPopup?: boolean;
+  setShowLoginPopup?: (show: boolean) => void;
 }
 
 export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
@@ -101,6 +105,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       actionAlert,
       clearAlert,
       onTemplateSelect,
+      showLoginPopup = false,
+      setShowLoginPopup,
     },
     ref
   ) => {
@@ -112,6 +118,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
     const [transcript, setTranscript] = useState('');
     const [isModelLoading, setIsModelLoading] = useState<string | undefined>('all');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const getProviderSettings = useCallback(() => {
       let providerSettings: Record<string, IProviderSetting> | undefined = undefined;
@@ -200,6 +207,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       }
     }, [providerList]);
 
+    useEffect(() => {
+      if (typeof window !== 'undefined') {
+        setIsAuthenticated(checkAuthStatus());
+      }
+    }, []);
+
     const onApiKeysChange = async (providerName: string, apiKey: string) => {
       const newApiKeys = { ...apiKeys, [providerName]: apiKey };
       setApiKeys(newApiKeys);
@@ -245,23 +258,25 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     };
 
     const handleSendMessage = (event: React.UIEvent, messageInput?: string) => {
-      if (sendMessage) {
-        sendMessage(event, messageInput);
+      event.preventDefault();
+      const _input = messageInput || input;
 
-        if (recognition) {
-          recognition.abort(); // Stop current recognition
-          setTranscript(''); // Clear transcript
-          setIsListening(false);
-
-          // Clear the input by triggering handleInputChange with empty value
-          if (handleInputChange) {
-            const syntheticEvent = {
-              target: { value: '' },
-            } as React.ChangeEvent<HTMLTextAreaElement>;
-            handleInputChange(syntheticEvent);
-          }
-        }
+      if (!_input.trim() && imageDataList.length === 0) {
+        return;
       }
+
+      if (!isAuthenticated) {
+        setShowLoginPopup?.(true);
+        return;
+      }
+
+      if (isStreaming) {
+        handleStop?.();
+        return;
+      }
+
+      chatStore.setKey('started', true);
+      sendMessage?.(event, messageInput);
     };
 
     const handleFileUpload = () => {
@@ -316,13 +331,30 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       }
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (!isAuthenticated) {
+          setShowLoginPopup?.(true);
+          return;
+        }
+        handleSendMessage(event as any);
+      }
+    };
+
+    const handleBlur = (event: React.FocusEvent) => {
+      if (!isAuthenticated && input.trim()) {
+        setShowLoginPopup?.(true);
+      }
+    };
+
     const baseChat = (
       <div
         ref={ref}
         className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
       >
-        <ClientOnly>{() => <Menu />}</ClientOnly>
+        <ClientOnly>{() => <Menu setShowLoginPopup={setShowLoginPopup} />}</ClientOnly>
         <div ref={scrollRef} className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
@@ -494,27 +526,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           }
                         });
                       }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          if (event.shiftKey) {
-                            return;
-                          }
-
-                          event.preventDefault();
-
-                          if (isStreaming) {
-                            handleStop?.();
-                            return;
-                          }
-
-                          // ignore if using input method engine
-                          if (event.nativeEvent.isComposing) {
-                            return;
-                          }
-
-                          handleSendMessage?.(event);
-                        }
-                      }}
+                      onKeyDown={handleKeyDown}
+                      onBlur={handleBlur}
                       value={input}
                       onChange={(event) => {
                         handleInputChange?.(event);
@@ -534,13 +547,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           isStreaming={isStreaming}
                           disabled={!providerList || providerList.length === 0}
                           onClick={(event) => {
+                            if (!isAuthenticated) {
+                              setShowLoginPopup?.(true);
+                              return;
+                            }
+
                             if (isStreaming) {
                               handleStop?.();
                               return;
                             }
 
                             if (input.length > 0 || uploadedFiles.length > 0) {
-                              handleSendMessage?.(event);
+                              handleSendMessage(event);
                             }
                           }}
                         />
@@ -608,15 +626,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   <GitCloneButton importChat={importChat} />
                 </div>
               )}
-              {!chatStarted &&
-                ExamplePrompts((event, messageInput) => {
-                  if (isStreaming) {
-                    handleStop?.();
-                    return;
-                  }
-
-                  handleSendMessage?.(event, messageInput);
-                })}
+              {!chatStarted && (
+                <ExamplePrompts 
+                  sendMessage={(event, messageInput) => {
+                    if (isStreaming) {
+                      handleStop?.();
+                      return;
+                    }
+                    handleSendMessage?.(event, messageInput);
+                  }}
+                  setShowLoginPopup={setShowLoginPopup}
+                />
+              )}
               {!chatStarted && (
                 <StarterTemplates 
                   onTemplateSelect={(prompt) => {
