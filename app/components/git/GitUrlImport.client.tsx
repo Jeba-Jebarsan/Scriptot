@@ -4,7 +4,7 @@ import ignore from 'ignore';
 import { useEffect, useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { BaseChat } from '~/components/chat/BaseChat';
-import { Chat } from '~/components/chat/Chat.client';
+import Chat from '~/components/chat/Chat.client';
 import { useGit } from '~/lib/hooks/useGit';
 import { useChatHistory } from '~/lib/persistence';
 import { createCommandsMessage, detectProjectCommands } from '~/utils/projectCommands';
@@ -123,10 +123,21 @@ ${file.content}
   }, [searchParams, historyReady, gitReady, imported]);
 
   return (
-    <ClientOnly fallback={<BaseChat />}>
+    <ClientOnly fallback={
+      <BaseChat 
+        imageDataList={[]}
+        messages={[]}
+        input=""
+        handleInputChange={() => {}}
+        sendMessage={() => {}}
+      />
+    }>
       {() => (
         <>
-          <Chat />
+          <Chat 
+            showLoginPopup={false}
+            setShowLoginPopup={() => {}}
+          />
           {loading && <LoadingOverlay message="Please wait while we clone the repository..." />}
         </>
       )}
