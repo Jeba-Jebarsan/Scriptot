@@ -4,8 +4,14 @@ import axios from "axios";
 import { api } from "../../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
 
-// Initialize Convex client with HTTP client for server-side
-const convex = new ConvexHttpClient(process.env.VITE_CONVEX_URL || "");
+const DEFAULT_CONVEX_URL = 'https://relaxed-elk-576.convex.cloud';
+const convexUrl = process.env.VITE_CONVEX_URL || DEFAULT_CONVEX_URL;
+
+if (!convexUrl.startsWith('https://') && !convexUrl.startsWith('http://')) {
+  throw new Error('Invalid CONVEX_URL: Must start with https:// or http://');
+}
+
+const convex = new ConvexHttpClient(convexUrl);
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
