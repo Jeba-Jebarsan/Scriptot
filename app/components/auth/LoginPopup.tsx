@@ -74,20 +74,17 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
 
   const handleGitHubLogin = () => {
     const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    console.log('GitHub Client ID:', clientId); // Debug log
     
     if (!clientId) {
-      console.error('Missing VITE_GITHUB_CLIENT_ID environment variable');
-      toast.error('GitHub login is not properly configured. Please contact support.');
+      console.error('GitHub Client ID is not configured');
+      toast.error('GitHub login is not properly configured');
       return;
     }
-    
+
     const redirectUri = `${window.location.origin}/auth/github/callback`;
-    const scope = 'user user:email repo';
-    const state = Math.random().toString(36).substring(7);
+    const scope = 'read:user user:email';
     
-    const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
-    window.location.href = githubUrl;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
   };
 
   useEffect(() => {

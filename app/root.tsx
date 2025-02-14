@@ -9,6 +9,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastContainer } from 'react-toastify';
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import { ConvexProviderWrapper } from '~/lib/providers/ConvexProvider';
+import { json } from "@remix-run/cloudflare";
+import type { LoaderFunction } from "@remix-run/cloudflare";
 
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
@@ -115,3 +117,12 @@ export default function App() {
     </ConvexProviderWrapper>
   );
 }
+
+export const loader: LoaderFunction = async () => {
+  return json({
+    ENV: {
+      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID,
+      CONVEX_URL: process.env.VITE_CONVEX_URL,
+    },
+  });
+};
