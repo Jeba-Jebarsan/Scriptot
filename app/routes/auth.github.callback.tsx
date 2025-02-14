@@ -13,7 +13,19 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   if (!code) {
     console.error('No code received from GitHub');
-    return redirect("/?error=github_auth_failed");
+    return redirect("/?error=github_auth_failed&reason=no_code");
+  }
+
+  // Debug log for environment variables
+  console.log('Environment check:', {
+    hasClientId: !!process.env.VITE_GITHUB_CLIENT_ID,
+    hasClientSecret: !!process.env.GITHUB_CLIENT_SECRET,
+    hasConvexUrl: !!process.env.VITE_CONVEX_URL
+  });
+
+  if (!process.env.VITE_GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+    console.error('Missing GitHub credentials');
+    return redirect("/?error=github_auth_failed&reason=missing_credentials");
   }
 
   try {
