@@ -73,11 +73,16 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
   });
 
   const handleGitHubLogin = () => {
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+    // Get client ID from environment variables
+    const clientId = process.env.VITE_GITHUB_CLIENT_ID || 
+                    import.meta.env.VITE_GITHUB_CLIENT_ID;
     
     if (!clientId) {
-      console.error('GitHub Client ID is not configured');
-      toast.error('GitHub login is not properly configured');
+      console.error('GitHub Client ID is not configured. Current environment:', {
+        processEnv: process.env.VITE_GITHUB_CLIENT_ID,
+        importMetaEnv: import.meta.env.VITE_GITHUB_CLIENT_ID
+      });
+      toast.error('GitHub login is not properly configured. Please contact support.');
       return;
     }
 
