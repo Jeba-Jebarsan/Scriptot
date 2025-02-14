@@ -29,7 +29,8 @@
     "db:generate": "drizzle-kit generate:pg",
     "db:push": "drizzle-kit push:pg",
     "vercel-deploy": "vercel deploy --prod",
-    "vercel-build": "pnpm run build"
+    "vercel-build": "pnpm run build",
+    "netlify:build": "npx pnpm install --no-frozen-lockfile && pnpm run build"
   },
   "engines": {
     "node": ">=18.18.0"

@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm run build"
+  command = "npx pnpm install --no-frozen-lockfile && pnpm run build"
   publish = "build/client"
   functions = "build/server"
 
@@ -15,4 +15,5 @@
 
 [build.environment]
   NODE_VERSION = "20.18.0"
-  NPM_FLAGS = "--version" 
+  NPM_FLAGS = "--version"
+  PNPM_FLAGS = "--shamefully-hoist" 
