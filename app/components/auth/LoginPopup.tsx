@@ -81,7 +81,12 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
       return;
     }
 
-    const redirectUri = `${window.location.origin}/auth/github/callback`;
+    // Use the deployed URL for production, localhost for development
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://scriptot.pages.dev'
+      : window.location.origin;
+      
+    const redirectUri = `${baseUrl}/auth/github/callback`;
     const scope = 'read:user user:email';
     
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
