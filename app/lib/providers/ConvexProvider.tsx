@@ -1,10 +1,7 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 
-if (!import.meta.env.VITE_CONVEX_URL) {
-  throw new Error('VITE_CONVEX_URL is required');
-}
-
-const convexClient = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
+const convexUrl = import.meta.env.VITE_CONVEX_URL || 'https://default-deployment.convex.cloud';
+const convexClient = new ConvexReactClient(convexUrl);
 
 export function ConvexProviderWrapper({ children }: { children: React.ReactNode }) {
   return (
