@@ -2,6 +2,18 @@ import type { NetlifyDeploymentStatus } from "../../types/netlify";
 
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 
+interface NetlifySite {
+  id: string;
+  name: string;
+}
+
+interface NetlifyDeployment {
+  id: string;
+  url: string;
+  state: string;
+  created_at: string;
+}
+
 export class NetlifyService {
   private token: string;
 
@@ -28,17 +40,33 @@ export class NetlifyService {
   }
 
   async createDeployment(projectName: string, files: Record<string, { data: string }>): Promise<NetlifyDeploymentStatus> {
-    const deployment = await this.fetchWithAuth('/sites', {
+    const site = await this.fetchWithAuth('/sites', {
       method: 'POST',
       body: JSON.stringify({
         name: projectName,
+      }),
+    }) as NetlifySite;
+
+    const deployment = await this.fetchWithAuth(`/sites/${site.id}/deploys`, {
+      method: 'POST',
+      body: JSON.stringify({
         files: Object.entries(files).map(([path, { data }]) => ({
           path,
           content: data,
         })),
       }),
-    });
+    }) as NetlifyDeployment;
 
-    return deployment as NetlifyDeploymentStatus;
+    return {
+      id: deployment.id,
+      url: deployment.url || `${projectName}.netlify.app`,
+      state: deployment.state,
+      created_at: deployment.created_at,
+    };
+  }
+
+  async getDeploymentStatus(deploymentId: string): Promise<NetlifyDeploymentStatus> {
+    const status = await this.fetchWithAuth(`/deploys/${deploymentId}`);
+    return status as NetlifyDeploymentStatus;
   }
 }

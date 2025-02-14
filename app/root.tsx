@@ -96,7 +96,7 @@ type LoaderData = {
 export const loader: LoaderFunction = async () => {
   return json({
     ENV: {
-      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID,
+      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID || 'Ov23liA3PwvOtkwYOKUy',
       CONVEX_URL: process.env.VITE_CONVEX_URL,
     },
   });

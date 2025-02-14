@@ -76,16 +76,12 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
     const clientId = (window as any).ENV?.GITHUB_CLIENT_ID;
     
     if (!clientId) {
-      console.error('GitHub Client ID is missing from window.ENV:', (window as any).ENV);
-      toast.error('GitHub login is not properly configured. Please contact support.');
+      console.error('GitHub Client ID is missing:', (window as any).ENV);
+      toast.error('GitHub login is temporarily unavailable. Please try again later.');
       return;
     }
 
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://scriptot.pages.dev'
-      : window.location.origin;
-      
-    const redirectUri = `${baseUrl}/auth/github/callback`;
+    const redirectUri = `${window.location.origin}/auth/github/callback`;
     const scope = 'read:user user:email';
     
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
