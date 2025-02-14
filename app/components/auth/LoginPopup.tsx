@@ -73,20 +73,14 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
   });
 
   const handleGitHubLogin = () => {
-    // Get client ID from environment variables
-    const clientId = process.env.VITE_GITHUB_CLIENT_ID || 
-                    import.meta.env.VITE_GITHUB_CLIENT_ID;
+    const clientId = (window as any).ENV?.GITHUB_CLIENT_ID;
     
     if (!clientId) {
-      console.error('GitHub Client ID is not configured. Current environment:', {
-        processEnv: process.env.VITE_GITHUB_CLIENT_ID,
-        importMetaEnv: import.meta.env.VITE_GITHUB_CLIENT_ID
-      });
+      console.error('GitHub Client ID is missing from window.ENV:', (window as any).ENV);
       toast.error('GitHub login is not properly configured. Please contact support.');
       return;
     }
 
-    // Use the deployed URL for production, localhost for development
     const baseUrl = process.env.NODE_ENV === 'production' 
       ? 'https://scriptot.pages.dev'
       : window.location.origin;

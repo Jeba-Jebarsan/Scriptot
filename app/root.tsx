@@ -11,6 +11,7 @@ import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import { ConvexProviderWrapper } from '~/lib/providers/ConvexProvider';
 import { json } from "@remix-run/cloudflare";
 import type { LoaderFunction } from "@remix-run/cloudflare";
+import { useLoaderData } from '@remix-run/react';
 
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
@@ -85,7 +86,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 import { themeStore } from './lib/stores/theme';
 import { logStore } from './lib/stores/logs';
 
+type LoaderData = {
+  ENV: {
+    GITHUB_CLIENT_ID: string;
+    CONVEX_URL: string;
+  }
+};
+
+export const loader: LoaderFunction = async () => {
+  return json({
+    ENV: {
+      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID,
+      CONVEX_URL: process.env.VITE_CONVEX_URL,
+    },
+  });
+};
+
 export default function App() {
+  const { ENV } = useLoaderData<LoaderData>();
   const theme = useStore(themeStore);
 
   useEffect(() => {
@@ -98,31 +116,35 @@ export default function App() {
   }, []);
 
   return (
-    <ConvexProviderWrapper>
-      <GoogleOAuthProvider clientId="778869098493-iqhl5il154f29o8nm399i0jfldfbru48.apps.googleusercontent.com">
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-        <ToastContainer
-          position="bottom-right"
-          theme="dark"
-          closeButton={({ closeToast }) => (
-            <button className="Toastify__close-button" onClick={closeToast}>
-              <div className="i-ph:x text-lg" />
-            </button>
-          )}
-        />
-      </GoogleOAuthProvider>
-    </ConvexProviderWrapper>
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <ConvexProviderWrapper>
+          <GoogleOAuthProvider clientId="778869098493-iqhl5il154f29o8nm399i0jfldfbru48.apps.googleusercontent.com">
+            <Outlet />
+            <ScrollRestoration />
+            <Scripts />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.ENV = ${JSON.stringify(ENV)}`,
+              }}
+            />
+            <LiveReload />
+            <ToastContainer
+              position="bottom-right"
+              theme="dark"
+              closeButton={({ closeToast }) => (
+                <button className="Toastify__close-button" onClick={closeToast}>
+                  <div className="i-ph:x text-lg" />
+                </button>
+              )}
+            />
+          </GoogleOAuthProvider>
+        </ConvexProviderWrapper>
+      </body>
+    </html>
   );
 }
-
-export const loader: LoaderFunction = async () => {
-  return json({
-    ENV: {
-      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID,
-      CONVEX_URL: process.env.VITE_CONVEX_URL,
-    },
-  });
-};
