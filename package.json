@@ -8,7 +8,7 @@
   "type": "module",
   "version": "0.0.5",
   "scripts": {
-    "deploy": "cross-env NODE_ENV=production pnpm run build && wrangler pages deploy ./build/client --project-name scriptot",
+    "deploy": "cross-env NODE_ENV=production VITE_CONVEX_URL=$VITE_CONVEX_URL VITE_GITHUB_CLIENT_ID=$VITE_GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET pnpm run build && wrangler pages deploy ./build/client --project-name scriptot",
     "build": "remix vite:build",
     "dev": "node pre-start.cjs && remix vite:dev",
     "test": "vitest --run",
