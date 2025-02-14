@@ -10,5 +10,4 @@ bucket = "./build/client"
 [vars]
 VITE_GITHUB_CLIENT_ID = "Ov23liA3PwvOtkwYOKUy"
 GITHUB_CLIENT_SECRET = "61a825cbffabe464cc8b5eca1d5a22ac211687bc"
-VITE_CONVEX_URL = "https://judicious-pelican-858.convex.cloud
-"
+VITE_CONVEX_URL = "https://judicious-pelican-858.convex.cloud"
