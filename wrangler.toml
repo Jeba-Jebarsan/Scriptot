@@ -1,5 +1,4 @@
 name = "scriptot"
-main = "dist/index.js"
 compatibility_date = "2025-02-14"
 
 [build]
@@ -7,12 +6,3 @@ command = "pnpm run build"
 
 [site]
 bucket = "./build/client"
-
-[pages]
-pages_build_output_dir = "./build/client"
-
-[env.production]
-# account_id = "your_account_id"
-# zone_id = "your_zone_id"
-# workers_dev = true
-# route = "https://codeiq-a4u.pages.dev/*"
