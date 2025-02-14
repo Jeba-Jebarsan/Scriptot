@@ -3,15 +3,9 @@ import { redirect } from "@remix-run/cloudflare";
 import axios from "axios";
 import { api } from "../../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
+import { getConvexUrl } from "~/lib/config/environment";
 
-const DEFAULT_CONVEX_URL = 'https://relaxed-elk-576.convex.cloud';
-const convexUrl = process.env.VITE_CONVEX_URL || DEFAULT_CONVEX_URL;
-
-if (!convexUrl.startsWith('https://') && !convexUrl.startsWith('http://')) {
-  throw new Error('Invalid CONVEX_URL: Must start with https:// or http://');
-}
-
-const convex = new ConvexHttpClient(convexUrl);
+const convex = new ConvexHttpClient(getConvexUrl());
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
