@@ -3,8 +3,9 @@ compatibility_date = "2024-01-01"
 
 [build]
 command = "pnpm run build"
-output_dir = "./build/client"
+output_dir = "build/client"
 
-[pages]
+[site]
 bucket = "./build/client"
+url = "https://codeiq-a4u.pages.dev" 
 entry-point = "functions/[[path]].ts"
