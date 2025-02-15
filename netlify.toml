@@ -6,10 +6,12 @@
   NODE_VERSION = "20.15.1"
   NPM_FLAGS = "--version"
 
-[functions]
-  directory = "functions"
-
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+[functions]
+  included_files = ["functions/**"]
+  external_node_modules = ["@remix-run/cloudflare"]
+  node_bundler = "esbuild"
