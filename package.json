@@ -30,7 +30,7 @@
     "db:push": "drizzle-kit push:pg",
     "vercel-deploy": "vercel deploy --prod",
     "vercel-build": "pnpm run build",
-    "netlify:build": "pnpm install --store=node_modules/.pnpm-store && pnpm run build"
+    "netlify:build": "npx convex deploy && pnpm run build"
   },
   "engines": {
     "node": ">=18.18.0"
