@@ -9,7 +9,7 @@
   "version": "0.0.5",
   "scripts": {
     "deploy": "wrangler pages deploy ./build/client --project-name scriptot",
-    "build": "remix vite:build && cp -r public/* build/client/",
+    "build": "remix vite:build && cpy 'public/**/*' build/client/",
     "dev": "node pre-start.cjs && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
@@ -139,6 +139,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/react-toastify": "^4.1.0",
+    "cpy-cli": "^5.0.0",
     "cross-env": "^7.0.3",
     "drizzle-kit": "^0.30.2",
     "fast-glob": "^3.3.2",
