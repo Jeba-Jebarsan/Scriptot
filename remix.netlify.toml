@@ -1,0 +1,3 @@
+[remix]
+  server_build_path = "build/server/index.js"
+  client_build_path = "build/client" 

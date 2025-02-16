@@ -12,6 +12,12 @@
   status = 200
 
 [functions]
-  included_files = ["functions/**"]
-  external_node_modules = ["@remix-run/cloudflare"]
+  directory = "build/server"
   node_bundler = "esbuild"
+
+[dev]
+  framework = "remix"
+  targetPort = 5173
+
+[build.processing]
+  skip_processing = false
