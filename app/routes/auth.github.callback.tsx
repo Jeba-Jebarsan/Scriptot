@@ -1,5 +1,5 @@
-import type { LoaderFunction } from "@remix-run/cloudflare";
-import { redirect } from "@remix-run/cloudflare";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import axios from "axios";
 import { api } from "../../convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
