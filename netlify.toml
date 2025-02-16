@@ -7,14 +7,22 @@
   NPM_VERSION = "10.2.4"
   PNPM_VERSION = "8.15.1"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 [functions]
   directory = "build/server"
   node_bundler = "esbuild"
+  included_files = ["build/server/**"]
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    "X-Frame-Options" = "DENY"
+    "X-XSS-Protection" = "1; mode=block"
 
 [dev]
   framework = "remix"
