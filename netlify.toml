@@ -1,16 +1,12 @@
 [build]
   command = "pnpm install && npx convex deploy && pnpm run build"
   publish = "build/client"
+  functions = "netlify/functions"
   
 [build.environment]
   NODE_VERSION = "20.15.1"
   NPM_VERSION = "10.2.4"
   PNPM_VERSION = "8.15.1"
-
-[functions]
-  directory = "build/server"
-  node_bundler = "esbuild"
-  included_files = ["build/server/**"]
 
 [[redirects]]
   from = "/*"
@@ -18,11 +14,9 @@
   status = 200
   force = true
 
-[[headers]]
-  for = "/*"
-  [headers.values]
-    "X-Frame-Options" = "DENY"
-    "X-XSS-Protection" = "1; mode=block"
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@remix-run/cloudflare"]
 
 [dev]
   framework = "remix"
