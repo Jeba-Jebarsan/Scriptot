@@ -30,10 +30,11 @@
     "db:push": "drizzle-kit push:pg",
     "vercel-deploy": "vercel deploy --prod",
     "vercel-build": "pnpm run build",
-    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/"
+    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install --no-frozen-lockfile --shamefully-flatten && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=20.15.1",
+    "pnpm": "8.15.1"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.39",
@@ -78,9 +79,9 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-oauth/google": "^0.12.1",
     "@remix-run/express": "^2.8.1",
-    "@remix-run/node": "^2.8.1",
     "@remix-run/netlify": "^2.8.1",
-    "@remix-run/react": "^2.15.3",
+    "@remix-run/node": "^2.8.1",
+    "@remix-run/react": "^2.8.1",
     "@tanstack/react-query": "^5.66.0",
     "@types/google-one-tap": "^1.2.6",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
@@ -92,7 +93,7 @@
     "ai": "^4.0.13",
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
-    "convex": "^1.18.2",
+    "convex": "^1.10.0",
     "date-fns": "^3.6.0",
     "diff": "^5.2.0",
     "dotenv": "^16.4.7",

@@ -1,5 +1,5 @@
 [build]
-  command = "npx convex deploy && pnpm run netlify:build"
+  command = "pnpm install --no-frozen-lockfile --shamefully-flatten && npx convex deploy && pnpm run build"
   publish = "build/client"
   
 [build.environment]
