@@ -30,7 +30,7 @@
     "db:push": "drizzle-kit push:pg",
     "vercel-deploy": "vercel deploy --prod",
     "vercel-build": "pnpm run build",
-    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install --no-frozen-lockfile && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/"
+    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install --no-frozen-lockfile && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/ && cpy 'server.js' netlify/functions/"
   },
   "engines": {
     "node": ">=18.18.0"

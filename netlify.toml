@@ -1,5 +1,5 @@
 [build]
-  command = "npx convex deploy && pnpm run build"
+  command = "npx convex deploy && pnpm run netlify:build"
   publish = "build/client"
   
 [build.environment]
@@ -12,6 +12,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  included_files = ["build/server/**"]
 
 [[redirects]]
   from = "/*"

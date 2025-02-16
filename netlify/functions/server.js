@@ -4,8 +4,10 @@ import * as build from "../../build/server/index.js";
 export const handler = createRequestHandler({
   build,
   mode: process.env.NODE_ENV,
-  getLoadContext: (event) => ({
-    env: process.env,
-    context: event.context
-  })
+  getLoadContext: (event) => {
+    return {
+      env: process.env,
+      context: event.context,
+    };
+  }
 });
