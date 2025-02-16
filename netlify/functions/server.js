@@ -8,4 +8,4 @@ export const handler = createRequestHandler({
     env: process.env,
     context: event.context
   })
-}); 
+});

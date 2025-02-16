@@ -1,16 +1,17 @@
 [build]
-  command = "pnpm install && npx convex deploy && pnpm run build"
+  command = "npx convex deploy && pnpm run build"
   publish = "build/client"
   
 [build.environment]
   NODE_VERSION = "20.15.1"
   NPM_VERSION = "10.2.4"
   PNPM_VERSION = "8.15.1"
+  VITE_GITHUB_CLIENT_ID = "Ov23liA3PwvOtkwYOKUy"
+  VITE_CONVEX_URL = "https://judicious-pelican-858.convex.cloud"
 
 [functions]
-  directory = "build/server"
+  directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["build/server/**"]
 
 [[redirects]]
   from = "/*"
