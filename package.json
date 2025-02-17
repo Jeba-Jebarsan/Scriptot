@@ -30,11 +30,11 @@
     "db:push": "drizzle-kit push:pg",
     "vercel-deploy": "vercel deploy --prod",
     "vercel-build": "pnpm run build",
-    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install --no-frozen-lockfile --shamefully-flatten && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/"
+    "netlify:build": "REMIX_DEPLOYMENT=1 pnpm install --no-frozen-lockfile && npx convex deploy && remix vite:build && cpy 'public/**/*' build/client/ && cpy 'build/server/**/*' netlify/functions/",
+    "clean": "rimraf node_modules build .cache"
   },
   "engines": {
-    "node": ">=20.15.1",
-    "pnpm": "8.15.1"
+    "node": ">=18.18.0"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^0.0.39",
@@ -78,10 +78,9 @@
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-oauth/google": "^0.12.1",
-    "@remix-run/express": "^2.8.1",
-    "@remix-run/netlify": "^2.8.1",
-    "@remix-run/node": "^2.8.1",
-    "@remix-run/react": "^2.8.1",
+    "@remix-run/netlify": "^1.19.3",
+    "@remix-run/node": "^2.15.3",
+    "@remix-run/react": "^2.15.3",
     "@tanstack/react-query": "^5.66.0",
     "@types/google-one-tap": "^1.2.6",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
@@ -93,7 +92,7 @@
     "ai": "^4.0.13",
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
-    "convex": "^1.10.0",
+    "convex": "^1.18.2",
     "date-fns": "^3.6.0",
     "diff": "^5.2.0",
     "dotenv": "^16.4.7",
@@ -125,8 +124,7 @@
     "remix-island": "^0.2.0",
     "remix-utils": "^7.7.0",
     "shiki": "^1.24.0",
-    "unist-util-visit": "^5.0.0",
-    "express": "^4.18.3"
+    "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@blitz/eslint-plugin": "0.1.0",
@@ -137,6 +135,7 @@
     "@types/dom-speech-recognition": "^0.0.4",
     "@types/file-saver": "^2.0.7",
     "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.17.15",
     "@types/pg": "^8.11.10",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -147,6 +146,7 @@
     "fast-glob": "^3.3.2",
     "husky": "9.1.7",
     "is-ci": "^3.0.1",
+    "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
     "pnpm": "^9.14.4",
     "prettier": "^3.4.1",
