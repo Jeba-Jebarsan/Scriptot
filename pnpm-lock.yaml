@@ -401,7 +401,7 @@ importers:
         specifier: ^2.1.7
         version: 2.1.9(@types/node@22.13.4)(sass-embedded@1.85.0)
       wrangler:
-        specifier: ^3.91.0
+        specifier: ^3.109.1
         version: 3.109.1(@cloudflare/workers-types@4.20250214.0)
       zod:
         specifier: ^3.24.1

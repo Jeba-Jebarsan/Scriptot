@@ -6,3 +6,6 @@ compatibility_flags = ["nodejs_compat"]
 # Add the pages build output directory configuration
 [pages]
 pages_build_output_dir = "build/client"
+
+[build]
+command = "pnpm run build"

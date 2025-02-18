@@ -7,8 +7,8 @@
   "type": "module",
   "version": "0.0.6",
   "scripts": {
-    "deploy": "pnpm run clean && pnpm install && pnpm run build && wrangler pages deploy build/client --project-name scriptot",
-    "build": "remix vite:build",
+    "deploy": "pnpm run clean && pnpm install && pnpm run build && wrangler pages deploy build/client --project-name scriptot --commit-dirty=true",
+    "build": "node scripts/build.js",
     "dev": "node pre-start.cjs && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
@@ -161,7 +161,7 @@
     "vite-plugin-optimize-css-modules": "^1.1.0",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.1.7",
-    "wrangler": "^3.91.0",
+    "wrangler": "^3.109.1",
     "zod": "^3.24.1"
   },
   "resolutions": {
