@@ -105,7 +105,8 @@ export default defineConfig((config) => {
           'os',
           'fs',
           'querystring',
-          'http2'
+          'http2',
+          'stream',
         ],
         globals: {
           Buffer: true,
