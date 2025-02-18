@@ -2,11 +2,3 @@
 name = "scriptot"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "./build/client"
-send_metrics = false
-
-[build]
-command = "pnpm run build"
-
-[site]
-bucket = "./build/client"
