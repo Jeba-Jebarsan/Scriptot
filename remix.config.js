@@ -1,10 +1,17 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-module.exports = {
-  serverBuildTarget: "netlify",
+export default {
+  serverBuildTarget: "cloudflare-pages",
   server: "./server.js",
   ignoredRouteFiles: ["**/.*"],
   serverModuleFormat: "esm",
-  serverDependenciesToBundle: "all",
+  serverPlatform: "neutral",
+  serverDependenciesToBundle: [
+    /@remix-run\/.*/,
+    /^@remix-run\/node$/,
+    "cookie-signature",
+    "stream-slice",
+    "undici"
+  ],
   serverEnvironmentVariables: [
     'VITE_GITHUB_CLIENT_ID',
     'GITHUB_CLIENT_SECRET',

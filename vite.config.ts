@@ -95,7 +95,18 @@ export default defineConfig((config) => {
     },
     plugins: [
       nodePolyfills({
-        include: ['path', 'buffer', 'process', 'crypto', 'stream'],
+        include: [
+          'path',
+          'buffer',
+          'process',
+          'crypto',
+          'stream',
+          'util',
+          'os',
+          'fs',
+          'querystring',
+          'http2'
+        ],
         globals: {
           Buffer: true,
           global: true,
