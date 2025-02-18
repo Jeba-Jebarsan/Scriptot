@@ -1,6 +1,6 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "scriptot"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-02-18"
 compatibility_flags = ["nodejs_compat"]
 
 # Add the pages build output directory configuration
