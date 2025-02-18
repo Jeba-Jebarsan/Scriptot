@@ -92,52 +92,10 @@ export default defineConfig((config) => {
     },
     build: {
       target: 'esnext',
-      rollupOptions: {
-        external: [
-          'node:stream',
-          'node:crypto',
-          'node:fs',
-          'node:path',
-          'node:os',
-          'node:util',
-          'node:buffer',
-          'node:assert',
-          'node:events',
-          'node:zlib',
-          'node:worker_threads',
-          'node:async_hooks',
-          'node:tls',
-          'node:console',
-          'node:perf_hooks',
-          'node:diagnostics_channel',
-          'node:querystring',
-          'node:http2'
-        ]
-      }
     },
     plugins: [
       nodePolyfills({
-        include: [
-          'path',
-          'buffer',
-          'process',
-          'crypto',
-          'stream',
-          'util',
-          'os',
-          'fs',
-          'querystring',
-          'http2',
-          'assert',
-          'zlib',
-          'events',
-          'tls'
-        ],
-        globals: {
-          Buffer: true,
-          global: true,
-          process: true,
-        },
+        include: ['path', 'buffer', 'process'],
       }),
       config.mode !== 'test' && remixCloudflareDevProxy(),
       remixVitePlugin({
