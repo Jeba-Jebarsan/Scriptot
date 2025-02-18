@@ -123,21 +123,14 @@ ${file.content}
   }, [searchParams, historyReady, gitReady, imported]);
 
   return (
-    <ClientOnly fallback={
-      <BaseChat 
-        imageDataList={[]}
-        messages={[]}
-        input=""
-        handleInputChange={() => {}}
-        sendMessage={() => {}}
-      />
-    }>
+    <ClientOnly
+      fallback={
+        <BaseChat imageDataList={[]} messages={[]} input="" handleInputChange={() => {}} sendMessage={() => {}} />
+      }
+    >
       {() => (
         <>
-          <Chat 
-            showLoginPopup={false}
-            setShowLoginPopup={() => {}}
-          />
+          <Chat showLoginPopup={false} setShowLoginPopup={() => {}} />
           {loading && <LoadingOverlay message="Please wait while we clone the repository..." />}
         </>
       )}

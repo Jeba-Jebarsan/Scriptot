@@ -160,7 +160,11 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       Download Code
                     </PanelHeaderButton>
                     <PanelHeaderButton className="mr-1 text-sm" onClick={handleSyncFiles} disabled={isSyncing}>
-                      {isSyncing ? <div className="i-ph:spinner text-blue-500" /> : <div className="i-ph:cloud-arrow-down text-blue-500" />}
+                      {isSyncing ? (
+                        <div className="i-ph:spinner text-blue-500" />
+                      ) : (
+                        <div className="i-ph:cloud-arrow-down text-blue-500" />
+                      )}
                       {isSyncing ? 'Syncing...' : 'Sync Files'}
                     </PanelHeaderButton>
                     <PanelHeaderButton
@@ -172,17 +176,11 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       <div className="i-ph:terminal text-blue-500" />
                       Toggle Terminal
                     </PanelHeaderButton>
-                    <PanelHeaderButton
-                      className="mr-1 text-sm"
-                      onClick={() => setShowGitHubModal(true)}
-                    >
+                    <PanelHeaderButton className="mr-1 text-sm" onClick={() => setShowGitHubModal(true)}>
                       <div className="i-ph:github-logo text-blue-500" />
                       Push to GitHub
                     </PanelHeaderButton>
-                    <PanelHeaderButton
-                      className="mr-1 text-sm"
-                      onClick={() => setShowVercelModal(true)}
-                    >
+                    <PanelHeaderButton className="mr-1 text-sm" onClick={() => setShowVercelModal(true)}>
                       <div className="i-ph:triangle-fill text-blue-500" />
                       Deploy to Vercel
                     </PanelHeaderButton>
@@ -226,14 +224,8 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
           </div>
         </div>
 
-        <GitHubPushModal 
-          isOpen={showGitHubModal}
-          onClose={() => setShowGitHubModal(false)}
-        />
-        <DeploymentAction
-          isOpen={showVercelModal} 
-          onClose={() => setShowVercelModal(false)}
-        />
+        <GitHubPushModal isOpen={showGitHubModal} onClose={() => setShowGitHubModal(false)} />
+        <DeploymentAction isOpen={showVercelModal} onClose={() => setShowVercelModal(false)} />
       </motion.div>
     )
   );

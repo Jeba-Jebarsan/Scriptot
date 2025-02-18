@@ -27,12 +27,8 @@ function PushSuccess({ repoUrl, onClose }: PushSuccessProps) {
         </motion.div>
 
         <div className="text-center">
-          <h3 className="text-xl font-medium text-bolt-elements-textPrimary mb-2">
-            Successfully Pushed!
-          </h3>
-          <p className="text-sm text-bolt-elements-textTertiary mb-4">
-            Your code has been pushed to GitHub
-          </p>
+          <h3 className="text-xl font-medium text-bolt-elements-textPrimary mb-2">Successfully Pushed!</h3>
+          <p className="text-sm text-bolt-elements-textTertiary mb-4">Your code has been pushed to GitHub</p>
           <a
             href={repoUrl}
             target="_blank"
@@ -55,13 +51,7 @@ function PushSuccess({ repoUrl, onClose }: PushSuccessProps) {
   );
 }
 
-export function GitHubPushModal({ 
-  isOpen, 
-  onClose 
-}: { 
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function GitHubPushModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [repoName, setRepoName] = useState('');
   const [githubUsername, setGithubUsername] = useState('');
   const [githubToken, setGithubToken] = useState('');
@@ -74,13 +64,14 @@ export function GitHubPushModal({
       toast.error('Repository name is required');
       return;
     }
+
     setStep('credentials');
   };
 
   const handlePush = async () => {
     try {
       setIsPushing(true);
-      
+
       if (!githubUsername || !githubToken) {
         toast.error('GitHub username and token are required');
         return;
@@ -91,8 +82,9 @@ export function GitHubPushModal({
       setStep('success');
     } catch (err) {
       console.error('Push failed:', err);
+
       const error = err as Error;
-      
+
       if (error.message.includes('Resource not accessible by personal access token')) {
         toast.error(
           'Your GitHub token needs additional permissions. Please ensure it has "repo" and "workflow" scopes. Visit GitHub Settings > Developer Settings > Personal Access Tokens to update permissions.',
@@ -106,14 +98,16 @@ export function GitHubPushModal({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       {step === 'success' ? (
         <PushSuccess repoUrl={repoUrl} onClose={onClose} />
       ) : (
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="bg-bolt-elements-background-depth-1 rounded-lg p-6 max-w-md w-full mx-4"
@@ -124,7 +118,7 @@ export function GitHubPushModal({
                 {step === 'repo' ? 'Create Repository' : 'GitHub Credentials'}
               </h3>
               <p className="text-sm text-bolt-elements-textTertiary">
-                {step === 'repo' 
+                {step === 'repo'
                   ? 'Enter a name for your new repository'
                   : 'Enter your GitHub credentials to push the code'}
               </p>
@@ -141,9 +135,7 @@ export function GitHubPushModal({
             ) : (
               <div className="w-full space-y-4">
                 <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-1">
-                    GitHub Username:
-                  </label>
+                  <label className="block text-sm text-bolt-elements-textSecondary mb-1">GitHub Username:</label>
                   <input
                     type="text"
                     value={githubUsername}
@@ -152,9 +144,7 @@ export function GitHubPushModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-1">
-                    Personal Access Token:
-                  </label>
+                  <label className="block text-sm text-bolt-elements-textSecondary mb-1">Personal Access Token:</label>
                   <input
                     type="password"
                     value={githubToken}
@@ -174,7 +164,11 @@ export function GitHubPushModal({
               </button>
               <button
                 onClick={step === 'repo' ? handleNext : handlePush}
-                disabled={isPushing || (!repoName && step === 'repo') || ((!githubUsername || !githubToken) && step === 'credentials')}
+                disabled={
+                  isPushing ||
+                  (!repoName && step === 'repo') ||
+                  ((!githubUsername || !githubToken) && step === 'credentials')
+                }
                 className="flex-1 px-4 py-2 rounded-lg bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
                 {isPushing ? (
@@ -195,4 +189,4 @@ export function GitHubPushModal({
       )}
     </div>
   );
-} 
+}

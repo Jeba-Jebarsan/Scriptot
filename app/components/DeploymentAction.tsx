@@ -3,19 +3,13 @@ import { useState } from 'react';
 import { useWorkbench } from '~/lib/stores/workbench';
 import { toast } from 'react-toastify';
 
-export function DeploymentAction({ 
-  isOpen,
-  onClose
-}: { 
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function DeploymentAction({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [netlifyToken, setNetlifyToken] = useState('');
   const [projectName, setProjectName] = useState('friendly-purchasehub');
   const [isDeploying, setIsDeploying] = useState(false);
   const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+
   const workbench = useWorkbench();
 
   const handleDeploy = async () => {
@@ -35,6 +29,7 @@ export function DeploymentAction({
 
     try {
       console.log('Starting deployment to:', domainName);
+
       const result = await workbench.deployToNetlify(projectName, netlifyToken);
       const deployUrl = `https://${domainName}`;
       setDeploymentUrl(deployUrl);
@@ -42,6 +37,7 @@ export function DeploymentAction({
       onClose();
     } catch (err) {
       console.error('Deployment failed:', err);
+
       const error = err as Error;
       toast.error(error.message || 'Failed to deploy');
       setError(error.message || 'Failed to deploy');
@@ -50,7 +46,9 @@ export function DeploymentAction({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -59,9 +57,7 @@ export function DeploymentAction({
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
     >
-      <motion.div 
-        className="w-full max-w-md p-6 bg-bolt-elements-background rounded-lg shadow-xl"
-      >
+      <motion.div className="w-full max-w-md p-6 bg-bolt-elements-background rounded-lg shadow-xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <div className="i-ph:rocket-launch text-bolt-elements-textPrimary text-xl" />
@@ -74,9 +70,7 @@ export function DeploymentAction({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-bolt-elements-textSecondary mb-2">
-              Project Name
-            </label>
+            <label className="block text-sm font-medium text-bolt-elements-textSecondary mb-2">Project Name</label>
             <div className="flex items-center">
               <span className="p-2 bg-bolt-elements-bg-depth-2 border border-r-0 border-bolt-elements-borderColor rounded-l text-bolt-elements-textTertiary">
                 preview--
@@ -97,10 +91,10 @@ export function DeploymentAction({
           <div>
             <label className="block text-sm font-medium text-bolt-elements-textSecondary mb-2">
               Netlify Access Token
-              <a 
-                href="https://app.netlify.com/user/applications" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://app.netlify.com/user/applications"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="ml-2 text-blue-500 hover:underline"
               >
                 Get token →
@@ -121,7 +115,10 @@ export function DeploymentAction({
           {error && <div className="text-red-500 text-sm">{error}</div>}
           {deploymentUrl && (
             <div className="text-green-500 text-sm">
-              Deployed successfully! Visit: <a href={deploymentUrl} target="_blank" rel="noopener noreferrer" className="underline">{deploymentUrl}</a>
+              Deployed successfully! Visit:{' '}
+              <a href={deploymentUrl} target="_blank" rel="noopener noreferrer" className="underline">
+                {deploymentUrl}
+              </a>
             </div>
           )}
 
@@ -154,4 +151,4 @@ export function DeploymentAction({
       </motion.div>
     </motion.div>
   );
-} 
+}

@@ -548,35 +548,35 @@ export class WorkbenchStore {
   async deployToVercel(projectName: string, vercelToken: string) {
     try {
       const vercelService = new VercelService(vercelToken);
-      
+
       // Get all project files
       const files = await this.getAllProjectFiles();
-      
+
       // Create deployment
       const deployment = await vercelService.createDeployment(projectName, files);
-      
+
       // Poll deployment status
       const maxAttempts = 30;
       let attempts = 0;
-      
+
       while (attempts < maxAttempts) {
         const status = await vercelService.getDeploymentStatus(deployment.id);
-        
+
         if (status.state === 'READY') {
           return {
             url: `https://${status.url}`,
             status: 'success' as const,
           };
         }
-        
+
         if (status.state === 'ERROR') {
           throw new Error('Deployment failed');
         }
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         attempts++;
       }
-      
+
       throw new Error('Deployment timed out');
     } catch (error) {
       console.error('Error deploying to Vercel:', error);
@@ -587,13 +587,13 @@ export class WorkbenchStore {
   async deployToNetlify(projectName: string, netlifyToken: string) {
     try {
       const netlifyService = new NetlifyService(netlifyToken);
-      
+
       // Get all project files
       const files = await this.getAllProjectFiles();
-      
+
       // Create deployment
       const deployment = await netlifyService.createDeployment(projectName, files);
-      
+
       return {
         url: deployment.url,
         status: 'success' as const,
@@ -607,6 +607,7 @@ export class WorkbenchStore {
   private async getAllProjectFiles(): Promise<Record<string, { data: string }>> {
     // Implementation to get all project files
     const files: Record<string, { data: string }> = {};
+
     // Add logic to gather all project files
     return files;
   }

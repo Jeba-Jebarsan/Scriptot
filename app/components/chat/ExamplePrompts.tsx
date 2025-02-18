@@ -28,7 +28,7 @@ const EXAMPLE_PROMPTS = [
 
 export function ExamplePrompts({
   sendMessage,
-  setShowLoginPopup
+  setShowLoginPopup,
 }: {
   sendMessage?: (event: React.UIEvent, messageInput?: string) => void;
   setShowLoginPopup?: (show: boolean) => void;
@@ -52,16 +52,19 @@ export function ExamplePrompts({
     };
   }, []);
 
-  const handleExampleClick = useCallback((event: React.UIEvent, text: string) => {
-    event.preventDefault();
-    
-    if (!isAuthenticated) {
-      setShowLoginPopup?.(true);
-      return;
-    }
-    
-    sendMessage?.(event, text);
-  }, [isAuthenticated, sendMessage, setShowLoginPopup]);
+  const handleExampleClick = useCallback(
+    (event: React.UIEvent, text: string) => {
+      event.preventDefault();
+
+      if (!isAuthenticated) {
+        setShowLoginPopup?.(true);
+        return;
+      }
+
+      sendMessage?.(event, text);
+    },
+    [isAuthenticated, sendMessage, setShowLoginPopup]
+  );
 
   return (
     <div id="examples" className="relative flex flex-col gap-9 w-full max-w-3xl mx-auto flex justify-center mt-6">

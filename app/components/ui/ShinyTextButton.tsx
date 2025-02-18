@@ -15,16 +15,16 @@ export const ShinyTextButton = ({ children, onClick, className }: ShinyTextButto
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={classNames(
-        "group relative mt-8 px-12 py-4",
-        "text-sm font-medium text-white",
-        "rounded-full overflow-hidden",
-        "transition-all duration-300",
+        'group relative mt-8 px-12 py-4',
+        'text-sm font-medium text-white',
+        'rounded-full overflow-hidden',
+        'transition-all duration-300',
         className
       )}
     >
       {/* Gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600 bg-[length:200%_100%] animate-gradient" />
-      
+
       {/* Shine overlay */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -36,4 +36,4 @@ export const ShinyTextButton = ({ children, onClick, className }: ShinyTextButto
       <span className="relative z-10 group-hover:animate-text-glow">{children}</span>
     </motion.button>
   );
-}; 
+};

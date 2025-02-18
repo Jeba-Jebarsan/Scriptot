@@ -61,8 +61,10 @@ export default function Chat({ showLoginPopup, setShowLoginPopup }: ChatProps) {
     if (!isAuthenticated) {
       setHasAttemptedAction(true);
       setShowLoginPopup(true);
+
       return;
     }
+
     // Continue with chat logic
   };
 
@@ -76,6 +78,7 @@ export default function Chat({ showLoginPopup, setShowLoginPopup }: ChatProps) {
         <LoginPopup
           onSuccess={() => {
             setShowLoginPopup(false);
+
             // Continue with chat logic after successful login
           }}
           onClose={() => setShowLoginPopup(false)}
@@ -150,7 +153,15 @@ interface ChatImplProps {
 }
 
 export const ChatImpl = memo(
-  ({ description, initialMessages, storeMessageHistory, importChat, exportChat, showLoginPopup, setShowLoginPopup }: ChatImplProps) => {
+  ({
+    description,
+    initialMessages,
+    storeMessageHistory,
+    importChat,
+    exportChat,
+    showLoginPopup,
+    setShowLoginPopup,
+  }: ChatImplProps) => {
     useShortcuts();
 
     const textareaRef = useRef<HTMLTextAreaElement>(null);

@@ -174,10 +174,11 @@ export function useSettings() {
       Cookies.set('isDebugEnabled', String(enabled), {
         expires: 365, // Store for 1 year
         sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === 'production',
       });
     } catch (error) {
       console.error('Failed to toggle debug mode:', error);
+
       // Revert the state if cookie setting fails
       isDebugMode.set(!enabled);
     }

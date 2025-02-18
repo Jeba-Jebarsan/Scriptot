@@ -440,19 +440,25 @@ export default function DebugTab() {
   }, [activeProviders, systemInfo, isLatestBranch]);
 
   return (
-    <div className={`
+    <div
+      className={`
       p-4 space-y-6
       ${isSmallViewport ? 'flex flex-col' : 'flex flex-row gap-4'}
-    `}>
-      <div className={`
+    `}
+    >
+      <div
+        className={`
         flex items-center justify-between
         ${isSmallViewport ? 'flex-col' : 'flex-row'}
-      `}>
+      `}
+      >
         <h3 className="text-lg font-medium text-bolt-elements-textPrimary">Debug Information</h3>
-        <div className={`
+        <div
+          className={`
           flex gap-2
           ${isSmallViewport ? 'flex-col' : 'flex-row'}
-        `}>
+        `}
+        >
           <button
             onClick={handleCopyToClipboard}
             className="bg-bolt-elements-button-primary-background rounded-lg px-4 py-2 transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text"

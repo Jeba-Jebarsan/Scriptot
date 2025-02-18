@@ -137,6 +137,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     const checkAuth = () => {
       if (typeof window !== 'undefined') {
         const user = localStorage.getItem('user');
+
         if (user) {
           setUserInfo(JSON.parse(user));
           setIsAuthenticated(true);
@@ -150,7 +151,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     checkAuth();
     window.addEventListener('storage', checkAuth);
     window.addEventListener('auth-change', checkAuth);
-    
+
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('auth-change', checkAuth);
@@ -183,9 +184,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     >
       <div className="h-[60px]" /> {/* Spacer for top margin */}
       <CurrentDateTime />
-      
       {/* Add User Profile Section */}
-      
       <div className="flex-1 flex flex-col h-full w-full overflow-hidden">
         <div className="p-4 select-none">
           <a
@@ -193,6 +192,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
               if (!isAuthenticated) {
                 e.preventDefault();
                 setShowLoginPopup?.(true);
+
                 return;
               }
             }}
@@ -269,21 +269,11 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
         </div>
         <div className="flex items-center justify-between border-t border-bolt-elements-borderColor p-4">
           <div className="flex items-center gap-3">
-            {userInfo?.picture && (
-              <img 
-                src={userInfo.picture} 
-                alt="Profile" 
-                className="w-8 h-8 rounded-full"
-              />
-            )}
+            {userInfo?.picture && <img src={userInfo.picture} alt="Profile" className="w-8 h-8 rounded-full" />}
             {userInfo && (
               <div>
-                <div className="text-bolt-elements-textPrimary font-medium text-sm">
-                  {userInfo.name}
-                </div>
-                <div className="text-bolt-elements-textSecondary text-xs">
-                  {userInfo.email}
-                </div>
+                <div className="text-bolt-elements-textPrimary font-medium text-sm">{userInfo.name}</div>
+                <div className="text-bolt-elements-textSecondary text-xs">{userInfo.email}</div>
               </div>
             )}
           </div>

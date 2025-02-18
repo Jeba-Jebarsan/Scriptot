@@ -9,4 +9,4 @@ export interface VercelDeploymentStatus {
 export interface VercelDeploymentError {
   message: string;
   code: string;
-} 
+}

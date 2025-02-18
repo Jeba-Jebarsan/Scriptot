@@ -9,7 +9,13 @@ interface StarterTemplatesProps {
   uploadedFiles?: File[];
 }
 
-const StarterTemplates: React.FC<StarterTemplatesProps> = ({ onTemplateSelect, setImageDataList, imageDataList = [], setUploadedFiles, uploadedFiles = [] }) => {
+const StarterTemplates: React.FC<StarterTemplatesProps> = ({
+  onTemplateSelect,
+  setImageDataList,
+  imageDataList = [],
+  setUploadedFiles,
+  uploadedFiles = [],
+}) => {
   const [showAllTemplates, setShowAllTemplates] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<string | React.ReactElement | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -25,68 +31,68 @@ const StarterTemplates: React.FC<StarterTemplatesProps> = ({ onTemplateSelect, s
 
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
-  
+
   const examples = [
     {
       image: '/ex1.png',
       alt: '',
-      title: 'Real Estate Landing Page Template'
+      title: 'Real Estate Landing Page Template',
     },
     {
       image: '/ex2.png',
       alt: '',
-      title: 'Tech Company Landing Page Template'
+      title: 'Tech Company Landing Page Template',
     },
     {
       image: '/ex3.png',
       alt: '',
-      title: 'Developer Portfolio Template'
+      title: 'Developer Portfolio Template',
     },
     {
       image: '/ex4.jpg',
       alt: '',
-      title: 'Modern SaaS Tech Website Template'
+      title: 'Modern SaaS Tech Website Template',
     },
     {
       image: '/ex5.jpg',
       alt: '',
-      title: 'Professional Analytics Dashboard Template'
+      title: 'Professional Analytics Dashboard Template',
     },
     {
       image: '/ex6.jpg',
       alt: '',
-      title: 'Cryptocurrency Dashboard Template'
+      title: 'Cryptocurrency Dashboard Template',
     },
     {
       image: '/ex7.jpg',
       alt: '',
-      title: 'Modern Blog Website Template'
+      title: 'Modern Blog Website Template',
     },
     {
       image: '/ex8.jpg',
       alt: '',
-      title: 'Professional Resume Template'
+      title: 'Professional Resume Template',
     },
     {
       image: '/ex9.jpg',
       alt: '',
-      title: 'Modern Pricing Plan Template'
+      title: 'Modern Pricing Plan Template',
     },
     {
       image: '/ex10.jpg',
       alt: '',
-      title: 'Beautiful Pricing Page Template'
+      title: 'Beautiful Pricing Page Template',
     },
     {
       image: '/ex11.1.jpg',
       alt: '',
-      title: 'Beautiful Authentication UI Template'
-    }
+      title: 'Beautiful Authentication UI Template',
+    },
   ];
 
   const displayedTemplates = showAllTemplates ? examples : examples.slice(0, isMobile ? 3 : 6);
 
-  const handleDirectTemplateClick = (template: { title: string, image: string }) => {
+  const handleDirectTemplateClick = (template: { title: string; image: string }) => {
     // Create and set the editable prompt
     const editablePrompt = `Create a ${template.title.toLowerCase()}:
 
@@ -121,21 +127,22 @@ Please review and modify these requirements before proceeding.`;
 
     // Process the image for upload
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    img.crossOrigin = 'anonymous';
     img.src = template.image;
-    
+
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
-      
+
       const ctx = canvas.getContext('2d');
+
       if (ctx) {
         ctx.drawImage(img, 0, 0);
         canvas.toBlob((blob) => {
           if (blob) {
             const file = new File([blob], `template-${Date.now()}.png`, { type: 'image/png' });
-            
+
             if (setImageDataList && setUploadedFiles) {
               setUploadedFiles([...uploadedFiles, file]);
               setImageDataList([...imageDataList, canvas.toDataURL('image/png')]);
@@ -155,23 +162,21 @@ Please review and modify these requirements before proceeding.`;
           >
             <div className="i-ph:x text-xl" />
           </button>
-          
+
           <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-6 p-6`}>
             {/* Template Image */}
             <div className={`w-full ${isMobile ? '' : 'md:w-1/2'}`}>
               <img src={template.image} alt="Template Preview" className="w-full h-auto rounded-lg" />
             </div>
-            
+
             {/* Template Details and Prompt */}
             <div className={`w-full ${isMobile ? '' : 'md:w-1/2'} flex flex-col gap-4`}>
               <h3 className="text-2xl font-semibold text-bolt-elements-textPrimary">{template.title}</h3>
-              
+
               <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 overflow-auto">
-                <pre className="whitespace-pre-wrap text-sm text-bolt-elements-textSecondary">
-                  {editablePrompt}
-                </pre>
+                <pre className="whitespace-pre-wrap text-sm text-bolt-elements-textSecondary">{editablePrompt}</pre>
               </div>
-              
+
               {/* Action Buttons */}
               <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4 mt-4`}>
                 <button
@@ -207,7 +212,7 @@ Please review and modify these requirements before proceeding.`;
       <div className="flex flex-col items-center w-full">
         <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2 lg:grid-cols-3'} gap-8 w-full`}>
           {displayedTemplates.map((example, index) => (
-            <div 
+            <div
               key={index}
               className="flex flex-col rounded-lg border border-bolt-elements-borderColor hover:border-bolt-elements-borderColor-hover transition-all duration-300"
             >
@@ -267,19 +272,19 @@ Please review and modify these requirements before proceeding.`;
 
         {/* Video Section */}
         <div className="mt-12 w-full max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-bolt-elements-textPrimary text-center mb-6">
-            Watch How It Works
-          </h2>
+          <h2 className="text-2xl font-bold text-bolt-elements-textPrimary text-center mb-6">Watch How It Works</h2>
           <div className="relative rounded-xl overflow-hidden shadow-2xl bg-black">
             <div className="aspect-w-16 aspect-h-9">
               <video
                 controls
                 className="w-full h-full object-cover"
                 poster="/net.png"
-                style={{
-                  backgroundColor: '#000000',
-                  '--video-bg': '#000000'
-                } as React.CSSProperties}
+                style={
+                  {
+                    backgroundColor: '#000000',
+                    '--video-bg': '#000000',
+                  } as React.CSSProperties
+                }
               >
                 <source src="/video.mp4" type="video/mp4" />
               </video>
@@ -302,38 +307,37 @@ Please review and modify these requirements before proceeding.`;
                 {
                   number: '1',
                   title: 'Share Your Vision',
-                  description: 'Share your vision of what you want to create.'
+                  description: 'Share your vision of what you want to create.',
                 },
                 {
                   number: '2',
                   title: 'Generate Prototype',
-                  description: 'Instantly generate a working prototype.'
+                  description: 'Instantly generate a working prototype.',
                 },
                 {
                   number: '3',
                   title: 'Refine & Enhance',
-                  description: 'Refine and enhance through interactive chat.'
+                  description: 'Refine and enhance through interactive chat.',
                 },
                 {
                   number: '4',
                   title: 'Deploy & Share',
-                  description: 'Deploy and share with a single click.'
-                }
+                  description: 'Deploy and share with a single click.',
+                },
               ].map((step, index, array) => (
-                <div key={index} className={`flex flex-col items-center relative z-10 ${isMobile ? 'w-full' : 'w-1/4'}`}>
+                <div
+                  key={index}
+                  className={`flex flex-col items-center relative z-10 ${isMobile ? 'w-full' : 'w-1/4'}`}
+                >
                   {/* Step Number */}
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center text-white text-xl font-bold mb-4 shadow-lg">
                     {step.number}
                   </div>
-                  
+
                   {/* Step Content */}
                   <div className="text-center px-4">
-                    <h3 className="text-lg font-semibold text-bolt-elements-textPrimary mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-bolt-elements-textSecondary">
-                      {step.description}
-                    </p>
+                    <h3 className="text-lg font-semibold text-bolt-elements-textPrimary mb-2">{step.title}</h3>
+                    <p className="text-sm text-bolt-elements-textSecondary">{step.description}</p>
                   </div>
 
                   {/* Connector Line */}
@@ -359,41 +363,41 @@ Please review and modify these requirements before proceeding.`;
             <h2 className="text-3xl font-bold text-bolt-elements-textPrimary text-center mb-12">
               Transforming the Way You Build Products
             </h2>
-            
+
             <div className={`grid grid-cols-1 ${isMobile ? '' : 'md:grid-cols-2'} gap-8`}>
               {[
                 {
                   title: 'For Product Teams',
-                  description: 'Equip your team to turn concepts into code. Align ideas by creating functional prototypes quickly and collaboratively.',
-                  icon: '👥'
+                  description:
+                    'Equip your team to turn concepts into code. Align ideas by creating functional prototypes quickly and collaboratively.',
+                  icon: '👥',
                 },
                 {
                   title: 'For Founders, Solopreneurs, and Indie Hackers',
-                  description: 'Validate and refine ideas in record time. Launch complete products in just hours, not days.',
-                  icon: '🚀'
+                  description:
+                    'Validate and refine ideas in record time. Launch complete products in just hours, not days.',
+                  icon: '🚀',
                 },
                 {
                   title: 'For Product Designers',
-                  description: 'Coming soon: Skip tedious prototyping and turn your designs into working applications instantly.',
-                  icon: '🎨'
+                  description:
+                    'Coming soon: Skip tedious prototyping and turn your designs into working applications instantly.',
+                  icon: '🎨',
                 },
                 {
                   title: 'For Developers',
-                  description: 'Generate entire frontends in a snap. Let CodeIQ handle bug fixes and make UI updates a breeze.',
-                  icon: '👩‍💻'
-                }
+                  description:
+                    'Generate entire frontends in a snap. Let CodeIQ handle bug fixes and make UI updates a breeze.',
+                  icon: '👩‍💻',
+                },
               ].map((item, index) => (
-                <div 
+                <div
                   key={index}
                   className="p-6 rounded-xl bg-gradient-to-br from-gray-900/40 to-gray-900/20 border border-gray-800/50 hover:border-purple-500/30 transition-all duration-300"
                 >
                   <span className="text-3xl mb-4 block">{item.icon}</span>
-                  <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">
-                    {item.title}
-                  </h3>
-                  <p className="text-bolt-elements-textSecondary">
-                    {item.description}
-                  </p>
+                  <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">{item.title}</h3>
+                  <p className="text-bolt-elements-textSecondary">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -420,33 +424,32 @@ Please review and modify these requirements before proceeding.`;
           {[
             {
               title: 'Fast and User-Friendly',
-              description: 'Real-time previews, smooth image handling, quick undo, and collaborative versioning. The AI resolves issues for you. Deploy your project with a single click.',
-              icon: '⚡'
+              description:
+                'Real-time previews, smooth image handling, quick undo, and collaborative versioning. The AI resolves issues for you. Deploy your project with a single click.',
+              icon: '⚡',
             },
             {
               title: 'Polished and Professional',
-              description: 'We prioritize aesthetics. CodeIQ ensures every project follows modern UI/UX standards, so your creations are always visually stunning.',
-              icon: '✨'
+              description:
+                'We prioritize aesthetics. CodeIQ ensures every project follows modern UI/UX standards, so your creations are always visually stunning.',
+              icon: '✨',
             },
             {
               title: 'Backend Versatility',
-              description: 'Compatible with any database, API, or backend service. Connect your existing setup or leverage our Supabase integration for simplicity.',
-              icon: '🔌'
-            }
+              description:
+                'Compatible with any database, API, or backend service. Connect your existing setup or leverage our Supabase integration for simplicity.',
+              icon: '🔌',
+            },
           ].map((feature, index) => (
-            <div 
+            <div
               key={index}
               className="p-6 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-900/20 border border-gray-800/50 hover:border-purple-500/30 transition-all duration-300 group"
             >
               <span className="text-3xl mb-4 block transform group-hover:scale-110 transition-transform duration-300">
                 {feature.icon}
               </span>
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-bolt-elements-textSecondary leading-relaxed">
-                {feature.description}
-              </p>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">{feature.title}</h3>
+              <p className="text-bolt-elements-textSecondary leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -456,28 +459,26 @@ Please review and modify these requirements before proceeding.`;
           {[
             {
               title: 'Effortless Customization',
-              description: 'Fine-tune every detail with ease. Just select an element and describe the changes you want to see.',
-              icon: '🎨'
+              description:
+                'Fine-tune every detail with ease. Just select an element and describe the changes you want to see.',
+              icon: '🎨',
             },
             {
               title: 'Seamless Git Integration',
-              description: 'Link CodeIQ to your GitHub for automatic code syncing. Ideal for handoffs, collaborations, and advanced development workflows.',
-              icon: '🔄'
-            }
+              description:
+                'Link CodeIQ to your GitHub for automatic code syncing. Ideal for handoffs, collaborations, and advanced development workflows.',
+              icon: '🔄',
+            },
           ].map((feature, index) => (
-            <div 
+            <div
               key={index}
               className="p-6 rounded-xl bg-gradient-to-br from-gray-900/40 via-gray-900/30 to-gray-900/20 border border-gray-800/50 hover:border-purple-500/30 transition-all duration-300 group"
             >
               <span className="text-3xl mb-4 block transform group-hover:scale-110 transition-transform duration-300">
                 {feature.icon}
               </span>
-              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-bolt-elements-textSecondary leading-relaxed">
-                {feature.description}
-              </p>
+              <h3 className="text-xl font-semibold text-bolt-elements-textPrimary mb-3">{feature.title}</h3>
+              <p className="text-bolt-elements-textSecondary leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -497,40 +498,43 @@ Please review and modify these requirements before proceeding.`;
           <div className="text-center space-y-12">
             {[
               {
-                quote: "Coding like poetry should be short and concise.",
-                author: "Santosh Kalwar"
+                quote: 'Coding like poetry should be short and concise.',
+                author: 'Santosh Kalwar',
               },
               {
-                quote: "Clean code always looks like it was written by someone who cares. ",
-                author: "Robert C. Martin"
+                quote: 'Clean code always looks like it was written by someone who cares. ',
+                author: 'Robert C. Martin',
               },
               {
-                quote: "First, solve the problem. Then, write the code.",
-                author: "John Johnson"
+                quote: 'First, solve the problem. Then, write the code.',
+                author: 'John Johnson',
               },
               {
                 quote: "Code is like humor. When you have to explain it, it's bad.",
-                author: "Cory House"
+                author: 'Cory House',
               },
               {
-                quote: "Make it work, make it right, make it fast.",
-                author: "Kent Beck"
-              }
+                quote: 'Make it work, make it right, make it fast.',
+                author: 'Kent Beck',
+              },
             ].map((testimonial, index) => (
-              <div key={index} className={`transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0 hidden'}`}>
-                <h2 className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} font-bold text-bolt-elements-textPrimary mb-4 leading-tight`}>
+              <div
+                key={index}
+                className={`transition-opacity duration-300 ${index === 0 ? 'opacity-100' : 'opacity-0 hidden'}`}
+              >
+                <h2
+                  className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} font-bold text-bolt-elements-textPrimary mb-4 leading-tight`}
+                >
                   "{testimonial.quote}"
                 </h2>
-                <p className="text-xl text-bolt-elements-textSecondary mt-6">
-                  ― {testimonial.author}
-                </p>
+                <p className="text-xl text-bolt-elements-textSecondary mt-6">― {testimonial.author}</p>
               </div>
             ))}
           </div>
-          
+
           {/* Slider Dots */}
           <div className="flex justify-center gap-3 mt-12">
-            {[0,1,2,3,4].map((index) => (
+            {[0, 1, 2, 3, 4].map((index) => (
               <button
                 key={index}
                 onClick={() => {
@@ -555,9 +559,7 @@ Please review and modify these requirements before proceeding.`;
         </div>
       </div>
 
-      {previewTemplate && (
-        previewTemplate
-      )}
+      {previewTemplate && previewTemplate}
     </div>
   );
 };

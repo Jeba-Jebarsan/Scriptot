@@ -27,6 +27,7 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
     }
 
     document.addEventListener('mousedown', handleClickOutside);
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -36,9 +37,10 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
     const checkAuth = () => {
       const isAuth = checkAuthStatus();
       setIsAuthenticated(isAuth);
-      
+
       if (typeof window !== 'undefined') {
         const user = localStorage.getItem('user');
+
         if (user) {
           setUserInfo(JSON.parse(user));
           setShowLoginPopup(false);
@@ -51,7 +53,7 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
     checkAuth();
     window.addEventListener('storage', checkAuth);
     window.addEventListener('auth-change', checkAuth);
-    
+
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('auth-change', checkAuth);
@@ -59,10 +61,12 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
   }, [setShowLoginPopup]);
 
   return (
-    <header className={classNames('flex items-center justify-between p-5 border-b h-[var(--header-height)]', {
-      'border-transparent': !chat.started,
-      'border-bolt-elements-borderColor': chat.started,
-    })}>
+    <header
+      className={classNames('flex items-center justify-between p-5 border-b h-[var(--header-height)]', {
+        'border-transparent': !chat.started,
+        'border-bolt-elements-borderColor': chat.started,
+      })}
+    >
       <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
         <div className="i-ph:sidebar-simple-duotone text-xl" />
         <a href="/" className="text-2xl font-semibold text-accent flex items-center">
@@ -77,15 +81,8 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
       )}
       {isAuthenticated && userInfo ? (
         <div className="relative z-50" ref={dropdownRef}>
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="w-10 h-10 rounded-full"
-            >
-            <img 
-              src={userInfo.picture} 
-              alt={userInfo.name} 
-              className="w-10 h-10 rounded-full"
-            />
+          <button onClick={() => setShowDropdown(!showDropdown)} className="w-10 h-10 rounded-full">
+            <img src={userInfo.picture} alt={userInfo.name} className="w-10 h-10 rounded-full" />
           </button>
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-56 bg-black/90 backdrop-blur-lg rounded-xl shadow-2xl py-2 border border-white/10">
@@ -100,7 +97,7 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
                   window.location.reload();
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-white bg-red-600 hover:bg-white/5 transition-colors"
-                >
+              >
                 Sign Out
               </button>
             </div>

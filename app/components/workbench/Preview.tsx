@@ -217,7 +217,7 @@ export const Preview = memo(() => {
     const loadingSteps = [
       { text: 'Initializing environment', icon: '🚀' },
       { text: 'Setting up dependencies', icon: '⚙️' },
-      { text: 'Starting development server', icon: '🔄' }
+      { text: 'Starting development server', icon: '🔄' },
     ];
 
     return (
@@ -240,9 +240,7 @@ export const Preview = memo(() => {
 
         {/* Text content with animations */}
         <div className="relative flex flex-col items-center gap-3 z-10">
-          <h3 className="text-xl font-medium text-bolt-elements-textPrimary animate-fade-in mb-8">
-            Building preview
-          </h3>
+          <h3 className="text-xl font-medium text-bolt-elements-textPrimary animate-fade-in mb-8">Building preview</h3>
           <div className="flex flex-col items-center gap-4">
             {loadingSteps.map((step, index) => (
               <div
@@ -255,15 +253,13 @@ export const Preview = memo(() => {
                   animation: `
                     slideUp 0.5s ease-out ${index * 0.3}s forwards,
                     glow 2s ease-in-out ${index * 0.3}s infinite
-                  `
+                  `,
                 }}
               >
                 <span className="animate-bounce text-xl" style={{ animationDelay: `${index * 0.3}s` }}>
                   {step.icon}
                 </span>
-                <p className="text-sm text-bolt-elements-textTertiary tracking-wide">
-                  {step.text}
-                </p>
+                <p className="text-sm text-bolt-elements-textTertiary tracking-wide">{step.text}</p>
               </div>
             ))}
           </div>
@@ -282,9 +278,15 @@ export const Preview = memo(() => {
           }
 
           @keyframes glow {
-            0% { text-shadow: 0 0 0 rgba(255,255,255,0); }
-            50% { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-            100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+            0% {
+              text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+            50% {
+              text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+              text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
           }
         `}</style>
       </div>

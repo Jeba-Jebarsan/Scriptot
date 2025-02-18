@@ -1,4 +1,4 @@
-import type { NetlifyDeploymentStatus } from "../../types/netlify";
+import type { NetlifyDeploymentStatus } from '../../types/netlify';
 
 const NETLIFY_API_BASE = 'https://api.netlify.com/api/v1';
 
@@ -32,22 +32,25 @@ export class NetlifyService {
     });
 
     if (!response.ok) {
-      const error = await response.json() as { message?: string };
+      const error = (await response.json()) as { message?: string };
       throw new Error(error.message || 'Failed to communicate with Netlify API');
     }
 
     return response.json();
   }
 
-  async createDeployment(projectName: string, files: Record<string, { data: string }>): Promise<NetlifyDeploymentStatus> {
-    const site = await this.fetchWithAuth('/sites', {
+  async createDeployment(
+    projectName: string,
+    files: Record<string, { data: string }>
+  ): Promise<NetlifyDeploymentStatus> {
+    const site = (await this.fetchWithAuth('/sites', {
       method: 'POST',
       body: JSON.stringify({
         name: projectName,
       }),
-    }) as NetlifySite;
+    })) as NetlifySite;
 
-    const deployment = await this.fetchWithAuth(`/sites/${site.id}/deploys`, {
+    const deployment = (await this.fetchWithAuth(`/sites/${site.id}/deploys`, {
       method: 'POST',
       body: JSON.stringify({
         files: Object.entries(files).map(([path, { data }]) => ({
@@ -55,7 +58,7 @@ export class NetlifyService {
           content: data,
         })),
       }),
-    }) as NetlifyDeployment;
+    })) as NetlifyDeployment;
 
     return {
       id: deployment.id,

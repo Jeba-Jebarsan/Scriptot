@@ -259,6 +259,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
     const handleSendMessage = (event: React.UIEvent, messageInput?: string) => {
       event.preventDefault();
+
       const _input = messageInput || input;
 
       if (!_input.trim() && imageDataList.length === 0) {
@@ -334,10 +335,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const handleKeyDown = (event: React.KeyboardEvent) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
+
         if (!isAuthenticated) {
           setShowLoginPopup?.(true);
           return;
         }
+
         handleSendMessage(event as any);
       }
     };
@@ -362,7 +365,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
                   Build Faster,{' '}
                   <GradientText
-                    colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+                    colors={['#40ffaa', '#4079ff', '#40ffaa', '#4079ff', '#40ffaa']}
                     animationSpeed={5}
                     showBorder={false}
                     className="text-6xl font-bold"
@@ -627,23 +630,25 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
               )}
               {!chatStarted && (
-                <ExamplePrompts 
+                <ExamplePrompts
                   sendMessage={(event, messageInput) => {
                     if (isStreaming) {
                       handleStop?.();
                       return;
                     }
+
                     handleSendMessage?.(event, messageInput);
                   }}
                   setShowLoginPopup={setShowLoginPopup}
                 />
               )}
               {!chatStarted && (
-                <StarterTemplates 
+                <StarterTemplates
                   onTemplateSelect={(prompt) => {
                     if (textareaRef?.current) {
                       textareaRef.current.value = prompt;
                       textareaRef.current.focus();
+
                       // Trigger input change to update state
                       const event = new Event('input', { bubbles: true });
                       textareaRef.current.dispatchEvent(event);

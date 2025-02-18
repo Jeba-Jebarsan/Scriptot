@@ -9,8 +9,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastContainer } from 'react-toastify';
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import { ConvexProviderWrapper } from '~/lib/providers/ConvexProvider';
-import { json } from "@remix-run/cloudflare";
-import type { LoaderFunction } from "@remix-run/cloudflare";
+import { json } from '@remix-run/cloudflare';
+import type { LoaderFunction } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
 
 import globalStyles from './styles/index.scss?url';
@@ -90,7 +90,7 @@ type LoaderData = {
   ENV: {
     GITHUB_CLIENT_ID: string;
     CONVEX_URL: string;
-  }
+  };
 };
 
 export const loader: LoaderFunction = async () => {

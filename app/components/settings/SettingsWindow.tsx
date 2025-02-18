@@ -32,6 +32,7 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
     const checkAuth = () => {
       if (typeof window !== 'undefined') {
         const user = localStorage.getItem('user');
+
         if (user) {
           setUserInfo(JSON.parse(user));
           setIsAuthenticated(true);
@@ -45,7 +46,7 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
     checkAuth();
     window.addEventListener('storage', checkAuth);
     window.addEventListener('auth-change', checkAuth);
-    
+
     return () => {
       window.removeEventListener('storage', checkAuth);
       window.removeEventListener('auth-change', checkAuth);
@@ -131,7 +132,6 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
                     {tab.label}
                   </button>
                 ))}
-              
               </div>
               <div className="flex-1 flex flex-col p-8 pt-10 bg-bolt-elements-background-depth-2">
                 <div className="flex-1 overflow-y-auto">{tabs.find((tab) => tab.id === activeTab)?.component}</div>

@@ -304,7 +304,7 @@ Now that the Template is imported please continue with my original request
 }
 
 const handleDirectTemplateClick = (
-  template: { title: string, image: string },
+  template: { title: string; image: string },
   setUploadedFiles?: (files: File[]) => void,
   uploadedFiles: File[] = [],
   setImageDataList?: (data: string[]) => void,
@@ -312,7 +312,8 @@ const handleDirectTemplateClick = (
   onTemplateSelect?: (prompt: string) => void
 ) => {
   // Create the editable prompt
-  const editablePrompt = `Create a ${template.title.toLowerCase()}:\n\n` + 
+  const editablePrompt =
+    `Create a ${template.title.toLowerCase()}:\n\n` +
     `Requirements:\n` +
     `- Make it modern and responsive\n` +
     `- Include user-friendly interface\n` +
@@ -321,7 +322,7 @@ const handleDirectTemplateClick = (
     `Additional context:\n` +
     `- Reference image provided for design inspiration\n` +
     `- Feel free to modify these requirements before sending`;
-  
+
   // Call the template selection handler
   if (onTemplateSelect) {
     onTemplateSelect(editablePrompt);
@@ -329,21 +330,22 @@ const handleDirectTemplateClick = (
 
   // Handle image processing after prompt is set
   const img = new Image();
-  img.crossOrigin = "anonymous";
+  img.crossOrigin = 'anonymous';
   img.src = template.image;
-  
+
   img.onload = () => {
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
-    
+
     const ctx = canvas.getContext('2d');
+
     if (ctx) {
       ctx.drawImage(img, 0, 0);
       canvas.toBlob((blob) => {
         if (blob) {
           const file = new File([blob], `template-${Date.now()}.png`, { type: 'image/png' });
-          
+
           // Update the image data and files
           if (setImageDataList && setUploadedFiles) {
             setUploadedFiles([...uploadedFiles, file]);
