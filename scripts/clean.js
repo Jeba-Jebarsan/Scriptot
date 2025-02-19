@@ -1,7 +1,7 @@
 import { rmSync } from 'fs';
 import { join } from 'path';
 
-const directories = ['build', '.cache', 'node_modules/.cache'];
+const directories = ['.cache', 'node_modules/.cache'];
 
 directories.forEach((dir) => {
   try {
