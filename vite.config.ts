@@ -95,8 +95,8 @@ export default defineConfig((config) => {
       rollupOptions: {
         external: ['__STATIC_CONTENT_MANIFEST'],
       },
-      outDir: 'build',
-      emptyOutDir: true
+      outDir: 'build/client',
+      emptyOutDir: false
     },
     plugins: [
       nodePolyfills({
@@ -114,7 +114,7 @@ export default defineConfig((config) => {
           v3_relativeSplatPath: true,
           v3_throwAbortReason: true,
         },
-        buildDirectory: "build/server"
+        buildDirectory: "build"
       }),
       UnoCSS(),
       tsconfigPaths(),

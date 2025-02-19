@@ -11,6 +11,10 @@ export default {
     v3_relativeSplatPath: true,
     v3_throwAbortReason: true,
   },
+  buildDirectory: "build",
+  serverBuildPath: "build/server/index.js",
+  assetsBuildDirectory: "build/client",
+  publicPath: "/",
   serverDependenciesToBundle: [
     /@remix-run\/.*/,
     /^@remix-run\/node$/,

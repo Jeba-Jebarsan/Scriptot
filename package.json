@@ -8,7 +8,7 @@
   "version": "0.0.6",
   "scripts": {
     "deploy": "pnpm run clean && pnpm install && pnpm run build && wrangler pages deploy build/client --project-name scriptot --commit-dirty=true",
-    "build": "remix vite:build && node scripts/copy-worker.js",
+    "build": "pnpm run clean && remix vite:build && node scripts/build.js",
     "dev": "node pre-start.cjs && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
