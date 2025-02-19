@@ -8,7 +8,7 @@
   "version": "0.0.6",
   "scripts": {
     "deploy": "pnpm run clean && pnpm install && pnpm run build && wrangler pages deploy build/client --project-name scriptot --commit-dirty=true",
-    "build": "node scripts/build.js",
+    "build": "remix vite:build && node scripts/copy-worker.js",
     "dev": "node pre-start.cjs && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
@@ -25,7 +25,8 @@
     "typegen": "wrangler types",
     "preview": "pnpm run build && pnpm run start",
     "prepare": "husky",
-    "clean": "node scripts/clean.js"
+    "clean": "node scripts/clean.js",
+    "build:worker": "wrangler pages functions build --outdir build/worker"
   },
   "engines": {
     "node": ">=18.18.0"
@@ -146,6 +147,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "fast-glob": "^3.3.2",
     "husky": "9.1.7",
     "is-ci": "^3.0.1",
@@ -153,6 +156,7 @@
     "pnpm": "^9.14.4",
     "prettier": "^3.4.1",
     "sass-embedded": "^1.81.0",
+    "stream-browserify": "^3.0.0",
     "typescript": "^5.7.2",
     "unified": "^11.0.5",
     "unocss": "^0.58.0",

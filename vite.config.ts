@@ -92,10 +92,20 @@ export default defineConfig((config) => {
     },
     build: {
       target: 'esnext',
+      rollupOptions: {
+        external: ['__STATIC_CONTENT_MANIFEST'],
+      },
+      outDir: 'build',
+      emptyOutDir: true
     },
     plugins: [
       nodePolyfills({
-        include: ['path', 'buffer', 'process'],
+        include: ['crypto', 'stream', 'buffer', 'process', 'util', 'path'],
+        globals: {
+          Buffer: true,
+          global: true,
+          process: true,
+        },
       }),
       config.mode !== 'test' && remixCloudflareDevProxy(),
       remixVitePlugin({
@@ -103,8 +113,8 @@ export default defineConfig((config) => {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,
           v3_throwAbortReason: true,
-          v3_lazyRouteDiscovery: true,
         },
+        buildDirectory: "build/server"
       }),
       UnoCSS(),
       tsconfigPaths(),
