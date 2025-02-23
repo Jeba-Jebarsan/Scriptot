@@ -11,6 +11,7 @@ import { logger } from '~/utils/logger';
 import { HistoryItem } from './HistoryItem';
 import { binDates } from './date-binning';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
+import { signOut } from '~/utils/auth';
 
 const menuVariants = {
   closed: {
@@ -117,11 +118,15 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     const exitThreshold = 40;
 
     function onMouseMove(event: MouseEvent) {
-      if (event.pageX < enterThreshold) {
-        setOpen(true);
-      }
+      if (isAuthenticated) {
+        if (event.pageX < enterThreshold) {
+          setOpen(true);
+        }
 
-      if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
+        if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
+          setOpen(false);
+        }
+      } else {
         setOpen(false);
       }
     }
@@ -131,7 +136,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -167,17 +172,15 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     loadEntries(); // Reload the list after duplication
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    window.dispatchEvent(new Event('storage'));
-    window.location.reload();
+  const handleLogout = async () => {
+    await signOut();
   };
 
   return (
     <motion.div
       ref={menuRef}
       initial="closed"
-      animate={open ? 'open' : 'closed'}
+      animate={isAuthenticated && open ? 'open' : 'closed'}
       variants={menuVariants}
       className="flex selection-accent flex-col side-menu fixed top-0 w-[350px] h-full bg-bolt-elements-background-depth-2 border-r rounded-r-3xl border-bolt-elements-borderColor z-sidebar shadow-xl shadow-bolt-elements-sidebar-dropdownShadow text-sm"
     >

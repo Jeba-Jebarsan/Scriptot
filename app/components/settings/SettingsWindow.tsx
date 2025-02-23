@@ -14,6 +14,7 @@ import ConnectionsTab from './connections/ConnectionsTab';
 import DataTab from './data/DataTab';
 import AppearanceTab from './Appearance/AppearanceTab';
 import HelpTab from './Help/HelpTab';
+import { signOut } from '~/utils/auth';
 
 interface SettingsProps {
   open: boolean;
@@ -52,10 +53,8 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
     };
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
-    setUserInfo(null);
+  const handleLogout = async () => {
+    await signOut();
   };
 
   const tabs: { id: TabType; label: string; icon: string; component?: ReactElement }[] = [

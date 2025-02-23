@@ -6,8 +6,10 @@ export default defineSchema({
     email: v.string(),
     name: v.string(),
     picture: v.string(),
+    phone: v.optional(v.string()),
     googleToken: v.optional(v.string()),
     githubToken: v.optional(v.string()),
+    supabaseId: v.optional(v.string()),
     lastLoginAt: v.number(),
   }),
   chats: defineTable({

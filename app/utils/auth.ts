@@ -1,27 +1,27 @@
 // Create new file: app/utils/auth.ts
-import { api } from "../../convex/_generated/api";
-import { useQuery } from "convex/react";
+import { supabase } from '~/lib/supabase'
 
-export const checkAuthStatus = () => {
-    if (typeof window === 'undefined') return false;
-    
-    try {
-      const user = localStorage.getItem('user');
-      console.log('Checking auth status, user:', user); // Debug log
-      if (!user) return false;
-      
-      const parsedUser = JSON.parse(user);
-      return !!parsedUser?.email && !!parsedUser?._id && (!!parsedUser?.googleToken || !!parsedUser?.githubToken);
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      return false;
-    }
-  };
-
-export const useAuthUser = () => {
-  const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-  const user = userStr ? JSON.parse(userStr) : null;
-  const convexUser = useQuery(api.users.getUser, { email: user?.email });
+export const checkAuthStatus = async () => {
+  if (typeof window === 'undefined') return false
   
-  return convexUser;
-};
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    return !!session
+  } catch (error) {
+    console.error('Auth check error:', error)
+    return false
+  }
+}
+
+export const signOut = async () => {
+  try {
+    await supabase.auth.signOut()
+    localStorage.removeItem('user')
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new Event('auth-change'))
+    return true
+  } catch (error) {
+    console.error('Sign out error:', error)
+    return false
+  }
+}
