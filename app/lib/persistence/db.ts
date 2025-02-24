@@ -232,3 +232,66 @@ export async function updateChatDescription(db: IDBDatabase, id: string, descrip
 
   await setMessages(db, id, chat.messages, chat.urlId, description, chat.timestamp);
 }
+
+export async function openProfileDatabase(): Promise<IDBDatabase | undefined> {
+  if (typeof indexedDB === 'undefined') {
+    console.error('indexedDB is not available in this environment.');
+    return undefined;
+  }
+
+  return new Promise((resolve) => {
+    const request = indexedDB.open('DeepgenProfile', 1);
+
+    request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      if (!db.objectStoreNames.contains('profiles')) {
+        const store = db.createObjectStore('profiles', { keyPath: 'id' });
+        store.createIndex('id', 'id', { unique: true });
+        store.createIndex('username', 'username', { unique: true });
+      }
+    };
+
+    request.onsuccess = (event: Event) => {
+      resolve((event.target as IDBOpenDBRequest).result);
+    };
+
+    request.onerror = (event: Event) => {
+      resolve(undefined);
+      logger.error((event.target as IDBOpenDBRequest).error);
+    };
+  });
+}
+
+export async function setProfile(
+  db: IDBDatabase,
+  profileData: {
+    id: string;
+    username: string;
+    name: string;
+    description: string;
+    location: string;
+    link: string;
+    hide_profile_picture: boolean;
+  }
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('profiles', 'readwrite');
+    const store = transaction.objectStore('profiles');
+    const request = store.put(profileData);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function getProfile(db: IDBDatabase, id: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('profiles', 'readonly');
+    const store = transaction.objectStore('profiles');
+    const request = store.get(id);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}

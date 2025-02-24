@@ -208,9 +208,13 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     }, [providerList]);
 
     useEffect(() => {
-      if (typeof window !== 'undefined') {
-        setIsAuthenticated(checkAuthStatus());
-      }
+      const init = async () => {
+        if (typeof window !== 'undefined') {
+          const authStatus = await checkAuthStatus();
+          setIsAuthenticated(authStatus);
+        }
+      };
+      init();
     }, []);
 
     const onApiKeysChange = async (providerName: string, apiKey: string) => {

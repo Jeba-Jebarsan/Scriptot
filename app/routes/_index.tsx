@@ -6,8 +6,14 @@ import { Header } from '~/components/header/Header';
 import BackgroundRays from '~/components/ui/BackgroundRays';
 import { useState, useEffect } from 'react';
 import { LoginPopup } from '~/components/auth/LoginPopup';
+<<<<<<< HEAD
 import { useSearchParams, useNavigate } from '@remix-run/react';
 import { toast } from 'react-toastify';
+=======
+import { useSearchParams, useNavigate } from "@remix-run/react";
+import { toast } from "react-toastify";
+import { supabase } from '~/lib/supabase';
+>>>>>>> my-lost-branch
 
 export const meta: MetaFunction = () => {
   return [{ title: 'codeiq' }, { name: 'description', content: 'Talk with codeiq, an AI assistant from Thomas' }];
@@ -21,6 +27,7 @@ export default function Index() {
   const navigate = useNavigate();
 
   useEffect(() => {
+<<<<<<< HEAD
     const error = searchParams.get('error');
     const login = searchParams.get('login');
 
@@ -31,8 +38,46 @@ export default function Index() {
     if (login === 'success') {
       toast.success('Successfully logged in!');
       navigate('/', { replace: true });
+=======
+    // ✅ Remove hash and trailing slashes from URL
+    if (window.location.hash || window.location.pathname.endsWith('/')) {
+      const cleanPath = window.location.pathname.replace(/[#/]+$/, '');
+      window.history.replaceState({}, '', cleanPath);
     }
-  }, [searchParams, navigate]);
+    
+    const error = searchParams.get("error");
+    const login = searchParams.get("login");
+    
+    if (error === "github_auth_failed") {
+      toast.error("GitHub login failed. Please try again.");
+    }
+    
+    if (login === "success") {
+      toast.success("Successfully logged in!");
+      window.history.replaceState({}, '', window.location.pathname.replace(/[#/]+$/, ''));
+>>>>>>> my-lost-branch
+    }
+
+    // ✅ Manually fetch session & trigger UI update
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        window.dispatchEvent(new Event('auth-change'));
+      }
+    };
+
+    fetchSession();
+  }, [searchParams]);
+
+  useEffect(() => {
+    // ✅ Listen for 'auth-change' event to update UI
+    const handleAuthChange = () => {
+      setShowLoginPopup(false);
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
+    return () => window.removeEventListener('auth-change', handleAuthChange);
+  }, []);
 
   return (
     <div className="flex flex-col h-full w-full bg-bolt-elements-background-depth-1">

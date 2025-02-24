@@ -646,5 +646,4 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
         </motion.div>
       </motion.div>
     </motion.div>
-  );
-}
+  );}

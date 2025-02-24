@@ -47,6 +47,7 @@ export const upsertUser = mutation({
     picture: v.string(),
     googleToken: v.optional(v.string()),
     githubToken: v.optional(v.string()),
+    supabaseId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     try {
