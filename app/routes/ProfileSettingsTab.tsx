@@ -76,9 +76,9 @@ export default function ProfileSettingsTab() {
           description: profileData?.description || '',
           location: profileData?.location || '',
           link: profileData?.link || '',
-          hideProfilePicture: profileData?.hide_profile_picture || false,
-          bannerColor: profileData?.banner_color || '#1A1B1E',
-          bannerImage: profileData?.banner_image || '',
+          hide_profile_picture: profileData?.hide_profile_picture || false,
+          banner_color: profileData?.banner_color || '#1A1B1E',
+          banner_image: profileData?.banner_image || '',
           picture: userData.picture || ''
         };
 
@@ -254,6 +254,18 @@ export default function ProfileSettingsTab() {
         pauseOnHover
         theme="dark"
       />
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 rounded-lg hover:bg-blue-500/20"
+        >
+          <div className="i-ph:arrow-left text-lg" />
+          Back
+        </button>
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+          Profile Settings
+        </h1>
+      </div>
       <div className="flex items-center gap-4">
         {userInfo?.picture && !formData.hideProfilePicture ? (
           <img src={userInfo.picture} alt="Profile" className="w-24 h-24 rounded-full" />
@@ -393,9 +405,9 @@ export default function ProfileSettingsTab() {
         <button
           onClick={handleSave}
           disabled={!hasChanges}
-          className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2
+          className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2
             ${hasChanges 
-              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-blue-500/25' 
               : 'bg-gray-600 cursor-not-allowed text-gray-300'}`}
         >
           <div className="i-ph:floppy-disk text-lg" />

@@ -117,6 +117,18 @@ export default function ProfilePage() {
         <Header setShowLoginPopup={setShowLoginPopup} />
         <div className="p-8">
           <div className="max-w-2xl mx-auto">
+            <div className="flex items-center gap-4 mb-6">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 rounded-lg hover:bg-blue-500/20"
+              >
+                <div className="i-ph:arrow-left text-lg" />
+                Back
+              </button>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                Profile
+              </h1>
+            </div>
             <div className="relative">
               <div 
                 className="h-48 w-full rounded-t-xl bg-cover bg-center"

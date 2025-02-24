@@ -93,7 +93,13 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
       'border-bolt-elements-borderColor': chat.started,
     })}>
       <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
-        <div className="i-ph:sidebar-simple-duotone text-xl" />
+        {isAuthenticated && (
+          <img 
+            src="/sidebar.png"
+            alt="menu" 
+            className="w-6 h-6" 
+          />
+        )}
         <a href="/" className="text-2xl font-semibold text-accent flex items-center">
           <img src="/logo-light-styled.png" alt="logo" className="w-[90px] inline-block dark:hidden" />
           <img src="/logo-dark-styled.png" alt="logo" className="w-[90px] inline-block hidden dark:block" />
