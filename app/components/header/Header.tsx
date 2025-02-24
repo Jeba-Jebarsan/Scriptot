@@ -5,7 +5,7 @@ import { classNames } from '~/utils/classNames';
 import { HeaderActionButtons } from './HeaderActionButtons.client';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { checkAuthStatus } from '~/utils/auth';
+import { checkAuthStatus, signOut } from '~/utils/auth';
 import { useLocation } from '@remix-run/react';
 
 interface HeaderProps {
@@ -60,6 +60,11 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
     };
   }, [setShowLoginPopup]);
 
+  const handleSignOut = async () => {
+    await signOut()
+    window.location.reload()
+  }
+
   return (
     <header
       className={classNames('flex items-center justify-between p-5 border-b h-[var(--header-height)]', {
@@ -91,11 +96,7 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
                 <div className="text-xs mt-1 text-gray-400">{userInfo.email}</div>
               </div>
               <button
-                onClick={() => {
-                  localStorage.removeItem('user');
-                  window.dispatchEvent(new Event('storage'));
-                  window.location.reload();
-                }}
+                onClick={handleSignOut}
                 className="w-full text-left px-4 py-2 text-sm text-white bg-red-600 hover:bg-white/5 transition-colors"
               >
                 Sign Out

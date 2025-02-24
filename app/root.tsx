@@ -12,6 +12,7 @@ import { ConvexProviderWrapper } from '~/lib/providers/ConvexProvider';
 import { json } from '@remix-run/cloudflare';
 import type { LoaderFunction } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
+import { createClient } from '@supabase/supabase-js'
 
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
@@ -88,16 +89,16 @@ import { logStore } from './lib/stores/logs';
 
 type LoaderData = {
   ENV: {
-    GITHUB_CLIENT_ID: string;
-    CONVEX_URL: string;
+    SUPABASE_URL: string;
+    SUPABASE_ANON_KEY: string;
   };
 };
 
 export const loader: LoaderFunction = async () => {
   return json({
     ENV: {
-      GITHUB_CLIENT_ID: process.env.VITE_GITHUB_CLIENT_ID || 'Ov23liA3PwvOtkwYOKUy',
-      CONVEX_URL: process.env.VITE_CONVEX_URL,
+      SUPABASE_URL: process.env.VITE_SUPABASE_URL,
+      SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY,
     },
   });
 };

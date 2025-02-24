@@ -7,11 +7,17 @@ import { toast } from 'react-toastify';
 import { api } from "../../../convex/_generated/api";
 import { useMutation } from "convex/react";
 import { TypeAnimation } from 'react-type-animation';
+import { createClient } from '@supabase/supabase-js';
 
 interface LoginPopupProps {
   onSuccess: () => void;
   onClose: () => void;
 }
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL!,
+  process.env.VITE_SUPABASE_ANON_KEY!
+);
 
 export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
   const navigate = useNavigate();
@@ -480,18 +486,16 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
       async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
           try {
-            const result = await upsertUser({
+            await upsertUser({
               email: session.user.email!,
               name: session.user.user_metadata.full_name || session.user.email!,
-              picture: session.user.user_metadata.avatar_url,
-              supabaseId: session.user.id,
+              picture: session.user.user_metadata.avatar_url
             });
 
             const userData = {
               email: session.user.email,
               name: session.user.user_metadata.full_name || session.user.email,
               picture: session.user.user_metadata.avatar_url,
-              _id: result,
               supabaseId: session.user.id
             };
 
@@ -642,4 +646,5 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
         </motion.div>
       </motion.div>
     </motion.div>
-  );}
+  );
+}
