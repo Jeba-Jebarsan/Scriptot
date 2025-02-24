@@ -301,7 +301,7 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-gray-400 text-sm mb-1">Revenue</div>
-              <div className="text-[#4079ff] text-2xl font-bold">$12.4k</div>
+              <div className="text-[#4079ff] text-2xl font-bold">$13.4k</div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-[#4079ff]/10 flex items-center justify-center">
               <div className="i-ph:trend-up text-[#4079ff]" />
