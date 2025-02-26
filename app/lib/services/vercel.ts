@@ -1,4 +1,4 @@
-import type { VercelDeploymentStatus } from "~/types/vercel";
+import type { VercelDeploymentStatus } from '~/types/vercel';
 
 const VERCEL_API_BASE = 'https://api.vercel.com/v13';
 
@@ -20,14 +20,17 @@ export class VercelService {
     });
 
     if (!response.ok) {
-      const error = await response.json() as { message?: string };
+      const error = (await response.json()) as { message?: string };
       throw new Error(error.message || 'Failed to communicate with Vercel API');
     }
 
     return response.json();
   }
 
-  async createDeployment(projectName: string, files: Record<string, { data: string }>): Promise<VercelDeploymentStatus> {
+  async createDeployment(
+    projectName: string,
+    files: Record<string, { data: string }>
+  ): Promise<VercelDeploymentStatus> {
     const deployment = await this.fetchWithAuth('/deployments', {
       method: 'POST',
       body: JSON.stringify({
@@ -47,4 +50,4 @@ export class VercelService {
     const deployment = await this.fetchWithAuth(`/deployments/${deploymentId}`);
     return deployment as VercelDeploymentStatus;
   }
-} 
+}

@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import type { ActionAlert } from '~/types/actions';
 import { classNames } from '~/utils/classNames';
+import { VercelService } from '~/lib/services/vercel';
+import { NetlifyService } from '~/lib/services/netlify';
 
 interface Props {
   alert: ActionAlert;
@@ -16,8 +18,8 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
   const isPreview = source === 'preview';
   const title = isPreview ? 'Preview Error' : 'Terminal Error';
   const message = isPreview
-    ? 'An error occurred while running terminal commands. Would you like to try to fix it or see the full error details?'
-    : 'An error occurred while running terminal commands. Would you like to try to fix it or see the full error details?';
+    ? 'We encountered an error while running the preview. Would you like Bolt to analyze and help resolve this issue?'
+    : 'We encountered an error while running terminal commands. Would you like Bolt to analyze and help resolve this issue?';
 
   return (
     <AnimatePresence>
@@ -26,7 +28,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-        className={`rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 p-4`}
+        className={`rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 p-4 mb-2`}
       >
         <div className="flex items-start">
           {/* Icon */}
@@ -78,7 +80,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                 <button
                   onClick={() =>
                     postMessage(
-                      `Try to fix this ${isPreview ? 'preview' : 'terminal'} error: \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`
+                      `*Fix this ${isPreview ? 'preview' : 'terminal'} error* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
                     )
                   }
                   className={classNames(
@@ -87,11 +89,11 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'hover:bg-bolt-elements-button-primary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-danger-background',
                     'text-bolt-elements-button-primary-text',
-                    'flex items-center gap-1.5'
+                    'flex items-center gap-1.5',
                   )}
                 >
-                  <div className="i-ph:wrench-duotone"></div>
-                  Try to Fix
+                  <div className="i-ph:chat-circle-duotone"></div>
+                  Ask Bolt
                 </button>
                 <button
                   onClick={() => setShowError(!showError)}
@@ -115,10 +117,8 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'hover:bg-bolt-elements-button-secondary-backgroundHover',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
                     'text-bolt-elements-button-secondary-text',
-                    'flex items-center gap-1.5'
                   )}
                 >
-                  <div className="i-ph:x-duotone"></div>
                   Dismiss
                 </button>
               </div>

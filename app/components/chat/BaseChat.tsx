@@ -21,6 +21,8 @@ import { ExportChatButton } from '~/components/chat/chatExportAndImport/ExportCh
 import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
 import { ExamplePrompts } from '~/components/chat/ExamplePrompts';
 import GitCloneButton from './GitCloneButton';
+import { VercelService } from '~/lib/services/vercel';
+import { NetlifyService } from '~/lib/services/netlify';
 
 import FilePreview from './FilePreview';
 import { ModelSelector } from '~/components/chat/ModelSelector';
@@ -35,6 +37,34 @@ import { LLMManager } from '~/lib/modules/llm/manager';
 import { GradientText } from '~/components/ui/GradientText';
 import { chatStore } from '~/lib/stores/chat';
 import { checkAuthStatus } from '~/utils/auth';
+
+// Vercel deployment configuration
+const vercelConfig = {
+  version: 2,
+  builds: [
+    {
+      src: 'package.json',
+      use: '@vercel/node'
+    }
+  ],
+  routes: [
+    {
+      src: '/(.*)',
+      dest: '/'
+    }
+  ]
+};
+
+// Netlify deployment configuration  
+const netlifyConfig = {
+  build: {
+    publish: "public",
+    command: "npm run build"
+  },
+  functions: {
+    directory: "functions"
+  }
+};
 
 const TEXTAREA_MIN_HEIGHT = 76;
 

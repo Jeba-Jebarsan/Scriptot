@@ -462,12 +462,23 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
 
       {/* Typing Animation */}
       <TypeAnimation
-        sequence={[demoPrompts[demoStep]]}
+        sequence={[
+          "Design a profile page with bio",
+          3000,
+          "Create a login and registration page with form validation",
+          3000,
+          "Generate a user dashboard with charts",
+          3000,
+          "Build a real-time chat component",
+          3000,
+          "Create a to-do list app with drag-and-drop functionality",
+          3000
+        ]}
         wrapper="div"
         cursor={true}
-        speed={50}
-        className="absolute top-1/2 left-12 -translate-y-1/2 text-gray-400 pointer-events-none"
-        style={{ display: inputValue ? 'none' : 'block' }}
+        repeat={Infinity}
+        speed={99}
+        className="text-[#71717A]"
       />
     </div>
   ];
@@ -475,7 +486,7 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setDemoStep((prev) => (prev + 1) % demoPrompts.length);
-    }, 3000); // Change demo every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -522,14 +533,35 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
     };
   }, [onSuccess, onClose, location.pathname, upsertUser]);
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
-      onClick={onClose}
+      onClick={handleBackdropClick}
     >
+      {/* Close button */}
+      <button 
+        className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+        onClick={onClose}
+      >
+        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60">
+          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24">
+            <path d="M12 3A9 9 0 1 0 12 21A9 9 0 1 0 12 3Z" opacity=".3"></path>
+            <path d="M12,22C6.5,22,2,17.5,2,12C2,6.5,6.5,2,12,2c5.5,0,10,4.5,10,10C22,17.5,17.5,22,12,22z M12,4c-4.4,0-8,3.6-8,8s3.6,8,8,8 s8-3.6,8-8S16.4,4,12,4z"></path>
+            <path d="M11 6.3H13V17.6H11z" transform="rotate(-45.001 12 12)"></path>
+            <path d="M6.3 11H17.6V13H6.3z" transform="rotate(-45.001 12 12)"></path>
+          </svg>
+        </div>
+      </button>
+
       <motion.div className="flex w-full max-w-6xl gap-8 p-8">
         {/* Left side - Auth UI */}
         <motion.div
@@ -595,28 +627,32 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
 
           {/* Content Container */}
           <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-white mb-6">Watch the Magic Happen</h2>
+            <h2 className="text-2xl font-bold text-white mb-6 bg-gradient-to-r from-[#2563EB] via-[#5D3FD3] to-[#7C3AED] bg-clip-text text-transparent drop-shadow-lg animate-pulse-slow relative">
+              <span className="relative z-10">Let AI <span className="text-[#00FFFF] drop-shadow-[0_0_5px_rgba(0,255,255,0.7)]">Accelerate</span> Your <span className="text-[#FF69B4] drop-shadow-[0_0_5px_rgba(255,105,180,0.7)]">Vision</span></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-[#2563EB]/20 via-[#5D3FD3]/20 to-[#7C3AED]/20 blur-sm"></span>
+            </h2>
+          
             
             <div className="relative mb-4">
               <div className="bg-[#2E2F33] rounded-lg p-4">
                 <TypeAnimation
                   sequence={[
                     "Design a profile page with bio",
-                    2000,
+                    3000,
                     "Create a login and registration page with form validation",
-                    2000,
+                    3000,
                     "Generate a user dashboard with charts",
-                    2000,
+                    3000,
                     "Build a real-time chat component",
-                    2000,
+                    3000,
                     "Create a to-do list app with drag-and-drop functionality",
-                    2000
+                    3000
                   ]}
                   wrapper="div"
                   cursor={true}
                   repeat={Infinity}
                   speed={99}
-                  className="text-[#71717A]"
+                  className="text-[#ffff]"
                 />
               </div>
             </div>
@@ -632,13 +668,15 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
                 sequence={[demoCode[demoStep]]}
                 wrapper="div"
                 cursor={false}
-                speed={20}
+                speed={10}
                 className="text-[#4079ff] text-sm whitespace-pre text-left"
               />
             </motion.div>
 
             <motion.div 
               key={`preview-${demoStep}`}
+            
+       
               className="mt-4 bg-[#2E2F33] rounded-lg w-full relative"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

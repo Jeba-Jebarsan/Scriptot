@@ -26,6 +26,8 @@ import { getTemplates, selectStarterTemplate } from '~/utils/selectStarterTempla
 import { LoginPopup } from '../auth/LoginPopup';
 import { checkAuthStatus } from '~/utils/auth';
 import { useLocation, useNavigate } from '@remix-run/react';
+import { VercelService } from '~/lib/services/vercel';
+import { NetlifyService } from '~/lib/services/netlify';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -160,7 +162,7 @@ export const ChatImpl = memo(
     const [searchParams, setSearchParams] = useSearchParams();
     const [fakeLoading, setFakeLoading] = useState(false);
     const files = useStore(workbenchStore.files);
-    const actionAlert = useStore(workbenchStore.alert);
+    const actionAlert = useStore(workbenchStore.actionAlert);
     const { activeProviders, promptId, autoSelectTemplate, contextOptimizationEnabled } = useSettings();
 
     const [model, setModel] = useState(() => {
