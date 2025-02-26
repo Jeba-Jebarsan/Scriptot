@@ -20,6 +20,7 @@ import useViewport from '~/lib/hooks';
 import Cookies from 'js-cookie';
 import { GitHubPushModal } from '../git/GitHubPushModal';
 import { DeploymentAction } from '../DeploymentAction';
+import { NetlifyPublishModal } from '../NetlifyPublishModal';
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -61,7 +62,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [showGitHubModal, setShowGitHubModal] = useState(false);
-  const [showVercelModal, setShowVercelModal] = useState(false);
+  const [showNetlifyModal, setShowNetlifyModal] = useState(false);
 
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
   const showWorkbench = useStore(workbenchStore.showWorkbench);
@@ -179,13 +180,6 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       <div className="i-ph:github-logo text-blue-500" />
                       Push to GitHub
                     </PanelHeaderButton>
-                    <PanelHeaderButton
-                      className="mr-1 text-sm"
-                      onClick={() => setShowVercelModal(true)}
-                    >
-                      <div className="i-ph:triangle-fill text-blue-500" />
-                      Deploy to Vercel
-                    </PanelHeaderButton>
                   </div>
                 )}
                 <IconButton
@@ -230,9 +224,9 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
           isOpen={showGitHubModal}
           onClose={() => setShowGitHubModal(false)}
         />
-        <DeploymentAction
-          isOpen={showVercelModal} 
-          onClose={() => setShowVercelModal(false)}
+        <NetlifyPublishModal 
+          isOpen={showNetlifyModal}
+          onClose={() => setShowNetlifyModal(false)}
         />
       </motion.div>
     )

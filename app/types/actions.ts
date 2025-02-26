@@ -17,7 +17,12 @@ export interface StartAction extends BaseAction {
   type: 'start';
 }
 
-export type BoltAction = FileAction | ShellAction | StartAction;
+export type BoltAction = {
+  type: 'file' | 'shell' | 'start' | 'build';
+  content: string;
+  filePath?: string;
+  changeSource?: string;
+};
 
 export type BoltActionData = BoltAction | BaseAction;
 

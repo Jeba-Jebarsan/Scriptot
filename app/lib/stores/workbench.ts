@@ -20,6 +20,7 @@ import type { ActionAlert } from '~/types/actions';
 import { EditorStore } from './editor';
 import { VercelService } from '~/lib/services/vercel';
 import { NetlifyService } from '../services/netlify';
+import { chatId } from '~/lib/persistence/useChatHistory';
 
 export interface ArtifactState {
   id: string;
@@ -331,6 +332,9 @@ export class WorkbenchStore {
 
     if (data.action.type === 'file') {
       const wc = await webcontainer;
+      if (!data.action.filePath) {
+        throw new Error('File path is required for file actions');
+      }
       const fullPath = nodePath.join(wc.workdir, data.action.filePath);
 
       if (this.selectedFile.value !== fullPath) {
@@ -586,13 +590,19 @@ export class WorkbenchStore {
 
   async deployToNetlify(projectName: string, netlifyToken: string) {
     try {
+      if (!netlifyToken) {
+        throw new Error('Please configure your Netlify Personal Access Token in Settings first');
+      }
+
       const netlifyService = new NetlifyService(netlifyToken);
+      const currentChatId = chatId.get();
+      const siteId = `Deepgen-${currentChatId}`;
       
       // Get all project files
       const files = await this.getAllProjectFiles();
       
       // Create deployment
-      const deployment = await netlifyService.createDeployment(projectName, files);
+      const deployment = await netlifyService.createDeployment(siteId, files);
       
       return {
         url: deployment.url,

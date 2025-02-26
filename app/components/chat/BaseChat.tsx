@@ -71,6 +71,7 @@ interface BaseChatProps {
   onTemplateSelect?: (prompt: string) => void;
   showLoginPopup?: boolean;
   setShowLoginPopup?: (show: boolean) => void;
+  onStreamingChange?: (streaming: boolean) => void;
 }
 
 export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
@@ -107,6 +108,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       onTemplateSelect,
       showLoginPopup = false,
       setShowLoginPopup,
+      onStreamingChange,
     },
     ref
   ) => {

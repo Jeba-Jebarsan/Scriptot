@@ -107,9 +107,12 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
       </div>
 
       {chat.started && (
-        <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
-          <ClientOnly>{() => <ChatDescription />}</ClientOnly>
-        </span>
+        <div className="flex items-center gap-4">
+          <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
+            <ClientOnly>{() => <ChatDescription />}</ClientOnly>
+          </span>
+          <ClientOnly>{() => <HeaderActionButtons />}</ClientOnly>
+        </div>
       )}
 
       {isAuthenticated && userInfo ? (

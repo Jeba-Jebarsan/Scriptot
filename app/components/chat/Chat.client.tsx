@@ -26,6 +26,8 @@ import { getTemplates, selectStarterTemplate } from '~/utils/selectStarterTempla
 import { LoginPopup } from '../auth/LoginPopup';
 import { checkAuthStatus } from '~/utils/auth';
 import { useLocation, useNavigate } from '@remix-run/react';
+import { streamingState } from '~/lib/stores/deployment';
+import { logStore } from '~/lib/stores/logs';
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -195,13 +197,17 @@ export const ChatImpl = memo(
       },
       onFinish: (message, response) => {
         const usage = response.usage;
-
         if (usage) {
           console.log('Token usage:', usage);
-
-          // You can now use the usage data as needed
+          logStore.logProvider('Chat response completed', {
+            component: 'Chat',
+            action: 'response', 
+            model,
+            provider: provider.name,
+            usage,
+            messageLength: message.content.length,
+          });
         }
-
         logger.debug('Finished streaming');
       },
       initialMessages,
@@ -517,6 +523,9 @@ export const ChatImpl = memo(
         showChat={showChat}
         chatStarted={chatStarted}
         isStreaming={isLoading || fakeLoading}
+        onStreamingChange={(streaming) => {
+          streamingState.set(streaming);
+        }}
         enhancingPrompt={enhancingPrompt}
         promptEnhanced={promptEnhanced}
         sendMessage={sendMessage}
