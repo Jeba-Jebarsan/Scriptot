@@ -570,7 +570,7 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
               }
             }}
             providers={['google', 'github']}
-            redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'https://deepgen.pages.dev/auth/callback'}
+            redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : 'https://gpt-1xa.pages.dev/auth/callback'}
             theme="dark"
           />
         </motion.div>

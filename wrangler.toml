@@ -1,11 +1,11 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "deepgen"
+name = "gpt"
 compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "./build/client"
 send_metrics = false
 
 [vars]
-VITE_APP_URL = "https://deepgen.pages.dev"
+VITE_APP_URL = "https://gpt-1xa.pages.dev"
 VITE_SUPABASE_URL = "https://tusrzkowngxwspvefyrh.supabase.co"
 VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1c3J6a293bmd4d3NwdmVmeXJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAyMDY4NzIsImV4cCI6MjA1NTc4Mjg3Mn0.KQbLmQY4z1eeCjVyhiMiUWBAVSQDOQAQFRGyKYjPlLI"

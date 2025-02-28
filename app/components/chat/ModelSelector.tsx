@@ -29,7 +29,7 @@ export const ModelSelector = ({
       setProvider(googleProvider);
     }
 
-    const geminiModel = modelList.find(m => m.name === 'gemini-2.0-pro-exp-02-05');
+    const geminiModel = modelList.find(m => m.name === 'gemini-exp-1206');
     if (geminiModel && setModel) {
       setModel(geminiModel.name);
     }
