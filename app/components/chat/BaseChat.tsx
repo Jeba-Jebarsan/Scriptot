@@ -377,7 +377,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   </GradientText>
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Create apps instantly with CodeIQ's AI-driven full-stack development tools, or receive expert help for
+                  Create apps instantly with Deepgen AI-driven full-stack development tools, or receive expert help for
                   your existing projects
                 </p>
               </div>

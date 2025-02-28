@@ -318,3 +318,73 @@
 .animate-focus-text {
   animation: focus-text 3s ease-in-out infinite;
 }
+
+@keyframes borderAnimation {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 0.5s ease-out forwards;
+}
+
+.animate-borderAnimation {
+  animation: borderAnimation 8s linear infinite;
+}
+
+/* Add these new animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    filter: blur(20px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(15px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.animate-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(50px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(50px) rotate(-360deg);
+  }
+}
+
+.animate-orbit {
+  animation: orbit 8s linear infinite;
+}

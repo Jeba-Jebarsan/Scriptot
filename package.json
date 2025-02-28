@@ -8,9 +8,10 @@
   "type": "module",
   "version": "0.0.5",
   "scripts": {
-    "deploy": "wrangler pages deploy ./build/client --project-name scriptot",
+    "deploy": "wrangler pages deploy ./build/client --project-name deepgen --branch main",
     "build": "remix vite:build",
     "dev": "node pre-start.cjs && remix vite:dev",
+    "postinstall": "patch-package",
     "test": "vitest --run",
     "test:watch": "vitest",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint app",
@@ -94,6 +95,7 @@
     "axios": "^1.7.9",
     "chalk": "^5.4.1",
     "convex": "^1.18.2",
+    "crypto-browserify": "^3.12.1",
     "date-fns": "^3.6.0",
     "diff": "^5.2.0",
     "dotenv": "^16.4.7",
@@ -130,6 +132,7 @@
     "remix-island": "^0.2.0",
     "remix-utils": "^7.7.0",
     "shiki": "^1.24.0",
+    "stream-browserify": "^3.0.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
@@ -152,6 +155,7 @@
     "husky": "9.1.7",
     "is-ci": "^3.0.1",
     "node-fetch": "^3.3.2",
+    "patch-package": "^8.0.0",
     "pnpm": "^9.14.4",
     "prettier": "^3.4.1",
     "sass-embedded": "^1.81.0",

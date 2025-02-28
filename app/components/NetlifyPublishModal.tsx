@@ -8,6 +8,8 @@ import { deploymentState, streamingState } from '~/lib/stores/deployment';
 import { useNavigate } from '@remix-run/react';
 import { fetchNetlifyStats, netlifyConnection } from '~/lib/services/netlify';
 import { NetlifyDeploymentLink } from './chat/NetlifyDeploymentLink.client';
+import { DeploymentSuccessAnimation } from './DeploymentSuccessAnimation';
+import { NetlifyDeploymentProgress } from '~/NetlifyDeploymentProgress';
 
 export function NetlifyPublishModal({ 
   isOpen,
@@ -23,6 +25,9 @@ export function NetlifyPublishModal({
   const workbench = useWorkbench();
   const navigate = useNavigate();
   const netlifyToken = Cookies.get('netlifyToken');
+  const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
 
   useEffect(() => {
     if (netlifyToken && !connection.user) {
@@ -53,19 +58,53 @@ export function NetlifyPublishModal({
     }
 
     deploymentState.set({ isDeploying: true, isBuildReady: false, error: null });
+    setShowDeploymentProgress(true);
 
     try {
       const result = await workbench.deployToNetlify(projectName, netlifyToken);
-      toast.success(`Successfully published to ${result.url}`);
-      onClose();
+      setDeploymentUrl(result.url);
+      // We'll show the success animation after the progress animation completes
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to publish';
       deploymentState.set({ isDeploying: false, isBuildReady: false, error: errorMsg });
+      setShowDeploymentProgress(false);
       toast.error(errorMsg);
     } finally {
       deploymentState.set({ isDeploying: false, isBuildReady: false, error: null });
     }
   };
+
+  const handleProgressComplete = () => {
+    setShowDeploymentProgress(false);
+    setShowSuccessAnimation(true);
+  };
+
+  const handleSuccessAnimationClose = () => {
+    setShowSuccessAnimation(false);
+    onClose();
+  };
+
+  if (showSuccessAnimation && deploymentUrl) {
+    return (
+      <DeploymentSuccessAnimation 
+        deploymentUrl={deploymentUrl} 
+        onClose={handleSuccessAnimationClose} 
+      />
+    );
+  }
+
+  if (showDeploymentProgress) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      >
+        <NetlifyDeploymentProgress onComplete={handleProgressComplete} />
+      </motion.div>
+    );
+  }
 
   if (!isOpen) return null;
 
