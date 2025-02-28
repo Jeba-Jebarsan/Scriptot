@@ -1,5 +1,6 @@
 name = "scriptot"
 compatibility_date = "2025-02-14"
+compatibility_flags = ["nodejs_compat"]
 
 main = "build/server/index.js"
 
@@ -9,11 +10,8 @@ command = "pnpm run build"
 [site]
 bucket = "./build/client"
 
+pages_build_output_dir = "./build/client"
+
 [vars]
 VITE_GITHUB_CLIENT_ID = "Ov23liNA1dVBglJhaSw5"
 VITE_APP_URL = "https://scriptot.pages.dev"
-
-[compatibility_flags]
-nodejs_compat = true
-
-pages_build_output_dir = "./build/client"
