@@ -1,6 +1,6 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { motion } from 'framer-motion';
-import { useState, type ReactElement, useEffect } from 'react';
+import { useState, type ReactElement, useEffect, useRef } from 'react';
 import { classNames } from '~/utils/classNames';
 import { DialogTitle, dialogVariants, dialogBackdropVariants } from '~/components/ui/Dialog';
 import { IconButton } from '~/components/ui/IconButton';
@@ -15,6 +15,7 @@ import DataTab from './data/DataTab';
 import AppearanceTab from './Appearance/AppearanceTab';
 import HelpTab from './Help/HelpTab';
 import { signOut } from '~/utils/auth';
+import { useResponsive } from '~/utils/mobile';
 
 interface SettingsProps {
   open: boolean;
@@ -28,6 +29,10 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('data');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { isMobile } = useResponsive();
 
   useEffect(() => {
     const checkAuth = () => {
@@ -90,6 +95,34 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
       : []),
   ];
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartY(e.touches[0].clientY);
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!contentRef.current) return;
+    
+    const touchY = e.touches[0].clientY;
+    const touchX = e.touches[0].clientX;
+    
+    // Calculate the difference
+    const diffY = touchStartY - touchY;
+    const diffX = touchStartX - touchX;
+    
+    // If horizontal swipe is greater than vertical, prevent default to allow scrolling
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      return;
+    }
+    
+    // If at the top and trying to scroll down, or at the bottom and trying to scroll up
+    const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
+    
+    if ((scrollTop <= 0 && diffY < 0) || (scrollTop + clientHeight >= scrollHeight && diffY > 0)) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <RadixDialog.Root open={open}>
       <RadixDialog.Portal>
@@ -104,16 +137,19 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
         </RadixDialog.Overlay>
         <RadixDialog.Content aria-describedby={undefined} asChild>
           <motion.div
-            className="fixed top-[50%] left-[50%] z-max h-[85vh] w-[90vw] max-w-[900px] translate-x-[-50%] translate-y-[-50%] border border-bolt-elements-borderColor rounded-lg shadow-lg focus:outline-none overflow-hidden"
+            className={`fixed top-[50%] left-[50%] z-max ${
+              isMobile ? 'h-[100vh] w-[100vw]' : 'h-[85vh] w-[90vw] max-w-[900px]'
+            } translate-x-[-50%] translate-y-[-50%] border border-bolt-elements-borderColor bg-bolt-elements-background rounded-xl shadow-2xl focus:outline-none overflow-hidden backdrop-blur-lg`}
             initial="closed"
             animate="open"
             exit="closed"
             variants={dialogVariants}
           >
-            <div className="flex h-full">
+            <div className={`flex h-full ${isMobile ? 'flex-col' : ''}`}>
               <div
                 className={classNames(
-                  'w-48 border-r border-bolt-elements-borderColor bg-bolt-elements-background-depth-1 p-4 flex flex-col',
+                  isMobile ? 'w-full border-b' : 'w-48 border-r',
+                  'border-bolt-elements-borderColor bg-bolt-elements-background-depth-1 p-4 flex flex-col',
                   styles['settings-tabs']
                 )}
               >
@@ -132,12 +168,20 @@ export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
                 ))}
               
               </div>
-              <div className="flex-1 flex flex-col p-8 pt-10 bg-bolt-elements-background-depth-2">
-                <div className="flex-1 overflow-y-auto">{tabs.find((tab) => tab.id === activeTab)?.component}</div>
+              <div 
+                ref={contentRef}
+                className={`${isMobile ? 'h-full' : 'flex-1'} overflow-y-auto`}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+              >
+                {tabs.find((tab) => tab.id === activeTab)?.component}
               </div>
             </div>
             <RadixDialog.Close asChild onClick={onClose}>
-              <IconButton icon="i-ph:x" className="absolute top-[10px] right-[10px]" />
+              <IconButton 
+                icon="i-ph:x" 
+                className={`absolute ${isMobile ? 'top-[15px] right-[15px]' : 'top-[10px] right-[10px]'}`} 
+              />
             </RadixDialog.Close>
           </motion.div>
         </RadixDialog.Content>

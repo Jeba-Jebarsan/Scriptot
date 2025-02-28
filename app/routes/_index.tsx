@@ -61,6 +61,28 @@ export default function Index() {
     return () => window.removeEventListener('auth-change', handleAuthChange);
   }, []);
 
+  useEffect(() => {
+    const protectRoute = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If no session and on a protected route, redirect to home
+      if (!session && window.location.pathname.includes('/chat/')) {
+        window.location.href = '/';
+      }
+    };
+    
+    protectRoute();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        window.location.href = '/';
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="flex flex-col h-full w-full bg-bolt-elements-background-depth-1">
       <BackgroundRays />

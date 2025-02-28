@@ -12,6 +12,7 @@ import { HistoryItem } from './HistoryItem';
 import { binDates } from './date-binning';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 import { signOut } from '~/utils/auth';
+import { isMobile, useResponsive } from '~/utils/mobile';
 
 const menuVariants = {
   closed: {
@@ -68,6 +69,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
+  const { isMobile: isOnMobile } = useResponsive();
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -114,29 +116,58 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
   }, [open]);
 
   useEffect(() => {
-    const enterThreshold = 40;
-    const exitThreshold = 40;
+    // Only use hover detection for non-mobile devices
+    if (!isOnMobile) {
+      const enterThreshold = 40;
+      const exitThreshold = 40;
 
-    function onMouseMove(event: MouseEvent) {
-      if (isAuthenticated) {
-        if (event.pageX < enterThreshold) {
-          setOpen(true);
-        }
+      function onMouseMove(event: MouseEvent) {
+        if (isAuthenticated) {
+          if (event.pageX < enterThreshold) {
+            setOpen(true);
+          }
 
-        if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
+          if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
+            setOpen(false);
+          }
+        } else {
           setOpen(false);
         }
-      } else {
-        setOpen(false);
       }
+
+      window.addEventListener('mousemove', onMouseMove);
+
+      return () => {
+        window.removeEventListener('mousemove', onMouseMove);
+      };
     }
+  }, [isAuthenticated, isOnMobile]);
 
-    window.addEventListener('mousemove', onMouseMove);
+  // Toggle menu for mobile with touch events
+  useEffect(() => {
+    if (isOnMobile) {
+      const handleTouchStart = (e: TouchEvent) => {
+        const touchX = e.touches[0].clientX;
+        if (touchX < 20 && isAuthenticated) {
+          setOpen(true);
+        }
+      };
 
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [isAuthenticated]);
+      const handleTouchEnd = (e: TouchEvent) => {
+        if (menuRef.current && e.changedTouches[0].clientX > menuRef.current.getBoundingClientRect().right + 50) {
+          setOpen(false);
+        }
+      };
+
+      document.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        document.removeEventListener('touchstart', handleTouchStart);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isOnMobile, isAuthenticated]);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -176,13 +207,29 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
     await signOut();
   };
 
+  // Close menu when clicking outside on mobile
+  useEffect(() => {
+    if (isOnMobile && open) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+          setOpen(false);
+        }
+      };
+      
+      document.addEventListener('click', handleClickOutside);
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+      };
+    }
+  }, [isOnMobile, open]);
+
   return (
     <motion.div
       ref={menuRef}
       initial="closed"
       animate={isAuthenticated && open ? 'open' : 'closed'}
       variants={menuVariants}
-      className="flex selection-accent flex-col side-menu fixed top-0 w-[350px] h-full bg-bolt-elements-background-depth-2 border-r rounded-r-3xl border-bolt-elements-borderColor z-sidebar shadow-xl shadow-bolt-elements-sidebar-dropdownShadow text-sm"
+      className="flex selection-accent flex-col side-menu fixed top-0 w-[350px] max-w-[85vw] h-full bg-bolt-elements-background-depth-2 border-r rounded-r-3xl border-bolt-elements-borderColor z-sidebar shadow-xl shadow-bolt-elements-sidebar-dropdownShadow text-sm"
     >
       <div className="h-[60px]" /> {/* Spacer for top margin */}
       <CurrentDateTime />
@@ -287,6 +334,7 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
                 <div className="text-bolt-elements-textSecondary text-xs">
                   {userInfo.email}
                 </div>
+
               </div>
             )}
           </div>
@@ -294,6 +342,17 @@ export const Menu = ({ setShowLoginPopup }: MenuProps) => {
         </div>
       </div>
       <SettingsWindow open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      
+      {/* Mobile menu toggle button */}
+      {isOnMobile && (
+        <button 
+          onClick={() => setOpen(!open)}
+          className="fixed top-4 left-4 z-50 bg-bolt-elements-background-depth-3 rounded-full p-2 shadow-lg"
+          aria-label={open ? "Close menu" : "Open menu"}
+        >
+          <div className={`h-5 w-5 ${open ? 'i-ph:x' : 'i-ph:list'}`} />
+        </button>
+      )}
     </motion.div>
   );
 };

@@ -15,6 +15,9 @@ export const ScreenshotSelector = memo(
     const mediaStreamRef = useRef<MediaStream | null>(null);
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
+    // Add touch state tracking
+    const isTouchSelecting = useRef(false);
+
     useEffect(() => {
       // Cleanup function to stop all tracks when component unmounts
       return () => {
@@ -91,11 +94,93 @@ export const ScreenshotSelector = memo(
       return mediaStreamRef.current;
     };
 
-    const handleCopySelection = useCallback(async () => {
-      if (!isSelectionMode || !selectionStart || !selectionEnd || !containerRef.current) {
+    // Handle selection start for both mouse and touch
+    const handleSelectionStart = (e: React.MouseEvent | React.TouchEvent) => {
+      if (!isSelectionMode || isCapturing) return;
+
+      let clientX, clientY;
+      
+      if ('touches' in e) {
+        // Touch event
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+        isTouchSelecting.current = true;
+      } else {
+        // Mouse event
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      const point = { x: clientX, y: clientY };
+      setSelectionStart(point);
+      setSelectionEnd(point);
+    };
+
+    // Handle selection move for both mouse and touch
+    const handleSelectionMove = (e: React.MouseEvent | React.TouchEvent) => {
+      if (!isSelectionMode || !selectionStart || isCapturing) return;
+
+      let clientX, clientY;
+      
+      if ('touches' in e) {
+        // Only process if we started with touch
+        if (!isTouchSelecting.current) return;
+        
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        // Only process mouse events if we didn't start with touch
+        if (isTouchSelecting.current) return;
+        
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      setSelectionEnd({ x: clientX, y: clientY });
+    };
+
+    // Handle selection end and copy for both mouse and touch
+    const handleCopySelection = (e: React.MouseEvent | React.TouchEvent) => {
+      if (!isSelectionMode || !selectionStart || !selectionEnd || isCapturing) return;
+
+      // For touch events, check if we're in touch mode
+      if ('changedTouches' in e && !isTouchSelecting.current) return;
+      
+      // For mouse events, check if we're not in touch mode
+      if (!('changedTouches' in e) && isTouchSelecting.current) return;
+
+      // Reset touch tracking
+      isTouchSelecting.current = false;
+
+      // Minimum size check to avoid accidental taps
+      const width = Math.abs(selectionEnd.x - selectionStart.x);
+      const height = Math.abs(selectionEnd.y - selectionStart.y);
+      
+      if (width < 10 || height < 10) {
+        setSelectionStart(null);
+        setSelectionEnd(null);
         return;
       }
 
+      // Continue with the existing screenshot capture logic
+      captureScreenshot();
+    };
+
+    // Handle touch cancel
+    const handleTouchCancel = () => {
+      if (isTouchSelecting.current) {
+        isTouchSelecting.current = false;
+        setSelectionStart(null);
+        setSelectionEnd(null);
+      }
+    };
+
+    const captureScreenshot = async () => {
+      // Add type guards for both selection points and containerRef
+      if (!selectionStart || !selectionEnd || !containerRef.current) {
+        return;
+      }
+      
       setIsCapturing(true);
 
       try {
@@ -104,6 +189,13 @@ export const ScreenshotSelector = memo(
         if (!stream || !videoRef.current) {
           return;
         }
+
+        // Now TypeScript knows containerRef.current is not null
+        const containerRect = containerRef.current.getBoundingClientRect();
+
+        // Offset adjustments for more accurate clipping
+        const leftOffset = -9; // Adjust left position
+        const bottomOffset = -14; // Adjust bottom position
 
         // Wait for video to be ready
         await new Promise((resolve) => setTimeout(resolve, 300));
@@ -129,13 +221,6 @@ export const ScreenshotSelector = memo(
         // Get window scroll position
         const scrollX = window.scrollX;
         const scrollY = window.scrollY + 40;
-
-        // Get the container's position in the page
-        const containerRect = containerRef.current.getBoundingClientRect();
-
-        // Offset adjustments for more accurate clipping
-        const leftOffset = -9; // Adjust left position
-        const bottomOffset = -14; // Adjust bottom position
 
         // Calculate the scaled coordinates with scroll offset and adjustments
         const scaledX = Math.round(
@@ -214,42 +299,7 @@ export const ScreenshotSelector = memo(
         setSelectionEnd(null);
         setIsSelectionMode(false); // Turn off selection mode after capture
       }
-    }, [isSelectionMode, selectionStart, selectionEnd, containerRef, setIsSelectionMode]);
-
-    const handleSelectionStart = useCallback(
-      (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!isSelectionMode) {
-          return;
-        }
-
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setSelectionStart({ x, y });
-        setSelectionEnd({ x, y });
-      },
-      [isSelectionMode]
-    );
-
-    const handleSelectionMove = useCallback(
-      (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!isSelectionMode || !selectionStart) {
-          return;
-        }
-
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setSelectionEnd({ x, y });
-      },
-      [isSelectionMode, selectionStart]
-    );
+    };
 
     if (!isSelectionMode) {
       return null;
@@ -261,6 +311,10 @@ export const ScreenshotSelector = memo(
         onMouseDown={handleSelectionStart}
         onMouseMove={handleSelectionMove}
         onMouseUp={handleCopySelection}
+        onTouchStart={handleSelectionStart}
+        onTouchMove={handleSelectionMove}
+        onTouchEnd={handleCopySelection}
+        onTouchCancel={handleTouchCancel}
         onMouseLeave={() => {
           if (selectionStart) {
             setSelectionStart(null);

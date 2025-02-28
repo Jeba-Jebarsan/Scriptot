@@ -20,7 +20,6 @@ import useViewport from '~/lib/hooks';
 import Cookies from 'js-cookie';
 import { GitHubPushModal } from '../git/GitHubPushModal';
 import { DeploymentAction } from '../DeploymentAction';
-import { NetlifyPublishModal } from '../NetlifyPublishModal';
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -62,7 +61,6 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [showGitHubModal, setShowGitHubModal] = useState(false);
-  const [showNetlifyModal, setShowNetlifyModal] = useState(false);
 
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
   const showWorkbench = useStore(workbenchStore.showWorkbench);
@@ -139,7 +137,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
             {
               'w-full': isSmallViewport,
               'left-0': showWorkbench && isSmallViewport,
-              'left-[var(--workbench-left)]': showWorkbench,
+              'left-[var(--workbench-left)]': showWorkbench && !isSmallViewport,
               'left-[100%]': !showWorkbench,
             }
           )}
@@ -150,7 +148,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                 <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
                 <div className="ml-auto" />
                 {selectedView === 'code' && (
-                  <div className="flex overflow-y-auto">
+                  <div className="flex overflow-x-auto">
                     <PanelHeaderButton
                       className="mr-1 text-sm"
                       onClick={() => {
@@ -158,11 +156,11 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       }}
                     >
                       <div className="i-ph:code text-blue-500" />
-                      Download Code
+                      <span className="hidden sm:inline">Download Code</span>
                     </PanelHeaderButton>
                     <PanelHeaderButton className="mr-1 text-sm" onClick={handleSyncFiles} disabled={isSyncing}>
                       {isSyncing ? <div className="i-ph:spinner text-blue-500" /> : <div className="i-ph:cloud-arrow-down text-blue-500" />}
-                      {isSyncing ? 'Syncing...' : 'Sync Files'}
+                      <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync Files'}</span>
                     </PanelHeaderButton>
                     <PanelHeaderButton
                       className="mr-1 text-sm"
@@ -171,14 +169,14 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       }}
                     >
                       <div className="i-ph:terminal text-blue-500" />
-                      Toggle Terminal
+                      <span className="hidden sm:inline">Toggle Terminal</span>
                     </PanelHeaderButton>
                     <PanelHeaderButton
                       className="mr-1 text-sm"
                       onClick={() => setShowGitHubModal(true)}
                     >
                       <div className="i-ph:github-logo text-blue-500" />
-                      Push to GitHub
+                      <span className="hidden sm:inline">Push to GitHub</span>
                     </PanelHeaderButton>
                   </div>
                 )}
@@ -223,10 +221,6 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
         <GitHubPushModal 
           isOpen={showGitHubModal}
           onClose={() => setShowGitHubModal(false)}
-        />
-        <NetlifyPublishModal 
-          isOpen={showNetlifyModal}
-          onClose={() => setShowNetlifyModal(false)}
         />
       </motion.div>
     )

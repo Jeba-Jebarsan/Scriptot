@@ -5,6 +5,7 @@ import { Switch } from '~/components/ui/Switch';
 import { logStore, type LogEntry } from '~/lib/stores/logs';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
+import { useResponsive } from '~/utils/mobile';
 
 export default function EventLogsTab() {
   const {} = useSettings();
@@ -13,6 +14,7 @@ export default function EventLogsTab() {
   const [autoScroll, setAutoScroll] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [, forceUpdate] = useState({});
+  const { isMobile } = useResponsive();
 
   const filteredLogs = useMemo(() => {
     const logs = logStore.getLogs();
@@ -122,9 +124,15 @@ export default function EventLogsTab() {
     <div className="p-4 h-full flex flex-col">
       <div className="flex flex-col space-y-4 mb-4">
         {/* Title and Toggles Row */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className={classNames(
+          "flex flex-col justify-between items-start gap-4",
+          isMobile ? "space-y-2" : "sm:flex-row sm:items-center"
+        )}>
           <h3 className="text-lg font-medium text-bolt-elements-textPrimary">Event Logs</h3>
-          <div className="flex flex-wrap items-center gap-4">
+          <div className={classNames(
+            "flex items-center gap-4",
+            isMobile ? "flex-col items-start space-y-2" : "flex-wrap"
+          )}>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-bolt-elements-textSecondary whitespace-nowrap">Show Actions</span>
               <Switch checked={showLogs} onCheckedChange={(checked) => logStore.showLogs.set(checked)} />
@@ -137,11 +145,17 @@ export default function EventLogsTab() {
         </div>
 
         {/* Controls Row */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={classNames(
+          "flex items-center gap-2",
+          isMobile ? "flex-col items-stretch" : "flex-wrap"
+        )}>
           <select
             value={logLevel}
             onChange={(e) => setLogLevel(e.target.value as LogEntry['level'])}
-            className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all lg:max-w-[20%] text-sm min-w-[100px]"
+            className={classNames(
+              "p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all text-sm min-w-[100px]",
+              isMobile ? "w-full" : "flex-1 lg:max-w-[20%]"
+            )}
           >
             <option value="all">All</option>
             <option value="info">Info</option>
@@ -149,7 +163,7 @@ export default function EventLogsTab() {
             <option value="error">Error</option>
             <option value="debug">Debug</option>
           </select>
-          <div className="flex-1 min-w-[200px]">
+          <div className={isMobile ? "w-full" : "flex-1 min-w-[200px]"}>
             <input
               type="text"
               placeholder="Search logs..."
@@ -159,14 +173,18 @@ export default function EventLogsTab() {
             />
           </div>
           {showLogs && (
-            <div className="flex items-center gap-2 flex-nowrap">
+            <div className={classNames(
+              "flex items-center gap-2",
+              isMobile ? "w-full justify-between mt-2" : "flex-nowrap"
+            )}>
               <button
                 onClick={handleExportLogs}
                 className={classNames(
                   'bg-bolt-elements-button-primary-background',
                   'rounded-lg px-4 py-2 transition-colors duration-200',
                   'hover:bg-bolt-elements-button-primary-backgroundHover',
-                  'text-bolt-elements-button-primary-text'
+                  'text-bolt-elements-button-primary-text',
+                  isMobile ? 'flex-1' : ''
                 )}
               >
                 Export Logs
@@ -177,7 +195,8 @@ export default function EventLogsTab() {
                   'bg-bolt-elements-button-danger-background',
                   'rounded-lg px-4 py-2 transition-colors duration-200',
                   'hover:bg-bolt-elements-button-danger-backgroundHover',
-                  'text-bolt-elements-button-danger-text'
+                  'text-bolt-elements-button-danger-text',
+                  isMobile ? 'flex-1' : ''
                 )}
               >
                 Clear Logs
@@ -187,7 +206,11 @@ export default function EventLogsTab() {
         </div>
       </div>
 
-      <div className="bg-bolt-elements-bg-depth-1 rounded-lg p-4 h-[calc(100vh - 250px)] min-h-[400px] overflow-y-auto logs-container overflow-y-auto">
+      <div className={classNames(
+        "bg-bolt-elements-bg-depth-1 rounded-lg p-4 overflow-y-auto logs-container",
+        isMobile ? "h-[calc(100vh-300px)]" : "h-[calc(100vh-250px)]",
+        "min-h-[400px]"
+      )}>
         {filteredLogs.length === 0 ? (
           <div className="text-center text-bolt-elements-textSecondary py-8">No logs found</div>
         ) : (
@@ -196,7 +219,10 @@ export default function EventLogsTab() {
               key={index}
               className="text-sm mb-3 font-mono border-b border-bolt-elements-borderColor pb-2 last:border-0"
             >
-              <div className="flex items-start space-x-2 flex-wrap">
+              <div className={classNames(
+                "flex items-start space-x-2",
+                isMobile ? "flex-col space-x-0 space-y-1" : "flex-wrap"
+              )}>
                 <span className={`font-bold ${getLevelColor(log.level)} whitespace-nowrap`}>
                   [{log.level.toUpperCase()}]
                 </span>
@@ -206,7 +232,10 @@ export default function EventLogsTab() {
                 <span className="text-bolt-elements-textPrimary break-all">{log.message}</span>
               </div>
               {log.details && (
-                <pre className="mt-2 text-xs text-bolt-elements-textSecondary overflow-x-auto whitespace-pre-wrap break-all">
+                <pre className={classNames(
+                  "mt-2 text-xs text-bolt-elements-textSecondary overflow-x-auto whitespace-pre-wrap break-all",
+                  isMobile ? "text-[10px]" : ""
+                )}>
                   {JSON.stringify(log.details, null, 2)}
                 </pre>
               )}

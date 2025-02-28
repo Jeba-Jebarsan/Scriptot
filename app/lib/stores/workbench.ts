@@ -51,6 +51,7 @@ export class WorkbenchStore {
   unsavedFiles: WritableAtom<Set<string>> = import.meta.hot?.data.unsavedFiles ?? atom(new Set<string>());
   actionAlert: WritableAtom<ActionAlert | undefined> =
     import.meta.hot?.data.unsavedFiles ?? atom<ActionAlert | undefined>(undefined);
+  isMobileView: WritableAtom<boolean> = import.meta.hot?.data.isMobileView ?? atom(false);
   modifiedFiles = new Set<string>();
   artifactIdList: string[] = [];
   #globalExecutionQueue = Promise.resolve();
@@ -61,6 +62,7 @@ export class WorkbenchStore {
       import.meta.hot.data.showWorkbench = this.showWorkbench;
       import.meta.hot.data.currentView = this.currentView;
       import.meta.hot.data.actionAlert = this.actionAlert;
+      import.meta.hot.data.isMobileView = this.isMobileView;
     }
   }
 
@@ -136,6 +138,10 @@ export class WorkbenchStore {
 
   setShowWorkbench(show: boolean) {
     this.showWorkbench.set(show);
+  }
+
+  setMobileView(isMobile: boolean) {
+    this.isMobileView.set(isMobile);
   }
 
   setCurrentDocumentContent(newContent: string) {

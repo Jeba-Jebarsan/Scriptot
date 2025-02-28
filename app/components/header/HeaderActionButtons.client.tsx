@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import type { NetlifyUser } from '~/types/netlify';
 import { Globe } from 'lucide-react';
 import { DeploymentHistory } from '~/components/DeploymentHistory';
+import { isMobile, useResponsive } from '~/utils/mobile';
 
 interface HeaderActionButtonsProps {}
 
@@ -31,6 +32,7 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
   const connection = useStore(netlifyConnection);
   const currentChatId = useStore(chatId);
   const [isCancelling, setIsCancelling] = useState(false);
+  const { isMobile: isOnMobile } = useResponsive();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -89,7 +89,9 @@ export const EditorPanel = memo(
                 />
               </div>
             </Panel>
-            <PanelResizeHandle />
+            <PanelResizeHandle className="group relative h-1 cursor-row-resize hover:bg-bolt-elements-focus active:bg-bolt-elements-focus">
+              <div className="absolute inset-x-0 top-1/2 h-4 -translate-y-1/2 group-hover:bg-bolt-elements-focus group-active:bg-bolt-elements-focus" />
+            </PanelResizeHandle>
             <Panel className="flex flex-col" defaultSize={80} minSize={20}>
               <PanelHeader className="overflow-x-auto">
                 {activeFileSegments?.length && (

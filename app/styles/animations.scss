@@ -388,3 +388,40 @@
 .animate-orbit {
   animation: orbit 8s linear infinite;
 }
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s forwards;
+}
+
+/* Mobile-specific animations - smoother and less resource-intensive */
+@media (max-width: 640px) {
+  .animate-pulse-subtle {
+    animation-duration: 3s; /* Slower animation on mobile */
+  }
+}

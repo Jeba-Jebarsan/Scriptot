@@ -1,4 +1,5 @@
 // Create new file: app/utils/auth.ts
+import { chatStore } from '~/lib/stores/chat'
 import { supabase } from '~/lib/supabase'
 
 export const checkAuthStatus = async () => {
@@ -15,13 +16,26 @@ export const checkAuthStatus = async () => {
 
 export const signOut = async () => {
   try {
-    await supabase.auth.signOut()
-    localStorage.removeItem('user')
-    window.dispatchEvent(new Event('storage'))
-    window.dispatchEvent(new Event('auth-change'))
-    return true
+    // Clear storage first
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    
+    // Reset any app state
+    chatStore.set({ started: false, aborted: false, showChat: false });
+    
+    // Perform Supabase signout
+    await supabase.auth.signOut();
+    
+    // Dispatch events
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('auth-change'));
+    
+    // Force navigation to home page
+    window.location.href = '/';
+    
+    return true;
   } catch (error) {
-    console.error('Sign out error:', error)
-    return false
+    console.error('Sign out error:', error);
+    return false;
   }
-}
+};

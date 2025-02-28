@@ -3,6 +3,8 @@ import { useGit } from '~/lib/hooks/useGit';
 import type { Message } from 'ai';
 import { detectProjectCommands, createCommandsMessage } from '~/utils/projectCommands';
 import { generateId } from '~/utils/fileUtils';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const IGNORE_PATTERNS = [
   'node_modules/**',
@@ -37,23 +39,21 @@ interface GitCloneButtonProps {
 
 export default function GitCloneButton({ importChat }: GitCloneButtonProps) {
   const { ready, gitClone } = useGit();
-  const onClick = async (_e: any) => {
-    if (!ready) {
-      return;
-    }
+  const [showPopup, setShowPopup] = useState(false);
+  const [repoUrl, setRepoUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-    const repoUrl = prompt('Enter the Git url');
+  const handleClone = async () => {
+    if (!ready || !repoUrl) return;
 
-    if (repoUrl) {
+    setIsLoading(true);
+    try {
       const { workdir, data } = await gitClone(repoUrl);
 
       if (importChat) {
         const filePaths = Object.keys(data).filter((filePath) => !ig.ignores(filePath));
-        console.log(filePaths);
-
         const textDecoder = new TextDecoder('utf-8');
 
-        // Convert files to common format for command detection
         const fileContents = filePaths
           .map((filePath) => {
             const { data: content, encoding } = data[filePath];
@@ -64,11 +64,9 @@ export default function GitCloneButton({ importChat }: GitCloneButtonProps) {
           })
           .filter((f) => f.content);
 
-        // Detect and create commands message
         const commands = await detectProjectCommands(fileContents);
         const commandsMessage = createCommandsMessage(commands);
 
-        // Create files message
         const filesMessage: Message = {
           role: 'assistant',
           content: `Cloning the repo ${repoUrl} into ${workdir}
@@ -87,24 +85,87 @@ ${file.content}
         };
 
         const messages = [filesMessage];
-
         if (commandsMessage) {
           messages.push(commandsMessage);
         }
 
         await importChat(`Git Project:${repoUrl.split('/').slice(-1)[0]}`, messages);
       }
+      setShowPopup(false);
+    } catch (error) {
+      console.error('Clone error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <button
-      onClick={onClick}
-      title="Clone a Git Repo"
-      className="px-4 py-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 transition-all flex items-center gap-2"
-    >
-      <span className="i-ph:git-branch" />
-      Clone a Git Repo
-    </button>
+    <>
+      <button
+        onClick={() => setShowPopup(true)}
+        title="Clone a Git Repo"
+        className="px-4 py-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 transition-all flex items-center gap-2"
+      >
+        <span className="i-ph:git-branch" />
+        Clone a Git Repo
+      </button>
+
+      <AnimatePresence>
+        {showPopup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#1A1B1E] rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-gray-700"
+            >
+              <h2 className="text-xl font-semibold text-white mb-4">Clone Git Repository</h2>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="repoUrl" className="block text-sm font-medium text-gray-300 mb-2">
+                    Repository URL
+                  </label>
+                  <input
+                    id="repoUrl"
+                    type="text"
+                    value={repoUrl}
+                    onChange={(e) => setRepoUrl(e.target.value)}
+                    placeholder="https://github.com/username/repo"
+                    className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => setShowPopup(false)}
+                    className="px-4 py-2 text-sm text-white bg-transparent border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleClone}
+                    disabled={!repoUrl || isLoading}
+                    className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 ${
+                      (!repoUrl || isLoading) && 'opacity-50 cursor-not-allowed'
+                    }`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="animate-spin i-ph:circle-notch" />
+                        Cloning...
+                      </>
+                    ) : (
+                      <>
+                        <div className="i-ph:git-branch" />
+                        Clone Repository
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -294,54 +294,278 @@ Please review and modify these requirements before proceeding.`;
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent blur-sm" />
             </div>
           </div>
-
-          {/* Steps Section */}
+          {/* Built with Tools Developers Love Section */}
           <div className="mt-16 w-full max-w-4xl mx-auto">
-            <div className={`relative flex ${isMobile ? 'flex-col gap-8' : 'justify-between'}`}>
-              {[
-                {
-                  number: '1',
-                  title: 'Share Your Vision',
-                  description: 'Share your vision of what you want to create.'
-                },
-                {
-                  number: '2',
-                  title: 'Generate Prototype',
-                  description: 'Instantly generate a working prototype.'
-                },
-                {
-                  number: '3',
-                  title: 'Refine & Enhance',
-                  description: 'Refine and enhance through interactive chat.'
-                },
-                {
-                  number: '4',
-                  title: 'Deploy & Share',
-                  description: 'Deploy and share with a single click.'
-                }
-              ].map((step, index, array) => (
-                <div key={index} className={`flex flex-col items-center relative z-10 ${isMobile ? 'w-full' : 'w-1/4'}`}>
-                  {/* Step Number */}
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 flex items-center justify-center text-white text-xl font-bold mb-4 shadow-lg">
-                    {step.number}
+            <div className="flex flex-col items-center gap-8">
+              <div className="relative">
+                <h2 className="text-3xl font-bold text-bolt-elements-textPrimary text-center z-10 relative">
+                  Built with Tools Developers Love
+                </h2>
+                <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+              </div>
+              
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                {/* Tool card 1 */}
+                <div className="bg-bolt-elements-bg-depth-3 rounded-xl p-6 border border-bolt-elements-borderColor hover:border-purple-500/50 transition-all duration-300 shadow-lg">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-bolt-elements-bg-depth-2 rounded-full flex items-center justify-center shadow-inner">
+                      <div className="i-ph:code-bold text-purple-500 text-2xl" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Modern Stack</h3>
+                  </div>
+                  <p className="text-bolt-elements-textSecondary">
+                    Crafted with Next.js, React, and cutting-edge tools that developers rely on for scalable applications.
+                  </p>
+                </div>
+                
+                {/* Tool card 2 */}
+                <div className="bg-bolt-elements-bg-depth-3 rounded-xl p-6 border border-bolt-elements-borderColor hover:border-blue-500/50 transition-all duration-300 shadow-lg">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-bolt-elements-bg-depth-2 rounded-full flex items-center justify-center shadow-inner">
+                      <div className="i-ph:package-bold text-blue-500 text-2xl" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Auto-Install</h3>
+                  </div>
+                  <p className="text-bolt-elements-textSecondary">
+                    DeepGen automatically installs packages, freeing you from dependency management.
+                  </p>
+                </div>
+                
+                {/* Tool card 3 */}
+                <div className="bg-bolt-elements-bg-depth-3 rounded-xl p-6 border border-bolt-elements-borderColor hover:border-green-500/50 transition-all duration-300 shadow-lg">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-bolt-elements-bg-depth-2 rounded-full flex items-center justify-center shadow-inner">
+                      <div className="i-ph:database-bold text-green-500 text-2xl" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Supabase Backend</h3>
+                  </div>
+                  <p className="text-bolt-elements-textSecondary">
+                    Supabase powers the backend, providing easy authentication, database, and storage setup.
+                  </p>
+                </div>
+                
+                {/* Tool card 4 */}
+                <div className="bg-bolt-elements-bg-depth-3 rounded-xl p-6 border border-bolt-elements-borderColor hover:border-amber-500/50 transition-all duration-300 shadow-lg">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-bolt-elements-bg-depth-2 rounded-full flex items-center justify-center shadow-inner">
+                      <div className="i-ph:lightning-bold text-amber-500 text-2xl" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Instant Preview</h3>
+                  </div>
+                  <p className="text-bolt-elements-textSecondary">
+                    See your changes in action instantly with live preview and hot reloading.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* The Code is Yours Section */}
+          <div className="mt-24 w-full max-w-4xl mx-auto">
+            <div className="bg-bolt-elements-bg-depth-2 rounded-2xl overflow-hidden border border-bolt-elements-borderColor shadow-xl">
+              <div className="p-8 md:p-12">
+                <div className="flex flex-col md:flex-row gap-12">
+                  {/* Text content */}
+                  <div className="w-full md:w-1/2 flex flex-col justify-center">
+                    <div className="relative inline-block mb-6">
+                      <h2 className="text-3xl font-bold text-bolt-elements-textPrimary">
+                        The Code is Yours
+                      </h2>
+                      <div className="absolute -bottom-3 left-0 w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+                    </div>
+                    
+                    <div className="space-y-4 mb-8">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          Download full source code with a single click
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          Full ownership rights to use in commercial projects
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          No attribution required, build your brand freely
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <button className="flex items-center justify-center gap-2 px-6 py-3 bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-textPrimary rounded-lg transition-colors w-full md:w-auto">
+                      <div className="i-ph:download-simple-bold" />
+                      Download Source Code
+                    </button>
                   </div>
                   
-                  {/* Step Content */}
-                  <div className="text-center px-4">
-                    <h3 className="text-lg font-semibold text-bolt-elements-textPrimary mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-sm text-bolt-elements-textSecondary">
-                      {step.description}
-                    </p>
+                  {/* Code preview */}
+                  <div className="w-full md:w-1/2">
+                    <div className="bg-bolt-elements-bg-depth-3 rounded-lg overflow-hidden border border-bolt-elements-borderColor shadow-lg">
+                      <div className="bg-bolt-elements-bg-depth-1 p-2 flex items-center gap-2 border-b border-bolt-elements-borderColor">
+                        <div className="flex gap-1.5">
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div className="text-xs text-bolt-elements-textSecondary mx-auto">App.jsx</div>
+                      </div>
+                      <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <pre className="text-sm">
+                          <code>
+                            <div className="flex">
+                              <span className="text-purple-400">import</span> <span className="text-white">{'{'}</span> <span className="text-green-400">useState</span> <span className="text-white">{'}'}</span> <span className="text-purple-400">from</span> <span className="text-orange-300">'react'</span><span className="text-white">;</span>
+                            </div>
+                            <div className="mt-4"></div>
+                            <div className="flex">
+                              <span className="text-purple-400">export</span> <span className="text-purple-400">default</span> <span className="text-blue-400">function</span> <span className="text-yellow-300">App</span><span className="text-white">() {'{'}</span>
+                            </div>
+                            <div className="ml-4">
+                              <span className="text-purple-400">const</span> <span className="text-white">[</span><span className="text-yellow-300">count</span><span className="text-white">, </span><span className="text-yellow-300">setCount</span><span className="text-white">] = </span><span className="text-blue-400">useState</span><span className="text-white">(</span><span className="text-orange-300">0</span><span className="text-white">);</span>
+                            </div>
+                            <div className="mt-2 ml-4">
+                              <span className="text-purple-400">return</span> <span className="text-white">(</span>
+                            </div>
+                            <div className="ml-8">
+                              <span className="text-gray-400">&lt;</span><span className="text-blue-300">div</span> <span className="text-green-400">className</span><span className="text-white">=</span><span className="text-orange-300">"container"</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-12">
+                              <span className="text-gray-400">&lt;</span><span className="text-blue-300">h1</span> <span className="text-green-400">className</span><span className="text-white">=</span><span className="text-orange-300">"title"</span><span className="text-gray-400">&gt;</span><span className="text-white">This is your app</span><span className="text-gray-400">&lt;/</span><span className="text-blue-300">h1</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-12">
+                              <span className="text-gray-400">&lt;</span><span className="text-blue-300">p</span><span className="text-gray-400">&gt;</span><span className="text-white">You clicked {'{'}count{'}'} times</span><span className="text-gray-400">&lt;/</span><span className="text-blue-300">p</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-12">
+                              <span className="text-gray-400">&lt;</span><span className="text-blue-300">button</span> <span className="text-green-400">onClick</span><span className="text-white">=</span><span className="text-orange-300">{'{() => setCount(count + 1)}'}</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-16">
+                              <span className="text-white">Click me</span>
+                            </div>
+                            <div className="ml-12">
+                              <span className="text-gray-400">&lt;/</span><span className="text-blue-300">button</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-8">
+                              <span className="text-gray-400">&lt;/</span><span className="text-blue-300">div</span><span className="text-gray-400">&gt;</span>
+                            </div>
+                            <div className="ml-4">
+                              <span className="text-white">);</span>
+                            </div>
+                            <div>
+                              <span className="text-white">{'}'}</span>
+                            </div>
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Connector Line */}
-                  {!isMobile && index < array.length - 1 && (
-                    <div className="absolute top-6 left-[60%] w-[calc(100%-20%)] h-[2px] bg-gradient-to-r from-purple-600/50 to-blue-500/50" />
-                  )}
                 </div>
-              ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Deploy to Your Custom Domain Section */}
+          <div className="mt-24 w-full max-w-4xl mx-auto">
+            <div className="bg-bolt-elements-bg-depth-2 rounded-2xl overflow-hidden border border-bolt-elements-borderColor shadow-xl">
+              <div className="p-8 md:p-12">
+                <div className="flex flex-col md:flex-row-reverse gap-12">
+                  {/* Text content */}
+                  <div className="w-full md:w-1/2 flex flex-col justify-center">
+                    <div className="relative inline-block mb-6">
+                      <h2 className="text-3xl font-bold text-bolt-elements-textPrimary">
+                        Deploy to Your Custom Domain
+                      </h2>
+                      <div className="absolute -bottom-3 left-0 w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+                    </div>
+                    
+                    <div className="space-y-4 mb-8">
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          One-click custom domain setup with automatic DNS configuration
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          Automatic SSL certificate provisioning for secure connections
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1.5 w-4 h-4 rounded-full bg-bolt-elements-button-primary-background flex items-center justify-center">
+                          <div className="i-ph:check text-xs text-white" />
+                        </div>
+                        <p className="text-bolt-elements-textSecondary">
+                          Global CDN deployment for fast loading worldwide
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <button className="flex items-center justify-center gap-2 px-6 py-3 bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-textPrimary rounded-lg transition-colors w-full md:w-auto">
+                      <div className="i-ph:globe-bold" />
+                      Set Up Domain
+                    </button>
+                  </div>
+                  
+                  {/* Domain status card */}
+                  <div className="w-full md:w-1/2 flex items-center">
+                    <div className="bg-bolt-elements-bg-depth-3 rounded-lg border border-bolt-elements-borderColor p-6 w-full">
+                      <div className="flex flex-col gap-6">
+                        {/* Status indicators */}
+                        <div className="flex flex-wrap justify-between items-center gap-2">
+                          <div className="flex items-center gap-2 bg-bolt-elements-bg-depth-1 px-4 py-2 rounded-full">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <span className="text-green-500 text-sm font-medium">Domain Connected</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 bg-bolt-elements-bg-depth-1 px-4 py-2 rounded-full">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <span className="text-green-500 text-sm font-medium">SSL Active</span>
+                          </div>
+                        </div>
+                        
+                        {/* URL display */}
+                        <div className="mt-2 bg-bolt-elements-bg-depth-1 rounded-lg p-6 flex items-center justify-center border border-bolt-elements-borderColor">
+                          <div className="flex items-center gap-2">
+                            <div className="i-ph:lock-fill text-green-500"></div>
+                            <span className="text-bolt-elements-textPrimary font-mono">https://your-app.com</span>
+                          </div>
+                        </div>
+                        
+                        {/* Status details */}
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div className="bg-bolt-elements-bg-depth-1 p-3 rounded-lg border border-bolt-elements-borderColor">
+                            <div className="text-xs text-bolt-elements-textSecondary mb-1">Last Deployed</div>
+                            <div className="text-sm text-bolt-elements-textPrimary">2 hours ago</div>
+                          </div>
+                          <div className="bg-bolt-elements-bg-depth-1 p-3 rounded-lg border border-bolt-elements-borderColor">
+                            <div className="text-xs text-bolt-elements-textSecondary mb-1">Status</div>
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                              <span className="text-sm text-bolt-elements-textPrimary">Healthy</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

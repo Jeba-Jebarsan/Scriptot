@@ -117,7 +117,7 @@ export const Preview = memo(() => {
     setIsDeviceModeOn((prev) => !prev);
   };
 
-  const startResizing = (e: React.MouseEvent, side: ResizeSide) => {
+  const startResizing = (e: React.MouseEvent | React.TouchEvent, side: ResizeSide) => {
     if (!isDeviceModeOn) {
       return;
     }
@@ -127,14 +127,27 @@ export const Preview = memo(() => {
 
     resizingState.current.isResizing = true;
     resizingState.current.side = side;
-    resizingState.current.startX = e.clientX;
+    
+    // Handle both mouse and touch events
+    if ('touches' in e) {
+      // Touch event
+      resizingState.current.startX = e.touches[0].clientX;
+    } else {
+      // Mouse event
+      resizingState.current.startX = e.clientX;
+    }
+    
     resizingState.current.startWidthPercent = widthPercent;
     resizingState.current.windowWidth = window.innerWidth;
 
+    // Add both mouse and touch event listeners
     document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
     document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('touchend', onTouchEnd);
 
-    e.preventDefault(); // Prevent any text selection on mousedown
+    // Prevent default behavior to avoid scrolling on touch devices
+    e.preventDefault();
   };
 
   const onMouseMove = (e: MouseEvent) => {
@@ -166,6 +179,49 @@ export const Preview = memo(() => {
     resizingState.current.isResizing = false;
     resizingState.current.side = null;
     document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    // Restore text selection
+    document.body.style.userSelect = '';
+  };
+
+  // Add a touch move handler
+  const onTouchMove = (e: TouchEvent) => {
+    if (!resizingState.current.isResizing) {
+      return;
+    }
+
+    const touch = e.touches[0];
+    const dx = touch.clientX - resizingState.current.startX;
+    const windowWidth = resizingState.current.windowWidth;
+
+    // Apply scaling factor to increase sensitivity
+    const dxPercent = (dx / windowWidth) * 100 * SCALING_FACTOR;
+
+    let newWidthPercent = resizingState.current.startWidthPercent;
+
+    if (resizingState.current.side === 'right') {
+      newWidthPercent = resizingState.current.startWidthPercent + dxPercent;
+    } else if (resizingState.current.side === 'left') {
+      newWidthPercent = resizingState.current.startWidthPercent - dxPercent;
+    }
+
+    // Clamp the width between 10% and 90%
+    newWidthPercent = Math.max(10, Math.min(newWidthPercent, 90));
+
+    setWidthPercent(newWidthPercent);
+    
+    // Prevent default to stop scrolling while resizing
+    e.preventDefault();
+  };
+
+  // Add a touch end handler
+  const onTouchEnd = () => {
+    resizingState.current.isResizing = false;
+    resizingState.current.side = null;
+    document.removeEventListener('touchmove', onTouchMove);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('touchend', onTouchEnd);
     document.removeEventListener('mouseup', onMouseUp);
 
     // Restore text selection
@@ -389,6 +445,7 @@ export const Preview = memo(() => {
               {/* Left handle */}
               <div
                 onMouseDown={(e) => startResizing(e, 'left')}
+                onTouchStart={(e) => startResizing(e, 'left')}
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -414,6 +471,7 @@ export const Preview = memo(() => {
               {/* Right handle */}
               <div
                 onMouseDown={(e) => startResizing(e, 'right')}
+                onTouchStart={(e) => startResizing(e, 'right')}
                 style={{
                   position: 'absolute',
                   top: 0,

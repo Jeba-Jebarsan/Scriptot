@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { api } from "../../../convex/_generated/api";
 import { useMutation } from "convex/react";
 import { TypeAnimation } from 'react-type-animation';
+import { useResponsive } from '~/utils/mobile';
 
 interface LoginPopupProps {
   onSuccess: () => void;
@@ -21,6 +22,7 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
   const [demoStep, setDemoStep] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const { isMobile, isTablet } = useResponsive();
   
   const demoPrompts = [
     "Design a profile page with bio",
@@ -505,7 +507,7 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
             window.dispatchEvent(new Event('storage'));
             window.dispatchEvent(new Event('auth-change'));
 
-            toast.success('Successfully logged in!');
+            showLoginSuccessToast();
             onSuccess();
             onClose();
             window.history.replaceState({}, '', window.location.pathname.replace(/[~/]+$/, ''));
@@ -522,6 +524,34 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
     };
   }, [onSuccess, onClose, location.pathname, upsertUser]);
 
+  // Enhanced login success toast with mobile responsiveness
+  const showLoginSuccessToast = () => {
+    toast.success(
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-green-500 to-teal-400 rounded-full flex items-center justify-center animate-pulse-subtle">
+          <div className="i-ph:check-bold text-white text-xl" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-semibold text-white text-sm sm:text-base truncate">Successfully logged in!</h4>
+          <p className="text-xs text-gray-300 truncate">Welcome to your DeepGen workspace</p>
+        </div>
+      </div>,
+      {
+        position: "bottom-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        className: "bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700 shadow-lg max-w-[90vw] sm:max-w-md",
+        progressClassName: "h-1 bg-gradient-to-r from-green-500 to-teal-400",
+        bodyClassName: "p-0",
+        icon: false,
+      }
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -530,28 +560,31 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
       className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50"
       onClick={onClose}
     >
-      <motion.div className="flex w-full max-w-6xl gap-8 p-8">
+      <motion.div 
+        className={`flex ${isMobile ? 'flex-col' : 'flex-row'} w-full ${isMobile ? 'max-w-[95%]' : 'max-w-6xl'} gap-4 sm:gap-8 p-4 sm:p-8`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Left side - Auth UI */}
         <motion.div
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          className="bg-black p-6 rounded-3xl shadow-2xl w-1/2"
+          initial={{ x: isMobile ? 0 : -20, y: isMobile ? -20 : 0, opacity: 0 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          className={`bg-black p-4 sm:p-6 rounded-3xl shadow-2xl ${isMobile ? 'w-full' : 'w-1/2'}`}
         >
-          <div className="text-center mb-6">
+          <div className="text-center mb-4 sm:mb-6">
             <div className="mb-4 flex flex-col items-center justify-center">
               <div className="relative">
                 <img 
                   src="/logo-dark-styled.png" 
                   alt="DeepGen Logo" 
-                  className="w-[100px] h-auto drop-shadow-2xl"
+                  className="w-[80px] sm:w-[100px] h-auto drop-shadow-2xl"
                 />
                 <div className="absolute -bottom-2 w-full h-[2px] bg-gradient-to-r from-transparent via-[#2563EB] to-transparent opacity-80"></div>
               </div>
-              <h1 className="mt-4 text-2xl font-bold bg-gradient-to-r from-[#2563EB] to-[#7C3AED] bg-clip-text text-transparent">
+              <h1 className="mt-4 text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#2563EB] to-[#7C3AED] bg-clip-text text-transparent">
                 DeepGen
               </h1>
             </div>
-            <p className="text-white text-sm font-light leading-relaxed">
+            <p className="text-white text-xs sm:text-sm font-light leading-relaxed">
               Access the future of coding with <span className="font-medium text-[#2563EB]">DeepGen</span>
             </p>
           </div>
@@ -575,90 +608,94 @@ export function LoginPopup({ onSuccess, onClose }: LoginPopupProps) {
           />
         </motion.div>
 
-        {/* Right side - Demo Animation */}
-        <motion.div className="bg-[#040810] p-6 rounded-3xl shadow-2xl w-1/2 relative overflow-hidden">
-          {/* Background Image and Overlay */}
-          <div className="absolute inset-0">
-            <img 
-              src="https://images.unsplash.com/photo-1564951434112-64d74cc2a2d7?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGxhaW4lMjBjb2xvdXJ8ZW58MHx8MHx8fDA%3D"
-              alt="background"
-              className="object-cover w-full h-full opacity-40"
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#3c5882]/50 via-[#111c32]/60 to-[#060c1c]/70" />
-          </div>
-
-          {/* Gradient Overlays */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute w-full h-full bg-gradient-to-tr from-[#324c6c]/30 via-[#1b2c4c]/30 to-[#334474]/30" />
-            <div className="absolute w-[800px] h-[800px] bg-gradient-to-r from-[#283e63]/40 to-transparent rounded-full blur-[80px] -top-[200px] -right-[200px]" />
-            <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-[#1c344e]/40 to-transparent rounded-full blur-[70px] -bottom-[200px] -left-[200px]" />
-          </div>
-
-          {/* Content Container */}
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold text-white mb-6">Watch the Magic Happen</h2>
-            
-            <div className="relative mb-4">
-              <div className="bg-[#2E2F33] rounded-lg p-4">
-                <TypeAnimation
-                  sequence={[
-                    "Design a profile page with bio",
-                    2000,
-                    "Create a login and registration page with form validation",
-                    2000,
-                    "Generate a user dashboard with charts",
-                    2000,
-                    "Build a real-time chat component",
-                    2000,
-                    "Create a to-do list app with drag-and-drop functionality",
-                    2000
-                  ]}
-                  wrapper="div"
-                  cursor={true}
-                  repeat={Infinity}
-                  speed={99}
-                  className="text-[#71717A]"
-                />
-              </div>
+        {/* Right side - Demo Animation (hidden on very small screens) */}
+        {(!isMobile || (isMobile && window.innerWidth > 480)) && (
+          <motion.div 
+            className={`bg-[#040810] p-4 sm:p-6 rounded-3xl shadow-2xl ${isMobile ? 'w-full' : 'w-1/2'} relative overflow-hidden ${isMobile ? 'max-h-[400px]' : ''}`}
+          >
+            {/* Background Image and Overlay */}
+            <div className="absolute inset-0">
+              <img 
+                src="https://images.unsplash.com/photo-1564951434112-64d74cc2a2d7?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGxhaW4lMjBjb2xvdXJ8ZW58MHx8MHx8fDA%3D"
+                alt="background"
+                className="object-cover w-full h-full opacity-40"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#3c5882]/50 via-[#111c32]/60 to-[#060c1c]/70" />
             </div>
 
-            <motion.div 
-              key={demoStep}
-              className="flex-1 bg-[#2E2F33] rounded-lg p-4 overflow-hidden font-mono"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <TypeAnimation
-                sequence={[demoCode[demoStep]]}
-                wrapper="div"
-                cursor={false}
-                speed={20}
-                className="text-[#4079ff] text-sm whitespace-pre text-left"
-              />
-            </motion.div>
+            {/* Gradient Overlays */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute w-full h-full bg-gradient-to-tr from-[#324c6c]/30 via-[#1b2c4c]/30 to-[#334474]/30" />
+              <div className="absolute w-[800px] h-[800px] bg-gradient-to-r from-[#283e63]/40 to-transparent rounded-full blur-[80px] -top-[200px] -right-[200px]" />
+              <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-[#1c344e]/40 to-transparent rounded-full blur-[70px] -bottom-[200px] -left-[200px]" />
+            </div>
 
-            <motion.div 
-              key={`preview-${demoStep}`}
-              className="mt-4 bg-[#2E2F33] rounded-lg w-full relative"
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Window Control Buttons */}
-              <div className="absolute left-4 top-4 flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-              </div>
+            {/* Content Container */}
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-white mb-6">Watch the Magic Happen</h2>
               
-              {/* Content with adjusted padding to account for buttons */}
-              <div className="pt-12 p-4">
-                {demoComponents[demoStep]}
+              <div className="relative mb-4">
+                <div className="bg-[#2E2F33] rounded-lg p-4">
+                  <TypeAnimation
+                    sequence={[
+                      "Design a profile page with bio",
+                      2000,
+                      "Create a login and registration page with form validation",
+                      2000,
+                      "Generate a user dashboard with charts",
+                      2000,
+                      "Build a real-time chat component",
+                      2000,
+                      "Create a to-do list app with drag-and-drop functionality",
+                      2000
+                    ]}
+                    wrapper="div"
+                    cursor={true}
+                    repeat={Infinity}
+                    speed={99}
+                    className="text-[#71717A]"
+                  />
+                </div>
               </div>
-            </motion.div>
-          </div>
-        </motion.div>
+
+              <motion.div 
+                key={demoStep}
+                className="flex-1 bg-[#2E2F33] rounded-lg p-4 overflow-hidden font-mono"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TypeAnimation
+                  sequence={[demoCode[demoStep]]}
+                  wrapper="div"
+                  cursor={false}
+                  speed={20}
+                  className="text-[#4079ff] text-sm whitespace-pre text-left"
+                />
+              </motion.div>
+
+              <motion.div 
+                key={`preview-${demoStep}`}
+                className="mt-4 bg-[#2E2F33] rounded-lg w-full relative"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Window Control Buttons */}
+                <div className="absolute left-4 top-4 flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+                  <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+                  <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+                </div>
+                
+                {/* Content with adjusted padding to account for buttons */}
+                <div className="pt-12 p-4">
+                  {demoComponents[demoStep]}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </motion.div>
   );

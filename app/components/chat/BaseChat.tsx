@@ -121,6 +121,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [transcript, setTranscript] = useState('');
     const [isModelLoading, setIsModelLoading] = useState<string | undefined>('all');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const getProviderSettings = useCallback(() => {
       let providerSettings: Record<string, IProviderSetting> | undefined = undefined;
@@ -217,6 +218,21 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         }
       };
       init();
+    }, []);
+
+    useEffect(() => {
+      const checkIfMobile = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      
+      // Check on initial load
+      checkIfMobile();
+      
+      // Add event listener for window resize
+      window.addEventListener('resize', checkIfMobile);
+      
+      // Cleanup
+      return () => window.removeEventListener('resize', checkIfMobile);
     }, []);
 
     const onApiKeysChange = async (providerName: string, apiKey: string) => {
@@ -371,7 +387,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                     animationSpeed={5}
                     showBorder={false}
-                    className="text-6xl font-bold"
+                    className="text-3xl lg:text-6xl font-bold"
                   >
                     Build Smarter
                   </GradientText>
@@ -418,13 +434,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
                 <div
                   className={classNames(
-                    'bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt'
-
-                    /*
-                     * {
-                     *   'sticky bottom-2': chatStarted,
-                     * },
-                     */
+                    'bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt shadow-lg transition-all duration-300 hover:shadow-xl'
                   )}
                 >
                   <svg className={classNames(styles.PromptEffectContainer)}>
@@ -449,6 +459,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         <stop offset="50%" stopColor="#ffffff" stopOpacity="80%"></stop>
                         <stop offset="100%" stopColor="white" stopOpacity="0%"></stop>
                       </linearGradient>
+                      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                      </filter>
                     </defs>
                     <rect className={classNames(styles.PromptEffectLine)} pathLength="100" strokeLinecap="round"></rect>
                     <rect className={classNames(styles.PromptShine)} x="48" y="24" width="70" height="1"></rect>
@@ -492,7 +506,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   </ClientOnly>
                   <div
                     className={classNames(
-                      'relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg'
+                      'relative shadow-md border border-bolt-elements-borderColor backdrop-blur rounded-lg transition-all duration-300 hover:border-bolt-elements-focus focus-within:border-bolt-elements-focus focus-within:ring-2 focus-within:ring-bolt-elements-focus/30'
                     )}
                   >
                     <textarea
@@ -500,8 +514,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       className={classNames(
                         'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
                         'transition-all duration-200',
-                        'hover:border-bolt-elements-focus'
+                        'focus:placeholder-bolt-elements-textSecondary'
                       )}
+                      onTouchStart={(e) => {
+                        e.currentTarget.focus();
+                      }}
                       onDragEnter={(e) => {
                         e.preventDefault();
                         e.currentTarget.style.border = '2px solid #1488fc';
@@ -571,14 +588,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       )}
                     </ClientOnly>
                     <div className="flex justify-between items-center text-sm p-4 pt-2">
-                      <div className="flex gap-1 items-center">
-                        <IconButton title="Upload file" className="transition-all" onClick={() => handleFileUpload()}>
+                      <div className="flex gap-1 items-center flex-wrap">
+                        <IconButton title="Upload file" className="transition-all hover:bg-bolt-elements-item-backgroundHover" onClick={() => handleFileUpload()}>
                           <div className="i-ph:paperclip text-xl"></div>
                         </IconButton>
                         <IconButton
                           title="Enhance prompt"
                           disabled={input.length === 0 || enhancingPrompt}
-                          className={classNames('transition-all', enhancingPrompt ? 'opacity-100' : '')}
+                          className={classNames('transition-all hover:bg-bolt-elements-item-backgroundHover', enhancingPrompt ? 'opacity-100' : '')}
                           onClick={() => {
                             enhancePrompt?.();
                             toast.success('Prompt enhanced!');
@@ -600,7 +617,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         {chatStarted && <ClientOnly>{() => <ExportChatButton exportChat={exportChat} />}</ClientOnly>}
                         <IconButton
                           title="Model Settings"
-                          className={classNames('transition-all flex items-center gap-1', {
+                          className={classNames('transition-all flex items-center gap-1 hover:bg-bolt-elements-item-backgroundHover', {
                             'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent':
                               isModelSettingsCollapsed,
                             'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault':
@@ -613,10 +630,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           {isModelSettingsCollapsed ? <span className="text-xs">{model}</span> : <span />}
                         </IconButton>
                       </div>
-                      {input.length > 3 ? (
+                      {input.length > 3 && !isMobile ? (
                         <div className="text-xs text-bolt-elements-textTertiary">
-                          Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd>{' '}
-                          + <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>{' '}
+                          Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-3 shadow-sm">Shift</kbd>{' '}
+                          + <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-3 shadow-sm">Return</kbd>{' '}
                           a new line
                         </div>
                       ) : null}
@@ -627,7 +644,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             </div>
             <div className="flex flex-col justify-center gap-5">
               {!chatStarted && (
-                <div className="flex justify-center gap-2">
+                <div className="flex justify-center gap-2 flex-wrap px-2">
                   {ImportButtons(importChat)}
                   <GitCloneButton importChat={importChat} />
                 </div>

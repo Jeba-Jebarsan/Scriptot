@@ -40,7 +40,7 @@ const inlineThemeCode = stripIndents`
 export const Head = createHead(() => (
   <>
     <meta charSet="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <Meta />
     <Links />
     <script dangerouslySetInnerHTML={{ __html: inlineThemeCode }} />
@@ -92,7 +92,24 @@ export default function App() {
           <Scripts />
           <script dangerouslySetInnerHTML={{ __html: `window.ENV = ${JSON.stringify(ENV)}` }} />
           <LiveReload />
-          <ToastContainer position="bottom-right" theme="dark" />
+          <ToastContainer
+            position="bottom-right"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+            toastClassName={(context) => {
+              return context?.type === 'success'
+                ? 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700 shadow-lg max-w-[90vw] sm:max-w-md animate-slide-in-right'
+                : 'bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700 shadow-lg max-w-[90vw] sm:max-w-md';
+            }}
+            bodyClassName="p-3"
+          />
         </ConvexProviderWrapper>
       </body>
     </html>

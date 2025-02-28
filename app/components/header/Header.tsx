@@ -7,6 +7,8 @@ import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { useState, useEffect, useRef } from 'react';
 import { useRevalidator, Link } from '@remix-run/react';
 import { supabase } from '~/lib/supabase';
+import { useResponsive } from '~/utils/mobile';
+import { signOut } from '~/utils/auth';
 
 interface HeaderProps {
   setShowLoginPopup: (show: boolean) => void;
@@ -20,6 +22,7 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const revalidator = useRevalidator();
+  const { isMobile, isTablet } = useResponsive();
 
   // ✅ Close dropdown when clicking outside
   useEffect(() => {
@@ -36,21 +39,28 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
   // ✅ Check authentication state and update UI
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setIsAuthenticated(!!session);
 
-      if (session?.user) {
-        const userData = {
-          email: session.user.email,
-          name: session.user.user_metadata.full_name || session.user.email,
-          picture: session.user.user_metadata.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.user_metadata.full_name || session.user.email)}`,
-          supabaseId: session.user.id
-        };
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUserInfo(userData);
-        setShowLoginPopup(false);
-      } else {
-        localStorage.removeItem('user');
+        if (session?.user) {
+          const userData = {
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email,
+            picture: session.user.user_metadata?.avatar_url,
+            supabaseId: session.user.id
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          setUserInfo(userData);
+          setShowLoginPopup(false);
+        } else {
+          localStorage.removeItem('user');
+          setUserInfo(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
         setUserInfo(null);
       }
     };
@@ -69,21 +79,17 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
   // ✅ Sign out and ensure full state reset
   const handleSignOut = async () => {
     try {
-      localStorage.removeItem('user'); // Clear first
-      await supabase.auth.signOut();
       setIsAuthenticated(false);
       setUserInfo(null);
       setShowDropdown(false);
-
-      // Reset chat store to prevent stale messages
-      chatStore.set({ started: false, aborted: false, showChat: false });
-
-      // Refresh the page or trigger Remix revalidation
-      revalidator.revalidate(); // Ensures Remix syncs with new session state
-      window.location.reload(); // Optional: Hard reset if needed
-
+      
+      // Call the signOut utility function
+      await signOut();
+      
     } catch (error) {
       console.error('Sign out error:', error);
+      // Ensure user is redirected even if there's an error
+      window.location.href = '/';
     }
   };
 
@@ -101,13 +107,13 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
           />
         )}
         <a href="/" className="text-2xl font-semibold text-accent flex items-center">
-          <img src="/logo-light-styled.png" alt="logo" className="w-[90px] inline-block dark:hidden" />
-          <img src="/logo-dark-styled.png" alt="logo" className="w-[90px] inline-block hidden dark:block" />
+          <img src="/logo-light-styled.png" alt="logo" className={`${isMobile ? 'w-[70px]' : 'w-[90px]'} inline-block dark:hidden`} />
+          <img src="/logo-dark-styled.png" alt="logo" className={`${isMobile ? 'w-[70px]' : 'w-[90px]'} inline-block hidden dark:block`} />
         </a>
       </div>
 
       {chat.started && (
-        <div className="flex items-center gap-4">
+        <div className={`flex items-center gap-4 ${isMobile ? 'max-w-[120px]' : ''}`}>
           <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
             <ClientOnly>{() => <ChatDescription />}</ClientOnly>
           </span>
@@ -123,9 +129,13 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
           <div className="relative z-50" ref={dropdownRef}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="px-6 py-2.5 text-sm font-semibold text-white bg-[#1A1B1E] border border-gray-700 rounded-lg hover:bg-gray-800 active:bg-gray-900 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out flex items-center gap-2"
+              className={`${isMobile ? 'px-3 py-2' : 'px-6 py-2.5'} text-sm font-semibold text-white bg-[#1A1B1E] border border-gray-700 rounded-lg hover:bg-gray-800 active:bg-gray-900 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out flex items-center gap-2`}
             >
-              {userInfo.name}
+              {isMobile ? (
+                <div className="i-ph:user-circle text-lg" />
+              ) : (
+                userInfo.name
+              )}
               <div className={`i-ph:caret-down transition-transform ${showDropdown ?'rotate-180' : ''}`} />
             </button>
 
@@ -165,9 +175,9 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
         ) : (
           <button
             onClick={() => setShowLoginPopup(true)}
-            className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
+            className={`${isMobile ? 'px-3 py-2' : 'px-6 py-2.5'} text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out`}
           >
-            Sign In
+            {isMobile ? 'Login' : 'Sign In'}
           </button>
         )}
       </div>
