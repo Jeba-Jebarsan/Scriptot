@@ -11,5 +11,9 @@ bucket = "./build/client"
 
 [vars]
 VITE_GITHUB_CLIENT_ID = "Ov23liNA1dVBglJhaSw5"
-VITE_CONVEX_URL = "https://judicious-pelican-858.convex.cloud"
 VITE_APP_URL = "https://scriptot.pages.dev"
+
+[compatibility_flags]
+nodejs_compat = true
+
+pages_build_output_dir = "./build/client"
