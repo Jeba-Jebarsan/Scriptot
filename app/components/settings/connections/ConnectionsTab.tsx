@@ -213,24 +213,45 @@ export default function ConnectionsTab() {
                 Get token →
               </a>
             </label>
-            <input
-              type="password"
-              value={netlifyToken}
-              onChange={async (e) => {
-                const newToken = e.target.value.replace('Bearer ', ''); // Remove Bearer if pasted with it
-                setNetlifyToken(newToken);
-                Cookies.set('netlifyToken', newToken);
-                if (newToken) {
+            <div className="relative">
+              <input
+                type="password"
+                value={netlifyToken}
+                onChange={(e) => {
+                  const newToken = e.target.value.replace('Bearer ', '');
+                  setNetlifyToken(newToken);
+                  Cookies.set('netlifyToken', newToken);
+                }}
+                className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor"
+                placeholder="Enter your Netlify access token"
+              />
+              <button
+                onClick={async () => {
+                  if (!netlifyToken) {
+                    toast.error('Please enter a Netlify token first');
+                    return;
+                  }
                   const isValid = await verifyNetlifyToken();
                   if (isValid) {
-                    toast.success('Netlify token verified successfully!');
-                  } else {
-                    toast.error('Invalid Netlify token');
+                    toast.success('Successfully connected to Netlify!');
                   }
-                }
-              }}
-              className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor"
-            />
+                }}
+                disabled={isNetlifyVerifying || !netlifyToken}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-bolt-elements-button-primary-background rounded-md px-3 py-1 text-sm transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isNetlifyVerifying ? (
+                  <>
+                    <div className="i-ph:spinner animate-spin" />
+                    <span>Verifying...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="i-ph:plug" />
+                    <span>Connect</span>
+                  </>
+                )}
+              </button>
+            </div>
             <p className="mt-1 text-xs text-bolt-elements-textTertiary">
               Get your token from Netlify: User Settings → Applications → New access token
             </p>
@@ -251,12 +272,37 @@ export default function ConnectionsTab() {
               </span>
             </>
           ) : (
-            isNetlifyVerifying && (
-              <span className="text-sm text-bolt-elements-textSecondary flex items-center">
-                <div className="i-ph:spinner animate-spin mr-2" />
-                Verifying...
-              </span>
-            )
+            <>
+              <button
+                onClick={async () => {
+                  if (!netlifyToken) {
+                    toast.error('Please enter a Netlify token first');
+                    return;
+                  }
+                  const isValid = await verifyNetlifyToken();
+                  if (isValid) {
+                    toast.success('Netlify token verified successfully!');
+                  }
+                }}
+                disabled={isNetlifyVerifying || !netlifyToken}
+                className="bg-bolt-elements-button-primary-background rounded-lg px-4 py-2 mr-2 transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              >
+                {isNetlifyVerifying ? (
+                  <>
+                    <div className="i-ph:spinner animate-spin mr-2" />
+                    Verifying...
+                  </>
+                ) : (
+                  'Connect'
+                )}
+              </button>
+              {isNetlifyVerifying && (
+                <span className="text-sm text-bolt-elements-textSecondary flex items-center">
+                  <div className="i-ph:spinner animate-spin mr-2" />
+                  Verifying...
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -1,33 +1,36 @@
 import { useStore } from '@nanostores/react';
 import { toast } from 'react-toastify';
-import useViewport from '~/lib/hooks';
 import { chatStore } from '~/lib/stores/chat';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { webcontainer } from '~/lib/webcontainer';
 import { classNames } from '~/utils/classNames';
 import { useEffect, useRef, useState } from 'react';
 import type { ActionCallbackData } from '~/lib/runtime/message-parser';
-import { chatId } from '~/lib/persistence/useChatHistory'; // Add this import
+import { chatId } from '~/lib/persistence/useChatHistory';
 import { NetlifyDeploymentLink } from '~/components/chat/NetlifyDeploymentLink.client';
-import { netlifyConnection } from '~/lib/services/netlify';
+import { netlifyConnection, updateNetlifyConnection } from '~/lib/services/netlify';
 import { streamingState } from '~/lib/stores/deployment';
+import Cookies from 'js-cookie';
+import type { NetlifyUser } from '~/types/netlify';
+import { Globe } from 'lucide-react';
+import { DeploymentHistory } from '~/components/DeploymentHistory';
 
 interface HeaderActionButtonsProps {}
 
 export function HeaderActionButtons({}: HeaderActionButtonsProps) {
-  const showWorkbench = useStore(workbenchStore.showWorkbench);
-  const { showChat } = useStore(chatStore);
-  const connection = useStore(netlifyConnection);
   const [activePreviewIndex] = useState(0);
   const previews = useStore(workbenchStore.previews);
   const activePreview = previews[activePreviewIndex];
   const [isDeploying, setIsDeploying] = useState(false);
-  const isSmallViewport = useViewport(1024);
-  const canHideChat = showWorkbench || !showChat;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNetlifyVerifying, setIsNetlifyVerifying] = useState(false);
+  const [netlifyToken, setNetlifyToken] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isStreaming = useStore(streamingState);
   const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
+  const connection = useStore(netlifyConnection);
+  const currentChatId = useStore(chatId);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -36,11 +39,43 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentChatId = useStore(chatId);
+  const verifyNetlifyToken = async () => {
+    setIsNetlifyVerifying(true);
+    try {
+      const cleanToken = netlifyToken.replace('Bearer ', '');
+      updateNetlifyConnection({ user: null, token: '' });
+      
+      const response = await fetch('https://api.netlify.com/api/v1/user', {
+        headers: {
+          Authorization: `Bearer ${cleanToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid token');
+      }
+
+      const userData = await response.json() as NetlifyUser;
+      updateNetlifyConnection({
+        user: userData,
+        token: cleanToken,
+      });
+      Cookies.set('netlifyToken', cleanToken);
+      toast.success('Netlify token verified successfully!');
+      return true;
+    } catch (error) {
+      console.error('Netlify verification error:', error);
+      updateNetlifyConnection({ user: null, token: '' });
+      toast.error('Failed to verify Netlify token. Please check your token and try again.');
+      return false;
+    } finally {
+      setIsNetlifyVerifying(false);
+    }
+  };
 
   const handleDeploy = async () => {
     if (!connection.user || !connection.token) {
@@ -192,8 +227,16 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
       if (deploymentStatus.state === 'ready' || deploymentStatus.state === 'uploaded') {
         const siteUrl = deploymentStatus.ssl_url || deploymentStatus.url;
         setDeploymentUrl(siteUrl);
+        setIsDropdownOpen(false);
+        
+        // Send email notification
+        
+        
         toast.success(
-          <div>
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="relative"
+          >
             Deployed successfully!{' '}
             <a
               href={siteUrl}
@@ -203,7 +246,12 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
             >
               View site
             </a>
-          </div>
+          </div>,
+          {
+            onClick: () => toast.dismiss(), // Close on click outside
+            position: "bottom-right",
+            autoClose: 3000, // Auto close after 3 seconds
+          }
         );
       }
     } catch (error) {
@@ -211,6 +259,21 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
       toast.error(error instanceof Error ? error.message : 'Deployment failed');
     } finally {
       setIsDeploying(false);
+    }
+  };
+
+  const handleCancelDeploy = async () => {
+    try {
+      setIsCancelling(true);
+      // Cancel the deployment process
+      setIsDeploying(false);
+      setDeploymentUrl(null);
+      toast.info('Deployment cancelled');
+    } catch (error) {
+      console.error('Error cancelling deployment:', error);
+      toast.error('Failed to cancel deployment');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -231,7 +294,7 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
               </>
             ) : (
               <>
-                <div className="i-ph:cloud-arrow-up" />
+                <Globe size={16} />
                 Deploy
               </>
             )}
@@ -239,97 +302,149 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
         </div>
 
         {isDropdownOpen && (
-          <div className="absolute right-2 flex flex-col gap-1 z-50 p-1 mt-1 min-w-[13.5rem] bg-bolt-elements-background-depth-2 rounded-md shadow-lg bg-bolt-elements-backgroundDefault border border-bolt-elements-borderColor">
-            <Button
-              active
-              onClick={() => {
-                handleDeploy();
-                setIsDropdownOpen(false);
-              }}
-              disabled={isDeploying || !activePreview || !connection.user}
-              className="flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative"
-            >
-              <img
-                className="w-5 h-5"
-                height="24"
-                width="24"
-                crossOrigin="anonymous"
-                src="https://cdn.simpleicons.org/netlify"
-              />
-              <span className="mx-auto">{!connection.user ? 'No Account Connected' : 'Deploy to Netlify'}</span>
-              {connection.user && <NetlifyDeploymentLink />}
-            </Button>
-            <Button
-              active={false}
-              disabled
-              className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2"
-            >
-              <span className="sr-only">Coming Soon</span>
-              <img
-                className="w-5 h-5 bg-black p-1 rounded"
-                height="24"
-                width="24"
-                crossOrigin="anonymous"
-                src="https://cdn.simpleicons.org/vercel/white"
-                alt="vercel"
-              />
-              <span className="mx-auto">Deploy to Vercel (Coming Soon)</span>
-            </Button>
-            <Button
-              active={false}
-              disabled
-              className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2"
-            >
-              <span className="sr-only">Coming Soon</span>
-              <img
-                className="w-5 h-5"
-                height="24"
-                width="24"
-                crossOrigin="anonymous"
-                src="https://cdn.simpleicons.org/cloudflare"
-                alt="vercel"
-              />
-              <span className="mx-auto">Deploy to Cloudflare (Coming Soon)</span>
-            </Button>
+          <div className="absolute right-2 flex flex-col gap-1 z-[100] p-1 mt-1 min-w-[13.5rem] bg-bolt-elements-background-depth-2 rounded-md shadow-lg bg-bolt-elements-backgroundDefault border border-bolt-elements-borderColor" onClick={(e) => e.stopPropagation()}>
+            {!connection.user ? (
+              <div className="p-4 bg-[#0D1117] border border-gray-800 rounded-lg">
+                <h3 className="text-sm font-medium text-white mb-2">Connect to Netlify</h3>
+                <div className="space-y-2">
+                  <input
+                    type="password"
+                    value={netlifyToken}
+                    onChange={(e) => setNetlifyToken(e.target.value)}
+                    placeholder="Enter Netlify access token"
+                    className="w-full px-3 py-1.5 bg-[#161B22] border border-gray-800 rounded text-sm text-white placeholder-gray-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <a
+                      href="https://app.netlify.com/user/applications"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-[#58a6ff] hover:underline"
+                    >
+                      Get token →
+                    </a>
+                    <button
+                      onClick={verifyNetlifyToken}
+                      disabled={isNetlifyVerifying || !netlifyToken}
+                      className="ml-auto px-3 py-1.5 text-sm bg-[#238636] hover:bg-[#2ea043] text-white rounded disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isNetlifyVerifying ? (
+                        <>
+                          <div className="i-ph:spinner animate-spin" />
+                          Verifying...
+                        </>
+                      ) : (
+                        'Connect'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <Button
+                  active
+                  onClick={() => {
+                    handleDeploy();
+                    setIsDropdownOpen(false);
+                  }}
+                  disabled={isDeploying || !activePreview || !connection.user}
+                  className="flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative"
+                >
+                  <img
+                    className="w-5 h-5"
+                    height="24"
+                    width="24"
+                    crossOrigin="anonymous"
+                    src="https://cdn.simpleicons.org/netlify"
+                  />
+                  <span className="mx-auto">{!connection.user ? 'No Account Connected' : 'Deploy to Netlify'}</span>
+                  {connection.user && <NetlifyDeploymentLink />}
+                </Button>
+                <Button
+                  active={false}
+                  disabled
+                  className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2"
+                >
+                  <span className="sr-only">Coming Soon</span>
+                  <img
+                    className="w-5 h-5 bg-black p-1 rounded"
+                    height="24"
+                    width="24"
+                    crossOrigin="anonymous"
+                    src="https://cdn.simpleicons.org/vercel/white"
+                    alt="vercel"
+                  />
+                  <span className="mx-auto">Deploy to Vercel (Coming Soon)</span>
+                </Button>
+                <Button
+                  active={false}
+                  disabled
+                  className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2"
+                >
+                  <span className="sr-only">Coming Soon</span>
+                  <img
+                    className="w-5 h-5"
+                    height="24"
+                    width="24"
+                    crossOrigin="anonymous"
+                    src="https://cdn.simpleicons.org/cloudflare"
+                    alt="vercel"
+                  />
+                  <span className="mx-auto">Deploy to Cloudflare (Coming Soon)</span>
+                </Button>
+                {connection.user && <DeploymentHistory />}
+              </>
+            )}
           </div>
         )}
       </div>
-      <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden">
-        <Button
-          active={showChat}
-          disabled={!canHideChat || isSmallViewport} // expand button is disabled on mobile as it's not needed
-          onClick={() => {
-            if (canHideChat) {
-              chatStore.setKey('showChat', !showChat);
-            }
-          }}
-        >
-          <div className="i-bolt:chat text-sm" />
-        </Button>
-        <div className="w-[1px] bg-bolt-elements-borderColor" />
-        <Button
-          active={showWorkbench}
-          onClick={() => {
-            if (showWorkbench && !showChat) {
-              chatStore.setKey('showChat', true);
-            }
-
-            workbenchStore.showWorkbench.set(!showWorkbench);
-          }}
-        >
-          <div className="i-ph:code-bold" />
-        </Button>
-      </div>
-      {deploymentUrl && (
-        <div className="mt-2 text-sm text-green-500">
-          Deployed successfully! Visit: 
+      {isDeploying && (
+        <div className="absolute right-2 top-14 z-50 p-4 mt-1 w-[300px] bg-[#0D1117] rounded-lg border border-gray-800 shadow-xl">
+          <div className="flex items-center gap-3 mb-4">
+            <img 
+              className="w-6 h-6"
+              height="24"
+              width="24"
+              crossOrigin="anonymous"
+              src="https://cdn.simpleicons.org/netlify"
+              alt="Netlify"
+            />
+            <h3 className="text-sm font-medium text-white">Deploying to Netlify</h3>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="i-ph:spinner animate-spin text-blue-400" />
+              <span className="text-sm text-gray-300">Building your project</span>
+            </div>
+            
+            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-full bg-blue-500 rounded-full w-1/2 animate-pulse" />
+            </div>
+            
+            <p className="text-xs text-gray-500">
+              This might take a few moments...
+            </p>
+          </div>
+        </div>
+      )}
+      {deploymentUrl && !isDeploying && (
+        <div className="absolute right-2 top-14 z-50 p-4 mt-1 w-[300px] bg-[#0D1117] rounded-lg border border-gray-800 shadow-xl">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="i-ph:check-circle text-green-500 text-xl" />
+            <span className="text-sm font-medium text-white">
+              Deployment successful!
+            </span>
+          </div>
           <a 
             href={deploymentUrl}
             target="_blank"
             rel="noopener noreferrer" 
-            className="ml-1 underline"
+            className="flex items-center gap-2 px-3 py-2 bg-[#161B22] rounded text-sm text-gray-300 hover:text-white transition-colors"
           >
-            {deploymentUrl}
+            <div className="i-ph:arrow-square-out" />
+            Visit your site
           </a>
         </div>
       )}

@@ -111,61 +111,66 @@ export function Header({ setShowLoginPopup }: HeaderProps) {
           <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
             <ClientOnly>{() => <ChatDescription />}</ClientOnly>
           </span>
+        </div>
+      )}
+
+      <div className="flex items-center gap-2">
+        {chat.started && (
           <ClientOnly>{() => <HeaderActionButtons />}</ClientOnly>
-        </div>
-      )}
-
-      {isAuthenticated && userInfo ? (
-        <div className="relative z-50" ref={dropdownRef}>
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="px-6 py-2.5 text-sm font-semibold text-white bg-[#1A1B1E] border border-gray-700 rounded-lg hover:bg-gray-800 active:bg-gray-900 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out flex items-center gap-2"
-          >
-            {userInfo.name}
-            <div className={`i-ph:caret-down transition-transform ${showDropdown ?'rotate-180' : ''}`} />
-          </button>
-
-          {showDropdown && (
-            <div 
-              className="absolute right-0 mt-2 w-48 bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700"
-              style={{
-                transform: 'translateX(-10px)',
-                transition: 'transform 200ms ease-out, opacity 200ms ease-out',
-                opacity: showDropdown ? 1 : 0
-              }}
+        )}
+        
+        {isAuthenticated && userInfo ? (
+          <div className="relative z-50" ref={dropdownRef}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="px-6 py-2.5 text-sm font-semibold text-white bg-[#1A1B1E] border border-gray-700 rounded-lg hover:bg-gray-800 active:bg-gray-900 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out flex items-center gap-2"
             >
-              <Link
-                to={`/profile/${userInfo.supabaseId}`}
-                className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+              {userInfo.name}
+              <div className={`i-ph:caret-down transition-transform ${showDropdown ?'rotate-180' : ''}`} />
+            </button>
+
+            {showDropdown && (
+              <div 
+                className="absolute right-0 mt-2 w-48 bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl overflow-hidden border border-gray-700"
+                style={{
+                  transform: 'translateX(-10px)',
+                  transition: 'transform 200ms ease-out, opacity 200ms ease-out',
+                  opacity: showDropdown ? 1 : 0
+                }}
               >
-                <div className="i-ph:user text-lg" />
-                Profile
-              </Link>
-              <Link
-                to="/settings"
-                className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2 border-t border-gray-700"
-              >
-                <div className="i-ph:gear text-lg" />
-                Settings
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="w-full px-4 py-3 text-left text-sm text-white bg-black/7 hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2 border-t border-gray-700"
-              >
-                <div className="i-ph:sign-out text-lg" />
-                Sign Out
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <button
-          onClick={() => setShowLoginPopup(true)}
-          className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
-        >
-          Sign In
-        </button>
-      )}
+                <Link
+                  to={`/profile/${userInfo.supabaseId}`}
+                  className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2"
+                >
+                  <div className="i-ph:user text-lg" />
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="w-full px-4 py-3 text-left text-sm text-white hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2 border-t border-gray-700"
+                >
+                  <div className="i-ph:gear text-lg" />
+                  Settings
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full px-4 py-3 text-left text-sm text-white bg-black/7 hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2 border-t border-gray-700"
+                >
+                  <div className="i-ph:sign-out text-lg" />
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowLoginPopup(true)}
+            className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
+          >
+            Sign In
+          </button>
+        )}
+      </div>
     </header>
   );
 }
