@@ -1,17 +1,6 @@
-name = "scriptot"
-compatibility_date = "2025-02-14"
+#:schema node_modules/wrangler/config-schema.json
+name = "bolt"
 compatibility_flags = ["nodejs_compat"]
-
-main = "build/server/index.js"
-
-[build]
-command = "pnpm run build"
-
-[site]
-bucket = "./build/client"
-
+compatibility_date = "2024-07-01"
 pages_build_output_dir = "./build/client"
-
-[vars]
-VITE_GITHUB_CLIENT_ID = "Ov23liNA1dVBglJhaSw5"
-VITE_APP_URL = "https://scriptot.pages.dev"
+send_metrics = false
