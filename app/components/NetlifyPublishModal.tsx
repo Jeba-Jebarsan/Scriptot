@@ -9,7 +9,27 @@ import { useNavigate } from '@remix-run/react';
 import { fetchNetlifyStats, netlifyConnection } from '~/lib/services/netlify';
 import { NetlifyDeploymentLink } from './chat/NetlifyDeploymentLink.client';
 import { DeploymentSuccessAnimation } from './DeploymentSuccessAnimation';
-import { NetlifyDeploymentProgress } from '~/NetlifyDeploymentProgress';
+
+export function DeploymentProgressCard({ onComplete, provider }: { onComplete: () => void, provider: string }) {
+  useEffect(() => {
+    // Simulate deployment progress
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div className="w-full max-w-md p-8 bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl border border-gray-700">
+      <div className="flex flex-col items-center justify-center gap-4">
+        <div className="i-ph:spinner animate-spin text-4xl text-blue-500" />
+        <h3 className="text-xl font-bold text-white">Deploying to {provider}...</h3>
+        <p className="text-gray-300">Your site is being published</p>
+      </div>
+    </div>
+  );
+}
 
 export function NetlifyPublishModal({ 
   isOpen,
@@ -58,16 +78,17 @@ export function NetlifyPublishModal({
     }
 
     deploymentState.set({ isDeploying: true, isBuildReady: false, error: null });
-    setShowDeploymentProgress(true);
 
     try {
       const result = await workbench.deployToNetlify(projectName, netlifyToken);
       setDeploymentUrl(result.url);
-      // We'll show the success animation after the progress animation completes
+      
+      // Show success animation immediately
+      setShowSuccessAnimation(true);
+      
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to publish';
       deploymentState.set({ isDeploying: false, isBuildReady: false, error: errorMsg });
-      setShowDeploymentProgress(false);
       toast.error(errorMsg);
     } finally {
       deploymentState.set({ isDeploying: false, isBuildReady: false, error: null });
@@ -101,7 +122,7 @@ export function NetlifyPublishModal({
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
       >
-        <NetlifyDeploymentProgress onComplete={handleProgressComplete} />
+        <DeploymentProgressCard onComplete={handleProgressComplete} provider="netlify" />
       </motion.div>
     );
   }

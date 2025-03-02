@@ -5,6 +5,10 @@ import { logStore } from '~/lib/stores/logs';
 import { netlifyConnection, updateNetlifyConnection, fetchNetlifyStats } from '~/lib/services/netlify';
 import { useStore } from '@nanostores/react';
 import type { NetlifyUser } from '~/types/netlify';
+import { motion } from 'framer-motion';
+import { GithubConnection } from '~/components/@settings/tabs/connections/components/GithubConnection';
+import { NetlifyConnection } from '~/components/@settings/tabs/connections/components/NetlifyConnection';
+import { DeploymentHistory } from '~/components/@settings/tabs/connections/components/DeploymentHistory';
 
 interface GitHubUserResponse {
   login: string;
@@ -143,168 +147,25 @@ export default function ConnectionsTab() {
   };
 
   return (
-    <div className="p-4 mb-4 border border-bolt-elements-borderColor rounded-lg bg-bolt-elements-background-depth-3">
-      <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">GitHub Connection</h3>
-      <div className="flex mb-4">
-        <div className="flex-1 mr-2">
-          <label className="block text-sm text-bolt-elements-textSecondary mb-1">GitHub Username:</label>
-          <input
-            type="text"
-            value={githubUsername}
-            onChange={(e) => setGithubUsername(e.target.value)}
-            disabled={isGithubVerifying}
-            className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor disabled:opacity-50"
-          />
-        </div>
-        <div className="flex-1">
-          <label className="block text-sm text-bolt-elements-textSecondary mb-1">Personal Access Token:</label>
-          <input
-            type="password"
-            value={githubToken}
-            onChange={(e) => setGithubToken(e.target.value)}
-            disabled={isGithubVerifying}
-            className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor disabled:opacity-50"
-          />
-        </div>
-      </div>
-      <div className="flex mb-4 items-center">
-        {!isGithubConnected ? (
-          <button
-            onClick={handleSaveConnection}
-            disabled={isGithubVerifying || !githubUsername || !githubToken}
-            className="bg-bolt-elements-button-primary-background rounded-lg px-4 py-2 mr-2 transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            {isGithubVerifying ? (
-              <>
-                <div className="i-ph:spinner animate-spin mr-2" />
-                Verifying...
-              </>
-            ) : (
-              'Connect'
-            )}
-          </button>
-        ) : (
-          <button
-            onClick={handleDisconnect}
-            className="bg-bolt-elements-button-danger-background rounded-lg px-4 py-2 mr-2 transition-colors duration-200 hover:bg-bolt-elements-button-danger-backgroundHover text-bolt-elements-button-danger-text"
-          >
-            Disconnect
-          </button>
-        )}
-        {isGithubConnected && (
-          <span className="text-sm text-green-600 flex items-center">
-            <div className="i-ph:check-circle mr-1" />
-            Connected to GitHub
-          </span>
-        )}
-      </div>
-      <div className="p-4 mb-4 border border-bolt-elements-borderColor rounded-lg bg-bolt-elements-background-depth-3">
-        <h3 className="text-lg font-medium text-bolt-elements-textPrimary mb-4">Netlify Connection</h3>
-        <div className="flex mb-4">
-          <div className="flex-1">
-            <label className="block text-sm text-bolt-elements-textSecondary mb-1">
-              Personal Access Token
-              <a 
-                href="https://app.netlify.com/user/applications" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="ml-2 text-blue-500 hover:underline"
-              >
-                Get token →
-              </a>
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                value={netlifyToken}
-                onChange={(e) => {
-                  const newToken = e.target.value.replace('Bearer ', '');
-                  setNetlifyToken(newToken);
-                  Cookies.set('netlifyToken', newToken);
-                }}
-                className="w-full bg-white dark:bg-bolt-elements-background-depth-4 relative px-2 py-1.5 rounded-md focus:outline-none placeholder-bolt-elements-textTertiary text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary border border-bolt-elements-borderColor"
-                placeholder="Enter your Netlify access token"
-              />
-              <button
-                onClick={async () => {
-                  if (!netlifyToken) {
-                    toast.error('Please enter a Netlify token first');
-                    return;
-                  }
-                  const isValid = await verifyNetlifyToken();
-                  if (isValid) {
-                    toast.success('Successfully connected to Netlify!');
-                  }
-                }}
-                disabled={isNetlifyVerifying || !netlifyToken}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-bolt-elements-button-primary-background rounded-md px-3 py-1 text-sm transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isNetlifyVerifying ? (
-                  <>
-                    <div className="i-ph:spinner animate-spin" />
-                    <span>Verifying...</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="i-ph:plug" />
-                    <span>Connect</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-bolt-elements-textTertiary">
-              Get your token from Netlify: User Settings → Applications → New access token
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center">
-          {connection.user ? (
-            <>
-              <button
-                onClick={handleNetlifyDisconnect}
-                className="bg-bolt-elements-button-danger-background rounded-lg px-4 py-2 mr-2 transition-colors duration-200 hover:bg-bolt-elements-button-danger-backgroundHover text-bolt-elements-button-danger-text"
-              >
-                Disconnect
-              </button>
-              <span className="text-sm text-green-600 flex items-center">
-                <div className="i-ph:check-circle mr-1" />
-                Connected as {connection.user.full_name}
-              </span>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={async () => {
-                  if (!netlifyToken) {
-                    toast.error('Please enter a Netlify token first');
-                    return;
-                  }
-                  const isValid = await verifyNetlifyToken();
-                  if (isValid) {
-                    toast.success('Netlify token verified successfully!');
-                  }
-                }}
-                disabled={isNetlifyVerifying || !netlifyToken}
-                className="bg-bolt-elements-button-primary-background rounded-lg px-4 py-2 mr-2 transition-colors duration-200 hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-              >
-                {isNetlifyVerifying ? (
-                  <>
-                    <div className="i-ph:spinner animate-spin mr-2" />
-                    Verifying...
-                  </>
-                ) : (
-                  'Connect'
-                )}
-              </button>
-              {isNetlifyVerifying && (
-                <span className="text-sm text-bolt-elements-textSecondary flex items-center">
-                  <div className="i-ph:spinner animate-spin mr-2" />
-                  Verifying...
-                </span>
-              )}
-            </>
-          )}
-        </div>
+    <div className="space-y-4">
+      {/* Header */}
+      <motion.div
+        className="flex items-center gap-2 mb-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <div className="i-ph:plugs-connected w-5 h-5 text-purple-500" />
+        <h2 className="text-lg font-medium text-bolt-elements-textPrimary">Connection Settings</h2>
+      </motion.div>
+      <p className="text-sm text-bolt-elements-textSecondary mb-6">
+        Manage your external service connections and integrations
+      </p>
+
+      <div className="grid grid-cols-1 gap-4">
+        <GithubConnection />
+        <NetlifyConnection />
+        <DeploymentHistory />
       </div>
     </div>
   );

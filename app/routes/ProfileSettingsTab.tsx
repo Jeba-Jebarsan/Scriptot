@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import { CheckCircle } from 'lucide-react';
 import { Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useResponsive } from '~/utils/mobile';
 
 const bannerColors = [
   '#1A1B1E', // Default dark
@@ -38,6 +39,7 @@ export default function ProfileSettingsTab() {
   const [showBannerOptions, setShowBannerOptions] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [originalData, setOriginalData] = useState<any>(null);
+  const { isMobile, isTablet } = useResponsive();
   const [formData, setFormData] = useState({
     username: '',
     name: '',
@@ -383,7 +385,7 @@ export default function ProfileSettingsTab() {
               <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">
                 Profile Banner Image
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className={`grid ${isMobile ? 'grid-cols-2' : isTablet ? 'grid-cols-3' : 'grid-cols-4'} gap-2`}>
                 {BACKGROUND_IMAGES.map((image) => (
                   <button
                     key={image}
@@ -405,7 +407,7 @@ export default function ProfileSettingsTab() {
         <button
           onClick={handleSave}
           disabled={!hasChanges}
-          className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2
+          className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 w-full justify-center
             ${hasChanges 
               ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-blue-500/25' 
               : 'bg-gray-600 cursor-not-allowed text-gray-300'}`}

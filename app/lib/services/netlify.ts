@@ -3,7 +3,8 @@ import type { NetlifyConnection, NetlifyUser, NetlifyDeploymentStatus, NetlifySi
 import { toast } from 'react-toastify';
 import { logStore } from '../stores/logs';
 
-// Add missing atom
+// Define missing atoms
+export const isConnecting = atom<boolean>(false);
 export const isFetchingStats = atom<boolean>(false);
 
 // Initialize with stored connection or defaults
@@ -17,18 +18,17 @@ const initialConnection: NetlifyConnection = storedConnection
     };
 
 export const netlifyConnection = atom<NetlifyConnection>(initialConnection);
-export const isConnecting = atom<boolean>(false);
 
-export const updateNetlifyConnection = (updates: Partial<NetlifyConnection>) => {
-  const currentState = netlifyConnection.get();
-  const newState = { ...currentState, ...updates };
-  netlifyConnection.set(newState);
-
-  // Persist to localStorage
+// Update connection and persist to localStorage
+export function updateNetlifyConnection(connection: Partial<NetlifyConnection>) {
+  const current = netlifyConnection.get();
+  const updated = { ...current, ...connection };
+  netlifyConnection.set(updated);
+  
   if (typeof window !== 'undefined') {
-    localStorage.setItem('netlify_connection', JSON.stringify(newState));
+    localStorage.setItem('netlify_connection', JSON.stringify(updated));
   }
-};
+}
 
 export async function fetchNetlifyStats(token: string) {
   try {

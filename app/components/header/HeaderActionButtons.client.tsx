@@ -9,12 +9,17 @@ import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
 import { NetlifyDeploymentLink } from '~/components/chat/NetlifyDeploymentLink.client';
 import { netlifyConnection, updateNetlifyConnection } from '~/lib/services/netlify';
-import { streamingState } from '~/lib/stores/deployment';
+import { streamingState, deploymentState } from '~/lib/stores/deployment';
 import Cookies from 'js-cookie';
 import type { NetlifyUser } from '~/types/netlify';
 import { Globe } from 'lucide-react';
 import { DeploymentHistory } from '~/components/DeploymentHistory';
 import { isMobile, useResponsive } from '~/utils/mobile';
+import { motion } from 'framer-motion';
+import { DeploymentSuccessAnimation } from '../DeploymentSuccessAnimation';
+import { DeploymentProgressCard } from '~/NetlifyDeploymentProgress';
+import { addDeployment } from '~/lib/services/deployments';
+import { ActionCommandError } from '~/lib/runtime/message-parser';
 
 interface HeaderActionButtonsProps {}
 
@@ -33,6 +38,10 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
   const currentChatId = useStore(chatId);
   const [isCancelling, setIsCancelling] = useState(false);
   const { isMobile: isOnMobile } = useResponsive();
+  
+  // New states for the deployment progress
+  const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -93,6 +102,15 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
     try {
       setIsDeploying(true);
       setDeploymentUrl(null);
+      setShowDeploymentProgress(true);
+      
+      // Update deployment state
+      deploymentState.set({ 
+        isDeploying: true, 
+        isBuildReady: false, 
+        error: null,
+        buildError: null 
+      });
 
       const artifact = workbenchStore.firstArtifact;
 
@@ -121,10 +139,103 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
         // Wait for build to complete
         const buildResult = await artifact.runner.buildOutput;
         if (!buildResult || buildResult.exitCode !== 0) {
-          throw new Error('Build failed: ' + buildResult?.output || 'No output available');
+          const errorOutput = buildResult?.output || 'No output available';
+          const errorDetails = artifact.runner.extractBuildError?.(errorOutput) || {
+            type: 'unknown',
+            solution: 'Check the build output for details on what went wrong.'
+          };
+          
+          deploymentState.set({
+            isDeploying: false,
+            isBuildReady: false,
+            error: 'Build failed',
+            buildError: {
+              message: 'Build process failed with errors',
+              output: errorOutput,
+              details: errorDetails
+            }
+          });
+          
+          // Save failed deployment to history
+          await addDeployment({
+            name: `deployment-${Date.now()}`,
+            url: '',
+            provider: 'netlify',
+            status: 'failed',
+            projectPath: currentChatId,
+            error: 'Build failed',
+            metadata: {
+              buildError: true,
+              buildOutput: errorOutput,
+              errorDetails
+            }
+          });
+          
+          throw new Error('Build failed: ' + errorOutput);
         }
+        
+        // Build succeeded, update state
+        deploymentState.set({
+          isDeploying: true,
+          isBuildReady: true,
+          error: null,
+          buildError: null
+        });
+        
+        // Continue with deployment...
       } catch (error) {
-        throw new Error('Build failed');
+        // Check if this is an ActionCommandError with build error details
+        if (error instanceof ActionCommandError) {
+          deploymentState.set({
+            isDeploying: false,
+            isBuildReady: false,
+            error: 'Build failed',
+            buildError: {
+              message: error.header || 'Build process failed',
+              output: error.output || '',
+              details: error.errorDetails
+            }
+          });
+          
+          // Save failed deployment to history
+          await addDeployment({
+            name: `deployment-${Date.now()}`,
+            url: '',
+            provider: 'netlify',
+            status: 'failed',
+            projectPath: currentChatId,
+            error: error.header || 'Build failed',
+            metadata: {
+              buildError: true,
+              buildOutput: error.output || '',
+              errorDetails: error.errorDetails
+            }
+          });
+        } else {
+          // Handle other types of errors
+          const errorMessage = error instanceof Error ? error.message : 'Unknown build error';
+          deploymentState.set({
+            isDeploying: false,
+            isBuildReady: false,
+            error: 'Build failed',
+            buildError: {
+              message: 'Build process failed',
+              output: errorMessage
+            }
+          });
+          
+          // Save failed deployment to history
+          await addDeployment({
+            name: `deployment-${Date.now()}`,
+            url: '',
+            provider: 'netlify',
+            status: 'failed',
+            projectPath: currentChatId,
+            error: errorMessage
+          });
+        }
+        
+        throw error;
       }
 
       // Get the build files
@@ -231,36 +342,27 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
         setDeploymentUrl(siteUrl);
         setIsDropdownOpen(false);
         
-        // Send email notification
-        
-        
-        toast.success(
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="relative"
-          >
-            Deployed successfully!{' '}
-            <a
-              href={siteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              View site
-            </a>
-          </div>,
-          {
-            onClick: () => toast.dismiss(), // Close on click outside
-            position: "bottom-right",
-            autoClose: 3000, // Auto close after 3 seconds
-          }
-        );
+        // Reset deployment states
+        setIsDeploying(false);
+        deploymentState.set({
+          isDeploying: false,
+          isBuildReady: true,
+          error: null,
+          buildError: null
+        });
       }
     } catch (error) {
       console.error('Deploy error:', error);
       toast.error(error instanceof Error ? error.message : 'Deployment failed');
-    } finally {
+      // Reset states on error
+      setShowDeploymentProgress(false);
       setIsDeploying(false);
+      deploymentState.set({
+        isDeploying: false,
+        isBuildReady: false,
+        error: error instanceof Error ? error.message : 'Deployment failed',
+        buildError: null
+      });
     }
   };
 
@@ -277,6 +379,26 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
     } finally {
       setIsCancelling(false);
     }
+  };
+
+  // Add this new handler for when the progress animation completes
+  const handleProgressComplete = () => {
+    if (deploymentUrl) {
+      setShowDeploymentProgress(false);
+      setShowSuccessAnimation(true);
+      setIsDeploying(false); // Reset deploying state
+      deploymentState.set({
+        isDeploying: false,
+        isBuildReady: true,
+        error: null,
+        buildError: null
+      });
+    }
+  };
+
+  // Add this handler for when the success animation is closed
+  const handleSuccessAnimationClose = () => {
+    setShowSuccessAnimation(false);
   };
 
   return (
@@ -401,54 +523,28 @@ export function HeaderActionButtons({}: HeaderActionButtonsProps) {
           </div>
         )}
       </div>
-      {isDeploying && (
-        <div className="absolute right-2 top-14 z-50 p-4 mt-1 w-[300px] bg-[#0D1117] rounded-lg border border-gray-800 shadow-xl">
-          <div className="flex items-center gap-3 mb-4">
-            <img 
-              className="w-6 h-6"
-              height="24"
-              width="24"
-              crossOrigin="anonymous"
-              src="https://cdn.simpleicons.org/netlify"
-              alt="Netlify"
-            />
-            <h3 className="text-sm font-medium text-white">Deploying to Netlify</h3>
-          </div>
-          
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="i-ph:spinner animate-spin text-blue-400" />
-              <span className="text-sm text-gray-300">Building your project</span>
-            </div>
-            
-            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 rounded-full w-1/2 animate-pulse" />
-            </div>
-            
-            <p className="text-xs text-gray-500">
-              This might take a few moments...
-            </p>
-          </div>
-        </div>
+      
+      {/* Deployment progress modal */}
+      {showDeploymentProgress && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        >
+          <DeploymentProgressCard
+            onComplete={handleProgressComplete}
+            provider="netlify" // or "vercel" or "cloudflare"
+          />
+        </motion.div>
       )}
-      {deploymentUrl && !isDeploying && (
-        <div className="absolute right-2 top-14 z-50 p-4 mt-1 w-[300px] bg-[#0D1117] rounded-lg border border-gray-800 shadow-xl">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="i-ph:check-circle text-green-500 text-xl" />
-            <span className="text-sm font-medium text-white">
-              Deployment successful!
-            </span>
-          </div>
-          <a 
-            href={deploymentUrl}
-            target="_blank"
-            rel="noopener noreferrer" 
-            className="flex items-center gap-2 px-3 py-2 bg-[#161B22] rounded text-sm text-gray-300 hover:text-white transition-colors"
-          >
-            <div className="i-ph:arrow-square-out" />
-            Visit your site
-          </a>
-        </div>
+      
+      {/* Success animation */}
+      {showSuccessAnimation && deploymentUrl && (
+        <DeploymentSuccessAnimation 
+          deploymentUrl={deploymentUrl} 
+          onClose={handleSuccessAnimationClose} 
+        />
       )}
     </div>
   );

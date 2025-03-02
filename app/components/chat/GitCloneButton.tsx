@@ -1,25 +1,26 @@
 import ignore from 'ignore';
 import { useGit } from '~/lib/hooks/useGit';
 import type { Message } from 'ai';
-import { detectProjectCommands, createCommandsMessage } from '~/utils/projectCommands';
+import { detectProjectCommands, createCommandsMessage, escapeBoltTags } from '~/utils/projectCommands';
 import { generateId } from '~/utils/fileUtils';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-toastify';
+import { LoadingOverlay } from '~/components/ui/LoadingOverlay';
+import { classNames } from '~/utils/classNames';
+import { RepositorySelectionDialog } from '../@settings/tabs/connections/components/RepositorySelectionDialog';
+import { Button } from '../ui/Buttons';
+import { GitAuthModal } from '../git/GitAuthModal';
 
 const IGNORE_PATTERNS = [
   'node_modules/**',
   '.git/**',
   '.github/**',
   '.vscode/**',
-  '**/*.jpg',
-  '**/*.jpeg',
-  '**/*.png',
   'dist/**',
   'build/**',
   '.next/**',
   'coverage/**',
   '.cache/**',
-  '.vscode/**',
   '.idea/**',
   '**/*.log',
   '**/.DS_Store',
@@ -32,21 +33,36 @@ const IGNORE_PATTERNS = [
 
 const ig = ignore().add(IGNORE_PATTERNS);
 
+const MAX_FILE_SIZE = 100 * 1024; // 100KB limit per file
+const MAX_TOTAL_SIZE = 500 * 1024; // 500KB total limit
+
 interface GitCloneButtonProps {
   className?: string;
-  importChat?: (description: string, messages: Message[]) => Promise<void>;
+  importChat?: (description: string, messages: Message[], metadata?: any) => Promise<void>;
 }
 
-export default function GitCloneButton({ importChat }: GitCloneButtonProps) {
-  const { ready, gitClone } = useGit();
-  const [showPopup, setShowPopup] = useState(false);
-  const [repoUrl, setRepoUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+export default function GitCloneButton({ importChat, className }: GitCloneButtonProps) {
+  const { 
+    ready, 
+    gitClone, 
+    isAuthModalOpen, 
+    pendingAuthUrl, 
+    handleAuthSubmit, 
+    handleAuthCancel 
+  } = useGit();
+  const [loading, setLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleClone = async () => {
-    if (!ready || !repoUrl) return;
+  const handleClone = async (repoUrl: string) => {
+    if (!ready) {
+      return;
+    }
 
-    setIsLoading(true);
+    // Only set loading to true if we're not showing the auth modal
+    if (!isAuthModalOpen) {
+      setLoading(true);
+    }
+
     try {
       const { workdir, data } = await gitClone(repoUrl);
 
@@ -54,15 +70,53 @@ export default function GitCloneButton({ importChat }: GitCloneButtonProps) {
         const filePaths = Object.keys(data).filter((filePath) => !ig.ignores(filePath));
         const textDecoder = new TextDecoder('utf-8');
 
-        const fileContents = filePaths
-          .map((filePath) => {
-            const { data: content, encoding } = data[filePath];
-            return {
+        let totalSize = 0;
+        const skippedFiles: string[] = [];
+        const fileContents = [];
+
+        for (const filePath of filePaths) {
+          const { data: content, encoding } = data[filePath];
+
+          // Skip binary files
+          if (
+            content instanceof Uint8Array &&
+            !filePath.match(/\.(txt|md|astro|mjs|js|jsx|ts|tsx|json|html|css|scss|less|yml|yaml|xml|svg)$/i)
+          ) {
+            skippedFiles.push(filePath);
+            continue;
+          }
+
+          try {
+            const textContent =
+              encoding === 'utf8' ? content : content instanceof Uint8Array ? textDecoder.decode(content) : '';
+
+            if (!textContent) {
+              continue;
+            }
+
+            // Check file size
+            const fileSize = new TextEncoder().encode(textContent).length;
+
+            if (fileSize > MAX_FILE_SIZE) {
+              skippedFiles.push(`${filePath} (too large: ${Math.round(fileSize / 1024)}KB)`);
+              continue;
+            }
+
+            // Check total size
+            if (totalSize + fileSize > MAX_TOTAL_SIZE) {
+              skippedFiles.push(`${filePath} (would exceed total size limit)`);
+              continue;
+            }
+
+            totalSize += fileSize;
+            fileContents.push({
               path: filePath,
-              content: encoding === 'utf8' ? content : content instanceof Uint8Array ? textDecoder.decode(content) : '',
-            };
-          })
-          .filter((f) => f.content);
+              content: textContent,
+            });
+          } catch (e: any) {
+            skippedFiles.push(`${filePath} (error: ${e.message})`);
+          }
+        }
 
         const commands = await detectProjectCommands(fileContents);
         const commandsMessage = createCommandsMessage(commands);
@@ -70,13 +124,20 @@ export default function GitCloneButton({ importChat }: GitCloneButtonProps) {
         const filesMessage: Message = {
           role: 'assistant',
           content: `Cloning the repo ${repoUrl} into ${workdir}
+${
+  skippedFiles.length > 0
+    ? `\nSkipped files (${skippedFiles.length}):
+${skippedFiles.map((f) => `- ${f}`).join('\n')}`
+    : ''
+}
+
 <boltArtifact id="imported-files" title="Git Cloned Files" type="bundled">
 ${fileContents
   .map(
     (file) =>
       `<boltAction type="file" filePath="${file.path}">
-${file.content}
-</boltAction>`
+${escapeBoltTags(file.content)}
+</boltAction>`,
   )
   .join('\n')}
 </boltArtifact>`,
@@ -85,87 +146,59 @@ ${file.content}
         };
 
         const messages = [filesMessage];
+
         if (commandsMessage) {
           messages.push(commandsMessage);
         }
 
         await importChat(`Git Project:${repoUrl.split('/').slice(-1)[0]}`, messages);
       }
-      setShowPopup(false);
     } catch (error) {
-      console.error('Clone error:', error);
+      console.error('Error during import:', error);
+      toast.error('Failed to import repository');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <button
-        onClick={() => setShowPopup(true)}
+      <Button
+        onClick={() => setIsDialogOpen(true)}
         title="Clone a Git Repo"
-        className="px-4 py-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 transition-all flex items-center gap-2"
-      >
-        <span className="i-ph:git-branch" />
-        Clone a Git Repo
-      </button>
-
-      <AnimatePresence>
-        {showPopup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#1A1B1E] rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-gray-700"
-            >
-              <h2 className="text-xl font-semibold text-white mb-4">Clone Git Repository</h2>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="repoUrl" className="block text-sm font-medium text-gray-300 mb-2">
-                    Repository URL
-                  </label>
-                  <input
-                    id="repoUrl"
-                    type="text"
-                    value={repoUrl}
-                    onChange={(e) => setRepoUrl(e.target.value)}
-                    placeholder="https://github.com/username/repo"
-                    className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    onClick={() => setShowPopup(false)}
-                    className="px-4 py-2 text-sm text-white bg-transparent border border-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleClone}
-                    disabled={!repoUrl || isLoading}
-                    className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 ${
-                      (!repoUrl || isLoading) && 'opacity-50 cursor-not-allowed'
-                    }`}
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="animate-spin i-ph:circle-notch" />
-                        Cloning...
-                      </>
-                    ) : (
-                      <>
-                        <div className="i-ph:git-branch" />
-                        Clone Repository
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+        variant="outline"
+        size="lg"
+        className={classNames(
+          'gap-2 bg-[#F5F5F5] dark:bg-[#252525]',
+          'text-bolt-elements-textPrimary dark:text-white',
+          'hover:bg-[#E5E5E5] dark:hover:bg-[#333333]',
+          'border-[#E5E5E5] dark:border-[#333333]',
+          'h-10 px-4 py-2 min-w-[120px] justify-center',
+          'transition-all duration-200 ease-in-out',
+          className,
         )}
-      </AnimatePresence>
+        disabled={!ready || loading}
+      >
+        <span className="i-ph:git-branch w-4 h-4" />
+        Clone a Git Repo
+      </Button>
+
+      <RepositorySelectionDialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} onSelect={handleClone} />
+      
+      {/* Add our new authentication modal with higher z-index */}
+      {pendingAuthUrl && (
+        <GitAuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={handleAuthCancel}
+          onSubmit={handleAuthSubmit}
+          repoUrl={pendingAuthUrl}
+        />
+      )}
+
+      {/* Only show loading overlay when not showing auth modal */}
+      {loading && !isAuthModalOpen && (
+        <LoadingOverlay message="Please wait while we clone the repository..." />
+      )}
     </>
   );
 }

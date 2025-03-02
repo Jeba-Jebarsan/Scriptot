@@ -340,8 +340,11 @@ Please review and modify these requirements before proceeding.`;
                     <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">Supabase Backend</h3>
                   </div>
                   <p className="text-bolt-elements-textSecondary">
-                    Supabase powers the backend, providing easy authentication, database, and storage setup.
+                    Supabase integration coming soon! Easily add authentication, database, and storage to your projects.
                   </p>
+                  <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400">
+                    Coming Soon
+                  </div>
                 </div>
                 
                 {/* Tool card 4 */}
@@ -354,6 +357,19 @@ Please review and modify these requirements before proceeding.`;
                   </div>
                   <p className="text-bolt-elements-textSecondary">
                     See your changes in action instantly with live preview and hot reloading.
+                  </p>
+                </div>
+                
+                {/* Tool card 5 */}
+                <div className="bg-bolt-elements-bg-depth-3 rounded-xl p-6 border border-bolt-elements-borderColor hover:border-teal-500/50 transition-all duration-300 shadow-lg col-span-1 md:col-span-2">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-bolt-elements-bg-depth-2 rounded-full flex items-center justify-center shadow-inner">
+                      <div className="i-ph:cloud-arrow-up-bold text-teal-500 text-2xl" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-bolt-elements-textPrimary">One-Click Deploy</h3>
+                  </div>
+                  <p className="text-bolt-elements-textSecondary">
+                    Deploy your application with a single click to your preferred cloud hosting service.
                   </p>
                 </div>
               </div>
@@ -649,7 +665,7 @@ Please review and modify these requirements before proceeding.`;
             },
             {
               title: 'Polished and Professional',
-              description: 'We prioritize aesthetics. CodeIQ ensures every project follows modern UI/UX standards, so your creations are always visually stunning.',
+              description: 'We prioritize aesthetics. Deepgen ensures every project follows modern UI/UX standards, so your creations are always visually stunning.',
               icon: '✨'
             },
             {
@@ -685,7 +701,7 @@ Please review and modify these requirements before proceeding.`;
             },
             {
               title: 'Seamless Git Integration',
-              description: 'Link CodeIQ to your GitHub for automatic code syncing. Ideal for handoffs, collaborations, and advanced development workflows.',
+              description: 'Link Deepgen to your GitHub for automatic code syncing. Ideal for handoffs, collaborations, and advanced development workflows.',
               icon: '🔄'
             }
           ].map((feature, index) => (

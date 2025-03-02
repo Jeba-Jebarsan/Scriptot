@@ -1,13 +1,21 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useStore } from '@nanostores/react';
+import { deploymentState } from '~/lib/stores/deployment';
+import { BuildErrorDisplay } from './components/BuildErrorDisplay';
 
-interface NetlifyDeploymentProgressProps {
+interface DeploymentProgressCardProps {
   onComplete: () => void;
+  provider?: 'netlify' | 'vercel' | 'cloudflare';
 }
 
-export function NetlifyDeploymentProgress({ onComplete }: NetlifyDeploymentProgressProps) {
+export function DeploymentProgressCard({ 
+  onComplete, 
+  provider = 'netlify' 
+}: DeploymentProgressCardProps) {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const deployment = useStore(deploymentState);
   
   const deploymentSteps = [
     "Initializing deployment...",
@@ -17,12 +25,33 @@ export function NetlifyDeploymentProgress({ onComplete }: NetlifyDeploymentProgr
     "Finalizing deployment..."
   ];
 
+  // Provider-specific configurations
+  const providerConfig = {
+    netlify: {
+      color: 'from-blue-500 to-teal-400',
+      icon: "https://cdn.simpleicons.org/netlify",
+      name: "Netlify"
+    },
+    vercel: {
+      color: 'from-black to-gray-700',
+      icon: "https://cdn.simpleicons.org/vercel/white",
+      name: "Vercel"
+    },
+    cloudflare: {
+      color: 'from-orange-500 to-amber-400',
+      icon: "https://cdn.simpleicons.org/cloudflare",
+      name: "Cloudflare"
+    }
+  };
+
+  const config = providerConfig[provider];
+
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(onComplete, 1000);
+          setTimeout(onComplete, 500);
           return 100;
         }
         
@@ -38,61 +67,88 @@ export function NetlifyDeploymentProgress({ onComplete }: NetlifyDeploymentProgr
       });
     }, 300);
 
-    return () => clearInterval(interval);
-  }, [onComplete]);
+    return () => {
+      clearInterval(interval);
+      if (progress > 90) {
+        onComplete();
+      }
+    };
+  }, [onComplete, progress, deploymentSteps.length]);
+
+  if (deployment.error && deployment.buildError) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-md overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl border border-gray-700"
+      >
+        {/* Animated background elements for error state */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-red-500/10 to-transparent rounded-full blur-[80px] -top-[200px] -right-[200px]" />
+          <div className="absolute w-[400px] h-[400px] bg-gradient-to-r from-orange-500/10 to-transparent rounded-full blur-[70px] -bottom-[200px] -left-[200px]" />
+        </div>
+        
+        <div className="relative p-6">
+          <BuildErrorDisplay />
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
-    <div className="relative w-full max-w-md p-8 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl border border-gray-700">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="relative w-full max-w-md p-8 overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl shadow-2xl border border-gray-700"
+    >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="ray1"></div>
-        <div className="ray2"></div>
-        <div className="ray3"></div>
-        <div className="ray4"></div>
+        <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-blue-500/10 to-transparent rounded-full blur-[80px] -top-[200px] -right-[200px]" />
+        <div className="absolute w-[400px] h-[400px] bg-gradient-to-r from-purple-500/10 to-transparent rounded-full blur-[70px] -bottom-[200px] -left-[200px]" />
         
         {/* Code particles effect */}
         <CodeParticles />
       </div>
       
-      <div className="relative z-10">
-        <div className="flex items-center justify-center mb-6">
-          <img 
-            className="w-8 h-8 mr-3"
-            height="32"
-            width="32"
-            crossOrigin="anonymous"
-            src="https://cdn.simpleicons.org/netlify"
-            alt="Netlify"
-          />
-          <h3 className="text-xl font-bold text-white">
-            Deploying to Netlify
-          </h3>
-        </div>
-        
-        <motion.div 
-          className="mb-6 text-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-blue-400 font-medium">{deploymentSteps[currentStep]}</p>
-          <p className="text-gray-400 text-sm mt-1">This might take a few moments...</p>
-        </motion.div>
-        
-        {/* Progress bar */}
-        <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden mb-6">
-          <motion.div 
-            className="h-full bg-gradient-to-r from-blue-500 to-teal-400"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
-        
-        {/* Animated deployment visualization */}
-        <DeploymentVisualization currentStep={currentStep} />
+      <div className="flex items-center justify-center mb-6">
+        <img 
+          className="w-8 h-8 mr-3"
+          height="32"
+          width="32"
+          crossOrigin="anonymous"
+          src={config.icon}
+          alt={config.name}
+        />
+        <h3 className="text-xl font-bold text-white">
+          Deploying to {config.name}
+        </h3>
       </div>
-    </div>
+      
+      <motion.div 
+        className="mb-6 text-center"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        key={currentStep} // Re-animate when step changes
+      >
+        <p className="text-blue-400 font-medium">{deploymentSteps[currentStep]}</p>
+      </motion.div>
+      
+      {/* Progress bar */}
+      <div className="w-full h-3 bg-gray-700 rounded-full overflow-hidden mb-6">
+        <motion.div 
+          className={`h-full bg-gradient-to-r ${config.color}`}
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.3 }}
+        />
+      </div>
+      
+      {/* Animated deployment visualization */}
+      <DeploymentVisualization currentStep={currentStep} />
+    </motion.div>
   );
 }
 
@@ -211,4 +267,4 @@ function DeploymentVisualization({ currentStep }: { currentStep: number }) {
       {steps[Math.min(currentStep, steps.length - 1)]}
     </motion.div>
   );
-} 
+}

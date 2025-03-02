@@ -4,12 +4,14 @@ import { openDatabase, getProfile } from '~/lib/persistence/indexedDB';
 import { supabase } from '~/lib/supabase';
 import { toast } from 'react-hot-toast';
 import { Header } from '~/components/header/Header';
+import { useResponsive } from '~/utils/mobile';
 
 export default function ProfilePage() {
     const [userInfo, setUserInfo] = useState<any>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
     const navigate = useNavigate();
+    const { isMobile, isTablet } = useResponsive();
     
     useEffect(() => {
       const loadProfile = async () => {
@@ -115,23 +117,23 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-bolt-elements-background-depth-1">
         <Header setShowLoginPopup={setShowLoginPopup} />
-        <div className="p-8">
-          <div className="max-w-2xl mx-auto">
+        <div className={`${isMobile ? 'p-4' : 'p-8'}`}>
+          <div className={`${isMobile ? 'w-full' : 'max-w-2xl mx-auto'}`}>
             <div className="flex items-center gap-4 mb-6">
               <button
                 onClick={() => navigate(-1)}
                 className="flex items-center gap-2 px-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 rounded-lg hover:bg-blue-500/20"
               >
                 <div className="i-ph:arrow-left text-lg" />
-                Back
+                {!isMobile && 'Back'}
               </button>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+              <h1 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent`}>
                 Profile
               </h1>
             </div>
             <div className="relative">
               <div 
-                className="h-48 w-full rounded-t-xl bg-cover bg-center"
+                className={`${isMobile ? 'h-36' : 'h-48'} w-full rounded-t-xl bg-cover bg-center`}
                 style={{ 
                   backgroundColor: userInfo?.banner_color || '#1A1B1E',
                   backgroundImage: userInfo?.banner_image ? `url(${userInfo.banner_image})` : 'none',
@@ -140,17 +142,17 @@ export default function ProfilePage() {
               />
              
               
-              <div className="absolute -bottom-16 left-6">
+              <div className={`absolute ${isMobile ? '-bottom-12 left-4' : '-bottom-16 left-6'}`}>
                 <div className="relative group">
                   {userInfo?.picture && !userInfo?.hide_profile_picture ? (
                     <img 
                       src={userInfo.picture} 
                       alt={userInfo.name || 'Profile'} 
-                      className="w-32 h-32 rounded-full border-4 border-bolt-elements-background-depth-2 object-cover"
+                      className={`${isMobile ? 'w-24 h-24' : 'w-32 h-32'} rounded-full border-4 border-bolt-elements-background-depth-2 object-cover`}
                     />
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gray-700 border-4 border-bolt-elements-background-depth-2 
-                                flex items-center justify-center text-4xl text-white">
+                    <div className={`${isMobile ? 'w-24 h-24' : 'w-32 h-32'} rounded-full bg-gray-700 border-4 border-bolt-elements-background-depth-2 
+                                flex items-center justify-center ${isMobile ? 'text-3xl' : 'text-4xl'} text-white`}>
                       {userInfo?.name?.charAt(0).toUpperCase() || 'T'}
                     </div>
                   )}
@@ -158,11 +160,11 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-bolt-elements-background-depth-2 rounded-b-xl shadow-lg pt-20 pb-6 px-6 
-                          border border-bolt-elements-borderColor">
-              <div className="flex justify-between items-start mb-6">
+            <div className={`bg-bolt-elements-background-depth-2 rounded-b-xl shadow-lg ${isMobile ? 'pt-16 pb-4 px-4' : 'pt-20 pb-6 px-6'} 
+                          border border-bolt-elements-borderColor`}>
+              <div className={`flex ${isMobile ? 'flex-col gap-3' : 'justify-between items-start'} mb-6`}>
                 <div>
-                  <h1 className="text-2xl font-bold text-bolt-elements-textPrimary">
+                  <h1 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-bolt-elements-textPrimary`}>
                     {userInfo?.name}
                   </h1>
                   <p className="text-bolt-elements-textSecondary">
@@ -174,8 +176,8 @@ export default function ProfilePage() {
                 </div>
                 <Link
                   to="/settings"
-                  className="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 
-                            transition-colors flex items-center gap-2"
+                  className={`${isMobile ? 'w-full justify-center' : ''} px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 
+                            transition-colors flex items-center gap-2`}
                 >
                   <div className="i-ph:pencil text-lg" />
                   Edit Profile
@@ -198,7 +200,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-bolt-elements-textSecondary flex items-center gap-2">
                     <div className="i-ph:link text-lg" />
                     <a href={userInfo.link} target="_blank" rel="noopener noreferrer" 
-                       className="text-blue-500 hover:text-blue-600">
+                       className="text-blue-500 hover:text-blue-600 break-all">
                       {userInfo.link}
                     </a>
                   </p>

@@ -78,3 +78,14 @@ ${commands.setupCommand}
     createdAt: new Date(),
   };
 }
+
+/**
+ * Escapes bolt tags in content to prevent conflicts with the bolt artifact syntax
+ */
+export function escapeBoltTags(content: string): string {
+  return content
+    .replace(/<boltArtifact/g, '&lt;boltArtifact')
+    .replace(/<\/boltArtifact>/g, '&lt;/boltArtifact>')
+    .replace(/<boltAction/g, '&lt;boltAction')
+    .replace(/<\/boltAction>/g, '&lt;/boltAction>');
+}
