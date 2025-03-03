@@ -1,7 +1,9 @@
-import * as Tooltip from '@radix-ui/react-tooltip';
+import React from 'react';
+import * as RadixTooltip from '@radix-ui/react-tooltip';
 import { forwardRef, type ForwardedRef, type ReactElement } from 'react';
+import { classNames } from '~/utils/classNames';
 
-interface TooltipProps {
+interface RadixTooltipProps {
   tooltip: React.ReactNode;
   children: ReactElement;
   sideOffset?: number;
@@ -25,14 +27,14 @@ const WithTooltip = forwardRef(
       position = 'top',
       maxWidth = 250,
       delay = 0,
-    }: TooltipProps,
+    }: RadixTooltipProps,
     _ref: ForwardedRef<HTMLElement>
   ) => {
     return (
-      <Tooltip.Root delayDuration={delay}>
-        <Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
+      <RadixTooltip.Root delayDuration={delay}>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
             side={position}
             className={`
               z-[2000]
@@ -61,7 +63,7 @@ const WithTooltip = forwardRef(
             }}
           >
             <div className="break-words">{tooltip}</div>
-            <Tooltip.Arrow
+            <RadixTooltip.Arrow
               className={`
                 fill-bolt-elements-background-depth-3
                 ${arrowClassName}
@@ -69,11 +71,46 @@ const WithTooltip = forwardRef(
               width={12}
               height={6}
             />
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
     );
   }
 );
+
+interface TooltipProps {
+  content: React.ReactNode;
+  children: React.ReactNode;
+}
+
+export function Tooltip({ content, children }: TooltipProps) {
+  const [show, setShow] = React.useState(false);
+  
+  return (
+    <div className="relative inline-block">
+      <div 
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        {children}
+      </div>
+      
+      {show && (
+        <div className={classNames(
+          "absolute z-50 px-2 py-1 text-xs rounded-md",
+          "bg-[#333] text-white dark:bg-[#EEE] dark:text-[#333]",
+          "transform -translate-x-1/2 left-1/2 -top-8"
+        )}>
+          {content}
+          <div className={classNames(
+            "absolute w-2 h-2 rotate-45",
+            "bg-[#333] dark:bg-[#EEE]",
+            "left-1/2 -translate-x-1/2 -bottom-1"
+          )} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default WithTooltip;

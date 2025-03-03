@@ -28,11 +28,58 @@ const saveGitAuth = (url: string, auth: GitAuth) => {
   Cookies.set(`git:${domain}`, JSON.stringify(auth));
 };
 
+// Add a new function to manage auth state
+const useGitAuth = () => {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [pendingAuthUrl, setPendingAuthUrl] = useState<string | null>(null);
+  const authResolveRef = useRef<((auth: GitAuth) => void) | null>(null);
+
+  const requestAuth = useCallback((url: string) => {
+    return new Promise<GitAuth>((resolve) => {
+      setPendingAuthUrl(url);
+      setIsAuthModalOpen(true);
+      authResolveRef.current = resolve;
+    });
+  }, []);
+
+  const handleAuthSubmit = useCallback((username: string, password: string) => {
+    if (authResolveRef.current) {
+      authResolveRef.current({ username, password });
+      authResolveRef.current = null;
+    }
+  }, []);
+
+  const handleAuthCancel = useCallback(() => {
+    if (authResolveRef.current) {
+      authResolveRef.current({ cancel: true });
+      authResolveRef.current = null;
+    }
+    setIsAuthModalOpen(false);
+    setPendingAuthUrl(null);
+  }, []);
+
+  return {
+    isAuthModalOpen,
+    pendingAuthUrl,
+    requestAuth,
+    handleAuthSubmit,
+    handleAuthCancel,
+  };
+};
+
 export function useGit() {
   const [ready, setReady] = useState(false);
   const [webcontainer, setWebcontainer] = useState<WebContainer>();
   const [fs, setFs] = useState<PromiseFsClient>();
   const fileData = useRef<Record<string, { data: any; encoding?: string }>>({});
+  const { 
+    isAuthModalOpen, 
+    pendingAuthUrl, 
+    requestAuth, 
+    handleAuthSubmit, 
+    handleAuthCancel 
+  } = useGitAuth();
+
   useEffect(() => {
     webcontainerPromise.then((container) => {
       fileData.current = {};
@@ -57,24 +104,15 @@ export function useGit() {
         depth: 1,
         singleBranch: true,
         corsProxy: 'https://cors.isomorphic-git.org',
-        onAuth: (url) => {
-          // let domain=url.split("/")[2]
-
+        onAuth: async (url) => {
           let auth = lookupSavedPassword(url);
 
           if (auth) {
             return auth;
           }
 
-          if (confirm('This repo is password protected. Ready to enter a username & password?')) {
-            auth = {
-              username: prompt('Enter username'),
-              password: prompt('Enter password'),
-            };
-            return auth;
-          } else {
-            return { cancel: true };
-          }
+          // Use our custom auth modal instead of browser prompts
+          return await requestAuth(url);
         },
         onAuthFailure: (url, _auth) => {
           toast.error(`Error Authenticating with ${url.split('/')[2]}`);
@@ -92,10 +130,17 @@ export function useGit() {
 
       return { workdir: webcontainer.workdir, data };
     },
-    [webcontainer]
+    [webcontainer, fs, ready, requestAuth]
   );
 
-  return { ready, gitClone };
+  return { 
+    ready, 
+    gitClone, 
+    isAuthModalOpen, 
+    pendingAuthUrl, 
+    handleAuthSubmit, 
+    handleAuthCancel 
+  };
 }
 
 const getFs = (

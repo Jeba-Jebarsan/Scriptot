@@ -108,7 +108,7 @@ export class StreamingMessageParser {
 
             if ('type' in currentAction && currentAction.type === 'file') {
               // Remove markdown code block syntax if present and file is not markdown
-              if (!currentAction.filePath.endsWith('.md')) {
+              if (currentAction.filePath && !currentAction.filePath.endsWith('.md')) {
                 content = cleanoutMarkdownSyntax(content);
               }
 
@@ -139,7 +139,7 @@ export class StreamingMessageParser {
             if ('type' in currentAction && currentAction.type === 'file') {
               let content = input.slice(i);
 
-              if (!currentAction.filePath.endsWith('.md')) {
+              if (currentAction.filePath && !currentAction.filePath.endsWith('.md')) {
                 content = cleanoutMarkdownSyntax(content);
               }
 
@@ -321,4 +321,24 @@ const createArtifactElement: ElementFactory = (props) => {
 
 function camelToDashCase(input: string) {
   return input.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
+
+// Add this error class for build errors
+export class ActionCommandError extends Error {
+  header: string;
+  output: string;
+  errorDetails?: {
+    type: string;
+    module?: string;
+    message?: string;
+    solution?: string;
+  };
+
+  constructor(header: string, output: string, errorDetails?: any) {
+    super(header);
+    this.name = 'ActionCommandError';
+    this.header = header;
+    this.output = output;
+    this.errorDetails = errorDetails;
+  }
 }

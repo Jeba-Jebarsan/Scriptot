@@ -37,8 +37,9 @@ type ActionsMap = MapStore<Record<string, ActionState>>;
 class ActionCommandError extends Error {
   readonly _output: string;
   readonly _header: string;
+  readonly _errorDetails?: any;
 
-  constructor(message: string, output: string) {
+  constructor(message: string, output: string, errorDetails?: any) {
     // Create a formatted message that includes both the error message and output
     const formattedMessage = `Failed To Execute Shell Command: ${message}\n\nOutput:\n${output}`;
     super(formattedMessage);
@@ -46,6 +47,7 @@ class ActionCommandError extends Error {
     // Set the output separately so it can be accessed programmatically
     this._header = message;
     this._output = output;
+    this._errorDetails = errorDetails;
 
     // Maintain proper prototype chain
     Object.setPrototypeOf(this, ActionCommandError.prototype);
@@ -60,6 +62,9 @@ class ActionCommandError extends Error {
   }
   get header() {
     return this._header;
+  }
+  get errorDetails() {
+    return this._errorDetails;
   }
 }
 
@@ -331,7 +336,9 @@ export class ActionRunner {
     const exitCode = await buildProcess.exit;
 
     if (exitCode !== 0) {
-      throw new ActionCommandError('Build Failed', output || 'No Output Available');
+      // Extract common build errors from output
+      const errorDetails = this.extractBuildError(output);
+      throw new ActionCommandError('Build Failed', output, errorDetails);
     }
 
     // Get the build output directory path
@@ -341,6 +348,39 @@ export class ActionRunner {
       path: buildDir,
       exitCode,
       output,
+    };
+  }
+
+  // Add a helper method to extract common build errors
+  extractBuildError(output: string) {
+    // Look for common error patterns
+    if (output.includes('Module not found')) {
+      const moduleMatch = output.match(/Module not found: Error: Can't resolve '([^']+)'/);
+      if (moduleMatch) {
+        return {
+          type: 'missing-module',
+          module: moduleMatch[1],
+          solution: `Run "npm install ${moduleMatch[1]}" to install the missing dependency.`
+        };
+      }
+    }
+    
+    if (output.includes('SyntaxError')) {
+      const syntaxMatch = output.match(/SyntaxError: ([^\n]+)/);
+      if (syntaxMatch) {
+        return {
+          type: 'syntax-error',
+          message: syntaxMatch[1],
+          solution: 'Check your code for syntax errors like missing brackets, semicolons, or quotes.'
+        };
+      }
+    }
+    
+    // Add more error patterns as needed
+    
+    return {
+      type: 'unknown',
+      solution: 'Check the build output for details on what went wrong.'
     };
   }
 

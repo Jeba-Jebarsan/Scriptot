@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useWorkbench } from '~/lib/stores/workbench';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
+import { addDeployment } from '~/lib/services/deployments';
+import { DeploymentSuccessAnimation } from './DeploymentSuccessAnimation';
+import { DeploymentProgressCard } from './NetlifyPublishModal';
 
 export function DeploymentAction({ 
   isOpen,
@@ -16,6 +19,8 @@ export function DeploymentAction({
   const [isProjectCreated, setIsProjectCreated] = useState(false);
   const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   
   const workbench = useWorkbench();
   const netlifyToken = Cookies.get('netlifyToken');
@@ -33,22 +38,83 @@ export function DeploymentAction({
 
     setIsDeploying(true);
     setError(null);
+    setShowDeploymentProgress(true);
 
     try {
       const result = await workbench.deployToNetlify(projectName, netlifyToken);
       setDeploymentUrl(result.url);
-      toast.success(`Successfully published! Your app is now available at ${result.url}`);
-      setIsProjectCreated(true);
-      onClose();
+      
+      // Save deployment to IndexedDB
+      await addDeployment({
+        name: projectName,
+        url: result.url,
+        provider: 'netlify',
+        status: 'success',
+        projectPath: projectName,
+        metadata: {
+          status: result.status,
+          deployedAt: new Date().toISOString()
+        }
+      });
+      
+      // We'll show the success animation after the progress animation completes
     } catch (err) {
       console.error('Publication failed:', err);
       const error = err as Error;
+      
+      // Save failed deployment to IndexedDB
+      if (projectName) {
+        await addDeployment({
+          name: projectName,
+          url: '', // No URL for failed deployments
+          provider: 'netlify',
+          status: 'failed',
+          projectPath: projectName,
+          error: error.message || 'Failed to publish'
+        });
+      }
+      
       toast.error(error.message || 'Failed to publish');
       setError(error.message || 'Failed to publish');
-    } finally {
-      setIsDeploying(false);
+      setShowDeploymentProgress(false);
     }
   };
+
+  const handleProgressComplete = () => {
+    setShowDeploymentProgress(false);
+    if (deploymentUrl) {
+      setShowSuccessAnimation(true);
+    }
+    setIsDeploying(false);
+  };
+
+  const handleSuccessAnimationClose = () => {
+    setShowSuccessAnimation(false);
+    setIsProjectCreated(true);
+    onClose();
+  };
+
+  if (showDeploymentProgress) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      >
+        <DeploymentProgressCard onComplete={handleProgressComplete} provider="netlify" />
+      </motion.div>
+    );
+  }
+
+  if (showSuccessAnimation && deploymentUrl) {
+    return (
+      <DeploymentSuccessAnimation 
+        deploymentUrl={deploymentUrl} 
+        onClose={handleSuccessAnimationClose} 
+      />
+    );
+  }
 
   if (!isOpen) return null;
 

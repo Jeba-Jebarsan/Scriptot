@@ -165,7 +165,7 @@ export function GitHubPushModal({
               </div>
             )}
 
-            <div className="flex gap-3 w-full">
+            <div className="flex w-full gap-4">
               <button
                 onClick={onClose}
                 className="flex-1 px-4 py-2 rounded-lg border border-bolt-elements-borderColor hover:bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary transition-all"

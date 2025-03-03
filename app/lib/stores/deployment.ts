@@ -4,6 +4,16 @@ export interface DeploymentState {
   isDeploying: boolean;
   isBuildReady: boolean;
   error: string | null;
+  buildError?: {
+    message: string;
+    output?: string;
+    details?: {
+      type: string;
+      module?: string;
+      message?: string;
+      solution?: string;
+    };
+  } | null;
   timeoutAt?: number;
 }
 
@@ -11,6 +21,7 @@ export const deploymentState = atom<DeploymentState>({
   isDeploying: false,
   isBuildReady: false,
   error: null,
+  buildError: null,
   timeoutAt: undefined
 });
 
