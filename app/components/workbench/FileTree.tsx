@@ -6,7 +6,7 @@ import * as ContextMenu from '@radix-ui/react-context-menu';
 
 const logger = createScopedLogger('FileTree');
 
-const NODE_PADDING_LEFT = 8;
+const NODE_PADDING_LEFT = 12; // Increased padding for better hierarchy visualization
 const DEFAULT_HIDDEN_FILES = [/\/node_modules\//, /\/\.next/, /\/\.astro/];
 
 interface Props {
@@ -215,7 +215,7 @@ function FileContextMenu({ onCopyPath, onCopyRelativePath, children }: FolderCon
       <ContextMenu.Portal>
         <ContextMenu.Content
           style={{ zIndex: 998 }}
-          className="border border-bolt-elements-borderColor rounded-md z-context-menu bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-2 data-[state=open]:animate-in animate-duration-100 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-98 w-56"
+          className="border border-bolt-elements-borderColor rounded-md z-context-menu bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-2 data-[state=open]:animate-in animate-duration-100 data-[state=open]:fade-in-0 data-[state=open]:zoom-in-98 w-56 shadow-md"
         >
           <ContextMenu.Group className="p-1 border-b-px border-solid border-bolt-elements-borderColor">
             <ContextMenuItem onSelect={onCopyPath}>Copy path</ContextMenuItem>
@@ -231,15 +231,19 @@ function Folder({ folder, collapsed, selected = false, onCopyPath, onCopyRelativ
   return (
     <FileContextMenu onCopyPath={onCopyPath} onCopyRelativePath={onCopyRelativePath}>
       <NodeButton
-        className={classNames('group', {
+        className={classNames('group rounded-md transition-colors duration-100', {
           'bg-transparent text-bolt-elements-item-contentDefault hover:text-bolt-elements-item-contentActive hover:bg-bolt-elements-item-backgroundActive':
             !selected,
           'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent': selected,
         })}
         depth={folder.depth}
         iconClasses={classNames({
-          'i-ph:caret-right scale-98': collapsed,
-          'i-ph:caret-down scale-98': !collapsed,
+          'i-ph:folder-simple-duotone text-amber-400 mr-0.5': collapsed,
+          'i-ph:folder-open-duotone text-amber-400 mr-0.5': !collapsed,
+        })}
+        caretClasses={classNames({
+          'i-ph:caret-right scale-90 mr-1': collapsed,
+          'i-ph:caret-down scale-90 mr-1': !collapsed,
         })}
         onClick={onClick}
       >
@@ -266,16 +270,51 @@ function File({
   selected,
   unsavedChanges = false,
 }: FileProps) {
+  const fileIcon = useMemo(() => {
+    const extension = name.split('.').pop()?.toLowerCase();
+    
+    if (!extension) return 'i-ph:file-duotone text-gray-400';
+    
+    switch (extension) {
+      case 'js':
+      case 'jsx':
+        return 'i-ph:file-js-duotone text-yellow-400';
+      case 'ts':
+      case 'tsx':
+        return 'i-ph:file-ts-duotone text-blue-400';
+      case 'css':
+      case 'scss':
+      case 'sass':
+        return 'i-ph:file-css-duotone text-purple-400';
+      case 'html':
+      case 'htm':
+        return 'i-ph:file-html-duotone text-orange-400';
+      case 'json':
+        return 'i-ph:brackets-curly-duotone text-green-400';
+      case 'md':
+      case 'markdown':
+        return 'i-ph:file-text-duotone text-blue-300';
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif':
+      case 'svg':
+        return 'i-ph:image-duotone text-pink-400';
+      default:
+        return 'i-ph:file-duotone text-gray-400';
+    }
+  }, [name]);
+
   return (
     <FileContextMenu onCopyPath={onCopyPath} onCopyRelativePath={onCopyRelativePath}>
       <NodeButton
-        className={classNames('group', {
+        className={classNames('group rounded-md transition-colors duration-100', {
           'bg-transparent hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-item-contentDefault':
             !selected,
           'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent': selected,
         })}
         depth={depth}
-        iconClasses={classNames('i-ph:file-duotone scale-98', {
+        iconClasses={classNames(fileIcon, {
           'group-hover:text-bolt-elements-item-contentActive': !selected,
         })}
         onClick={onClick}
@@ -296,22 +335,24 @@ function File({
 interface ButtonProps {
   depth: number;
   iconClasses: string;
+  caretClasses?: string;
   children: ReactNode;
   className?: string;
   onClick?: () => void;
 }
 
-function NodeButton({ depth, iconClasses, onClick, className, children }: ButtonProps) {
+function NodeButton({ depth, iconClasses, caretClasses, onClick, className, children }: ButtonProps) {
   return (
     <button
       className={classNames(
-        'flex items-center gap-1.5 w-full pr-2 border-2 border-transparent text-faded py-0.5',
+        'flex items-center gap-1 w-full pr-2 border-transparent py-1 my-0.5 hover:shadow-sm',
         className
       )}
-      style={{ paddingLeft: `${6 + depth * NODE_PADDING_LEFT}px` }}
+      style={{ paddingLeft: `${8 + depth * NODE_PADDING_LEFT}px` }}
       onClick={() => onClick?.()}
     >
-      <div className={classNames('scale-120 shrink-0', iconClasses)}></div>
+      {caretClasses && <div className={classNames('shrink-0', caretClasses)}></div>}
+      <div className={classNames('shrink-0', iconClasses)}></div>
       <div className="truncate w-full text-left">{children}</div>
     </button>
   );

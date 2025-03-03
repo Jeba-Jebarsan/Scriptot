@@ -42,16 +42,18 @@ const sliderOptions: SliderOptions<WorkbenchViewType> = {
 const workbenchVariants = {
   closed: {
     width: 0,
+    opacity: 0,
     transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
+      width: { duration: 0.2, ease: cubicEasingFn },
+      opacity: { duration: 0.15, ease: cubicEasingFn }
     },
   },
   open: {
     width: 'var(--workbench-width)',
+    opacity: 1,
     transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
+      width: { duration: 0.2, ease: cubicEasingFn },
+      opacity: { duration: 0.25, ease: cubicEasingFn, delay: 0.05 }
     },
   },
 } satisfies Variants;
@@ -143,14 +145,14 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
           )}
         >
           <div className="absolute inset-0 px-2 lg:px-6">
-            <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
-              <div className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor">
+            <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-lg rounded-lg overflow-hidden backdrop-blur-sm">
+              <div className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor bg-gradient-to-r from-bolt-elements-background-depth-2 to-bolt-elements-background-depth-3">
                 <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
                 <div className="ml-auto" />
                 {selectedView === 'code' && (
                   <div className="flex overflow-x-auto">
                     <PanelHeaderButton
-                      className="mr-1 text-sm"
+                      className="mr-1 text-sm hover:bg-blue-500/10 transition-colors"
                       onClick={() => {
                         workbenchStore.downloadZip();
                       }}
@@ -158,12 +160,23 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       <div className="i-ph:code text-blue-500" />
                       <span className="hidden sm:inline">Download Code</span>
                     </PanelHeaderButton>
-                    <PanelHeaderButton className="mr-1 text-sm" onClick={handleSyncFiles} disabled={isSyncing}>
-                      {isSyncing ? <div className="i-ph:spinner text-blue-500" /> : <div className="i-ph:cloud-arrow-down text-blue-500" />}
+                    <PanelHeaderButton 
+                      className={classNames(
+                        "mr-1 text-sm transition-colors",
+                        isSyncing ? "opacity-70" : "hover:bg-blue-500/10"
+                      )} 
+                      onClick={handleSyncFiles} 
+                      disabled={isSyncing}
+                    >
+                      {isSyncing ? (
+                        <div className="i-ph:spinner animate-spin text-blue-500" />
+                      ) : (
+                        <div className="i-ph:cloud-arrow-down text-blue-500" />
+                      )}
                       <span className="hidden sm:inline">{isSyncing ? 'Syncing...' : 'Sync Files'}</span>
                     </PanelHeaderButton>
                     <PanelHeaderButton
-                      className="mr-1 text-sm"
+                      className="mr-1 text-sm hover:bg-blue-500/10 transition-colors"
                       onClick={() => {
                         workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
                       }}
@@ -172,7 +185,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                       <span className="hidden sm:inline">Toggle Terminal</span>
                     </PanelHeaderButton>
                     <PanelHeaderButton
-                      className="mr-1 text-sm"
+                      className="mr-1 text-sm hover:bg-blue-500/10 transition-colors"
                       onClick={() => setShowGitHubModal(true)}
                     >
                       <div className="i-ph:github-logo text-blue-500" />
@@ -182,7 +195,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
                 )}
                 <IconButton
                   icon="i-ph:x-circle"
-                  className="-mr-1"
+                  className="-mr-1 hover:text-red-400 transition-colors"
                   size="xl"
                   onClick={() => {
                     workbenchStore.showWorkbench.set(false);
@@ -226,6 +239,7 @@ export const Workbench = memo(({ chatStarted, isStreaming }: WorkspaceProps) => 
     )
   );
 });
+
 interface ViewProps extends HTMLMotionProps<'div'> {
   children: JSX.Element;
 }

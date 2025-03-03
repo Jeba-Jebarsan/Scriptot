@@ -1,8 +1,16 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { cleanStackTrace } from '~/utils/stacktrace';
 
 const PREVIEW_CHANNEL = 'preview-updates';
+
+// Helper function to clean WebContainer ID
+function cleanWebContainerId(id: string): string {
+  // Extract the base ID without port and hash
+  const baseId = id.split('--')[0];
+  return baseId;
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const previewId = params.id;
@@ -19,6 +27,7 @@ export default function WebContainerPreview() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const broadcastChannelRef = useRef<BroadcastChannel>();
   const [previewUrl, setPreviewUrl] = useState('');
+  const [displayUrl, setDisplayUrl] = useState('');
 
   // Handle preview refresh
   const handleRefresh = useCallback(() => {
@@ -58,9 +67,43 @@ export default function WebContainerPreview() {
       }
     };
 
+    // Clean the WebContainer ID
+    const cleanId = cleanWebContainerId(previewId);
+
     // Construct the WebContainer preview URL
-    const url = `https://${previewId}.local-credentialless.webcontainer-api.io`;
+    // Support both URL formats - local-credentialless and local-corp
+    const isCorpFormat = previewId.includes('-');
+    const url = isCorpFormat 
+      ? `https://${previewId}.local-corp.webcontainer-api.io`
+      : `https://${previewId}.local-credentialless.webcontainer-api.io`;
+    
+    // Extract port number from URL if available
+    let port = '';
+    if (isCorpFormat) {
+      const portMatch = previewId.match(/--(\d+)--/);
+      port = portMatch ? `:${portMatch[1]}` : '';
+    }
+    
+    // Set the actual URL for the iframe
     setPreviewUrl(url);
+    
+    // Set a cleaner display URL with cleaned ID - domain at the end
+    const cleanUrl = `https://${cleanId}${port}.deepgen.dev`;
+    setDisplayUrl(cleanUrl);
+    
+    // Update the browser's address bar without navigation
+    if (window.history && window.history.replaceState) {
+      try {
+        const originalUrl = window.location.href;
+        window.history.replaceState({ originalUrl }, '', cleanUrl);
+        
+        return () => {
+          window.history.replaceState({}, '', originalUrl);
+        };
+      } catch (error) {
+        console.error('Failed to update URL:', error);
+      }
+    }
 
     // Set the iframe src
     if (iframeRef.current) {
@@ -76,8 +119,36 @@ export default function WebContainerPreview() {
     };
   }, [previewId, handleRefresh, notifyPreviewReady]);
 
+  // Override console.error to clean WebContainer URLs from stack traces
+  useEffect(() => {
+    const originalConsoleError = console.error;
+    
+    console.error = (...args) => {
+      const cleanedArgs = args.map(arg => {
+        if (typeof arg === 'string' && (
+            arg.includes('webcontainer-api.io') || 
+            arg.includes('local-corp.webcontainer-api.io')
+          )) {
+          return cleanStackTrace(arg);
+        }
+        return arg;
+      });
+      
+      originalConsoleError(...cleanedArgs);
+    };
+    
+    return () => {
+      console.error = originalConsoleError;
+    };
+  }, []);
+
   return (
     <div className="w-full h-full">
+      {displayUrl && (
+        <div className="absolute top-0 left-0 right-0 bg-bolt-elements-background-depth-2 p-2 text-center text-bolt-elements-textSecondary text-sm z-10">
+          {displayUrl}
+        </div>
+      )}
       <iframe
         ref={iframeRef}
         title="WebContainer Preview"

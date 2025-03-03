@@ -14,7 +14,7 @@ export function DeploymentAction({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [projectName, setProjectName] = useState('friendly-purchasehub');
+  const [projectName, setProjectName] = useState('project-deepgen');
   const [isDeploying, setIsDeploying] = useState(false);
   const [isProjectCreated, setIsProjectCreated] = useState(false);
   const [deploymentUrl, setDeploymentUrl] = useState<string | null>(null);
@@ -161,7 +161,7 @@ export function DeploymentAction({
               </label>
               <input
                 type="text"
-                placeholder="friendly-purchasehub"
+                placeholder="project-deepgen"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
                 className="w-full p-2 bg-bolt-elements-bg-depth-1 border border-bolt-elements-borderColor rounded"

@@ -44,15 +44,29 @@ export const Preview = memo(() => {
     if (!activePreview) {
       setUrl('');
       setIframeUrl(undefined);
-
       return;
     }
 
     const { baseUrl } = activePreview;
-    setUrl(baseUrl);
-    setIframeUrl(baseUrl);
+    
+    // Extract project identifier from the WebContainer URL
+    const projectId = baseUrl.split('.')[0].split('//')[1];
+    
+    // Extract port if available
+    let port = '';
+    const portMatch = baseUrl.match(/--(\d+)--/);
+    if (portMatch) {
+      port = `:${portMatch[1]}`;
+    }
+    
+    // Create a clean display URL with domain at the end
+    const displayUrl = `https://${projectId}${port}.deepgen.dev`;
+    
+    setUrl(displayUrl);
+    setIframeUrl(baseUrl); // Keep the actual WebContainer URL for iframe
   }, [activePreview]);
 
+  // Update validateUrl to handle the new URL format
   const validateUrl = useCallback(
     (value: string) => {
       if (!activePreview) {
@@ -60,7 +74,23 @@ export const Preview = memo(() => {
       }
 
       const { baseUrl } = activePreview;
+      const projectId = baseUrl.split('.')[0].split('//')[1];
+      
+      let port = '';
+      const portMatch = baseUrl.match(/--(\d+)--/);
+      if (portMatch) {
+        port = `:${portMatch[1]}`;
+      }
+      
+      const displayUrl = `https://${projectId}${port}.deepgen.dev`;
+      
+      if (value === displayUrl) {
+        return true;
+      } else if (value.startsWith(displayUrl)) {
+        return ['/', '?', '#'].includes(value.charAt(displayUrl.length));
+      }
 
+      // Also allow the actual WebContainer URL for compatibility
       if (value === baseUrl) {
         return true;
       } else if (value.startsWith(baseUrl)) {
@@ -257,90 +287,70 @@ export const Preview = memo(() => {
     >
       <div
         style={{
-          color: 'rgba(0,0,0,0.5)',
+          color: 'rgba(255,255,255,0.7)',
           fontSize: '10px',
           lineHeight: '5px',
           userSelect: 'none',
           marginLeft: '1px',
         }}
       >
-        ••• •••
+        ⋮ ⋮ ⋮
       </div>
     </div>
   );
 
   const PreviewLoader = () => {
-    const loadingSteps = [
-      { text: 'Initializing environment', icon: '🚀' },
-      { text: 'Setting up dependencies', icon: '⚙️' },
-      { text: 'Starting development server', icon: '🔄' }
-    ];
-
     return (
-      <div className="flex flex-col w-full h-full justify-center items-center bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+      <div className="flex flex-col w-full h-full justify-center items-center bg-gradient-to-br from-gray-800 to-gray-950 dark:from-gray-900 dark:to-black relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <div className="absolute w-full h-full">
-            {[...Array(3)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className={`absolute w-[200px] h-[200px] rounded-full mix-blend-multiply filter blur-xl animate-orbit-${i + 1}`}
+                className="absolute rounded-full opacity-20 animate-pulse"
                 style={{
-                  background: `radial-gradient(circle, var(--bolt-elements-loader-progress) 0%, transparent 70%)`,
-                  opacity: 0.15,
+                  width: `${Math.random() * 300 + 100}px`,
+                  height: `${Math.random() * 300 + 100}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  background: `radial-gradient(circle, rgba(99,102,241,0.8) 0%, rgba(99,102,241,0.1) 70%)`,
+                  animationDuration: `${Math.random() * 4 + 3}s`,
+                  transform: 'translate(-50%, -50%)',
                 }}
               />
             ))}
           </div>
         </div>
 
-        {/* Text content with animations */}
-        <div className="relative flex flex-col items-center gap-3 z-10">
-          <h3 className="text-xl font-medium text-bolt-elements-textPrimary animate-fade-in mb-8">
-            Building preview
-          </h3>
-          <div className="flex flex-col items-center gap-4">
-            {loadingSteps.map((step, index) => (
-              <div
-                key={step.text}
-                className="flex items-center gap-3 animate-slide-up"
-                style={{
-                  animationDelay: `${index * 0.3}s`,
-                  transform: 'translateY(20px)',
-                  opacity: 0,
-                  animation: `
-                    slideUp 0.5s ease-out ${index * 0.3}s forwards,
-                    glow 2s ease-in-out ${index * 0.3}s infinite
-                  `
-                }}
-              >
-                <span className="animate-bounce text-xl" style={{ animationDelay: `${index * 0.3}s` }}>
-                  {step.icon}
-                </span>
-                <p className="text-sm text-bolt-elements-textTertiary tracking-wide">
-                  {step.text}
-                </p>
-              </div>
-            ))}
+        {/* Loading spinner */}
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          
+          <div className="flex flex-col items-center">
+            <h3 className="text-xl font-medium text-white mb-2">
+              Loading Preview
+            </h3>
+            <p className="text-indigo-300 text-sm max-w-xs text-center">
+              Setting up your development environment and preparing your preview
+            </p>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-64 h-1.5 bg-gray-700 rounded-full overflow-hidden mt-4">
+            <div className="h-full bg-indigo-500 rounded-full animate-progress-bar"></div>
           </div>
         </div>
 
         <style jsx>{`
-          @keyframes slideUp {
-            from {
-              transform: translateY(20px);
-              opacity: 0;
-            }
-            to {
-              transform: translateY(0);
-              opacity: 1;
-            }
-          }
-
-          @keyframes glow {
-            0% { text-shadow: 0 0 0 rgba(255,255,255,0); }
-            50% { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
-            100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+          @keyframes progress-bar {
+            0% { width: 0%; }
+            20% { width: 20%; }
+            40% { width: 40%; }
+            60% { width: 60%; }
+            80% { width: 80%; }
+            95% { width: 95%; }
+            100% { width: 95%; }
           }
         `}</style>
       </div>
@@ -348,27 +358,30 @@ export const Preview = memo(() => {
   };
 
   return (
-    <div ref={containerRef} className="w-full h-full flex flex-col relative">
+    <div ref={containerRef} className="w-full h-full flex flex-col relative bg-gray-900">
       {isPortDropdownOpen && (
         <div className="z-iframe-overlay w-full h-full absolute" onClick={() => setIsPortDropdownOpen(false)} />
       )}
-      <div className="bg-bolt-elements-background-depth-2 p-2 flex items-center gap-1.5">
-        <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} />
+      <div className="bg-gray-800 p-2 flex items-center gap-1.5">
+        <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} className="text-gray-300 hover:text-white hover:bg-gray-700" />
         <IconButton
           icon="i-ph:selection"
           onClick={() => setIsSelectionMode(!isSelectionMode)}
-          className={isSelectionMode ? 'bg-bolt-elements-background-depth-3' : ''}
+          className={isSelectionMode ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-700'}
         />
         <div
-          className="flex items-center gap-1 flex-grow bg-bolt-elements-preview-addressBar-background border border-bolt-elements-borderColor text-bolt-elements-preview-addressBar-text rounded-full px-3 py-1 text-sm hover:bg-bolt-elements-preview-addressBar-backgroundHover hover:focus-within:bg-bolt-elements-preview-addressBar-backgroundActive focus-within:bg-bolt-elements-preview-addressBar-backgroundActive
-        focus-within-border-bolt-elements-borderColorActive focus-within:text-bolt-elements-preview-addressBar-textActive"
+          className="flex items-center gap-2 flex-grow bg-gray-900 border border-gray-700 text-gray-300 rounded-md px-3 py-1.5 text-sm hover:border-gray-600 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 focus-within:text-white transition-all duration-200"
         >
+          <span className="text-indigo-400 text-xs">
+            <i className="i-ph:globe-simple w-4 h-4"></i>
+          </span>
           <input
             title="URL"
             ref={inputRef}
-            className="w-full bg-transparent outline-none"
+            className="w-full bg-transparent outline-none placeholder-gray-500"
             type="text"
             value={url}
+            placeholder="Loading URL..."
             onChange={(event) => {
               setUrl(event.target.value);
             }}
@@ -382,6 +395,20 @@ export const Preview = memo(() => {
               }
             }}
           />
+          <button 
+            className="text-gray-400 hover:text-white transition-colors"
+            onClick={() => {
+              if (validateUrl(url)) {
+                setIframeUrl(url);
+                if (inputRef.current) {
+                  inputRef.current.blur();
+                }
+              }
+            }}
+            title="Go to URL"
+          >
+            <i className="i-ph:arrow-right w-4 h-4"></i>
+          </button>
         </div>
 
         {previews.length > 1 && (
@@ -400,6 +427,7 @@ export const Preview = memo(() => {
           icon="i-ph:devices"
           onClick={toggleDeviceMode}
           title={isDeviceModeOn ? 'Switch to Responsive Mode' : 'Switch to Device Mode'}
+          className={isDeviceModeOn ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:text-white hover:bg-gray-700'}
         />
 
         {/* Fullscreen toggle button */}
@@ -407,10 +435,11 @@ export const Preview = memo(() => {
           icon={isFullscreen ? 'i-ph:arrows-in' : 'i-ph:arrows-out'}
           onClick={toggleFullscreen}
           title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+          className="text-gray-300 hover:text-white hover:bg-gray-700"
         />
       </div>
 
-      <div className="flex-1 border-t border-bolt-elements-borderColor flex justify-center items-center overflow-auto">
+      <div className="flex-1 border-t border-gray-700 flex justify-center items-center overflow-auto bg-gray-800">
         <div
           style={{
             width: isDeviceModeOn ? `${widthPercent}%` : '100%',
@@ -419,6 +448,7 @@ export const Preview = memo(() => {
             background: '#fff',
             position: 'relative',
             display: 'flex',
+            boxShadow: isDeviceModeOn ? '0 0 20px rgba(0,0,0,0.3)' : 'none',
           }}
         >
           {activePreview ? (
@@ -454,15 +484,16 @@ export const Preview = memo(() => {
                   marginLeft: '-15px',
                   height: '100%',
                   cursor: 'ew-resize',
-                  background: 'rgba(255,255,255,.2)',
+                  background: 'rgba(79, 70, 229, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'background 0.2s',
                   userSelect: 'none',
+                  borderRadius: '4px 0 0 4px',
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.5)')}
-                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.2)')}
+                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(79, 70, 229, 0.6)')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(79, 70, 229, 0.3)')}
                 title="Drag to resize width"
               >
                 <GripIcon />
@@ -480,15 +511,16 @@ export const Preview = memo(() => {
                   marginRight: '-15px',
                   height: '100%',
                   cursor: 'ew-resize',
-                  background: 'rgba(255,255,255,.2)',
+                  background: 'rgba(79, 70, 229, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   transition: 'background 0.2s',
                   userSelect: 'none',
+                  borderRadius: '0 4px 4px 0',
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.5)')}
-                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.2)')}
+                onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(79, 70, 229, 0.6)')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(79, 70, 229, 0.3)')}
                 title="Drag to resize width"
               >
                 <GripIcon />

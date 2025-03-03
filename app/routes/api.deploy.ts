@@ -21,7 +21,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // If no siteId provided, create a new site
     if (!targetSiteId) {
-      const siteName = `Deepgen-${chatId}-${Date.now()}`;
+      // Update the site name format to have deepgen at the end
+      const siteName = `${chatId}-${Date.now()}-deepgen`;
       const createSiteResponse = await fetch('https://api.netlify.com/api/v1/sites', {
         method: 'POST',
         headers: {
@@ -70,7 +71,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
       // If no siteId provided or site doesn't exist, create a new site
       if (!targetSiteId) {
-        const siteName = `Deepgen-${chatId}-${Date.now()}`;
+        // Update the site name format to have deepgen at the end
+        const siteName = `${chatId}-${Date.now()}-deepgen`;
         const createSiteResponse = await fetch('https://api.netlify.com/api/v1/sites', {
           method: 'POST',
           headers: {

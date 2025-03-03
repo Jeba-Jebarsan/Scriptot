@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import {
   CodeMirrorEditor,
@@ -52,6 +52,8 @@ export const EditorPanel = memo(
     onFileReset,
   }: EditorPanelProps) => {
     renderLogger.trace('EditorPanel');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchFocused, setSearchFocused] = useState(false);
 
     const theme = useStore(themeStore);
     const showTerminal = useStore(workbenchStore.showTerminal);
@@ -68,19 +70,50 @@ export const EditorPanel = memo(
       return editorDocument !== undefined && unsavedFiles?.has(editorDocument.filePath);
     }, [editorDocument, unsavedFiles]);
 
+    // Filter files based on search query
+    const filteredFiles = useMemo(() => {
+      if (!searchQuery.trim() || !files) return files;
+      
+      const result: FileMap = {};
+      const query = searchQuery.toLowerCase();
+      
+      for (const [path, file] of Object.entries(files)) {
+        const fileName = path.split('/').pop()?.toLowerCase() || '';
+        if (fileName.includes(query)) {
+          result[path] = file;
+        }
+      }
+      
+      return result;
+    }, [files, searchQuery]);
+
     return (
       <PanelGroup direction="vertical">
         <Panel defaultSize={showTerminal ? DEFAULT_EDITOR_SIZE : 100} minSize={20}>
           <PanelGroup direction="horizontal">
             <Panel defaultSize={20} minSize={10} collapsible>
               <div className="flex flex-col border-r border-bolt-elements-borderColor h-full">
-                <PanelHeader>
-                  <div className="i-ph:tree-structure-duotone shrink-0" />
-                  Files
+                <PanelHeader className="flex items-center">
+                  <div className="relative w-full">
+                    <div className={`relative flex items-center transition-all duration-200 ${searchFocused ? 'scale-105' : ''}`}>
+                      <div className={`absolute left-2.5 transition-all duration-200 ${searchFocused ? 'text-bolt-elements-focus' : 'text-bolt-elements-textSecondary'}`}>
+                        <div className="i-ph:magnifying-glass text-sm" />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search files..."
+                        className="w-full py-2 pl-9 pr-3 text-xs bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor rounded-lg focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus focus:border-transparent shadow-lg transition-all duration-200"
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery}
+                        onFocus={() => setSearchFocused(true)}
+                        onBlur={() => setSearchFocused(false)}
+                      />
+                    </div>
+                  </div>
                 </PanelHeader>
                 <FileTree
                   className="h-full"
-                  files={files}
+                  files={filteredFiles}
                   hideRoot
                   unsavedFiles={unsavedFiles}
                   rootFolder={WORK_DIR}
