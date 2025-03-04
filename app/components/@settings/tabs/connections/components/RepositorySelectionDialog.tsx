@@ -494,7 +494,7 @@ export function RepositorySelectionDialog({ isOpen, onClose, onSelect }: Reposit
         return;
       }
     } else {
-      toast.error('Please select a repository');
+      toast.error('Please select a repository.');
       return;
     }
   };
