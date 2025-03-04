@@ -490,7 +490,7 @@ export function RepositorySelectionDialog({ isOpen, onClose, onSelect }: Reposit
         setShowStatsDialog(true);
         return; // Don't proceed with import yet
       } else {
-        toast.error('Failed to verify repository');
+        toast.error('Failed to verify repository.');
         return;
       }
     } else {
